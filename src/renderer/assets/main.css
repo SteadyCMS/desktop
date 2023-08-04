@@ -1,6 +1,6 @@
-/* npx tailwindcss -i ./src/assets/input.css -o ./src/assets/main.css --watch */
-
-/* ! tailwindcss v3.3.3 | MIT License | https://tailwindcss.com */
+/*
+! tailwindcss v3.3.3 | MIT License | https://tailwindcss.com
+*/
 
 /*
 1. Prevent padding and border from affecting element width. (https://github.com/mozdevs/cssremedy/issues/4)
@@ -649,10 +649,6 @@ video {
   margin-top: 1rem;
 }
 
-.ml-4 {
-  margin-left: 1rem;
-}
-
 .block {
   display: block;
 }
@@ -671,10 +667,6 @@ video {
 
 .h-5 {
   height: 1.25rem;
-}
-
-.h-60 {
-  height: 15rem;
 }
 
 .h-full {
@@ -723,10 +715,6 @@ video {
 
 .flex-col {
   flex-direction: column;
-}
-
-.flex-wrap {
-  flex-wrap: wrap;
 }
 
 .items-center {
@@ -1044,8 +1032,3 @@ body {
 .group:hover .group-hover\:visible {
   visibility: visible;
 }
-
-
-
-
-

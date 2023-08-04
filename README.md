@@ -24,6 +24,16 @@ npm install
 npm run dev
 ```
 
+### Rebuilding tailwindcss
+
+```bash
+cd src/renderer
+```
+
+```bash
+npx tailwindcss -i ./assets/source.css -o ./assets/main.css --watch
+```
+
 
 ## Additional Commands
 
