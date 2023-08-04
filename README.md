@@ -4,6 +4,8 @@ The desktop app for SteadyCMS — a block-based, Hugo static site CMS for deskto
 
 This repository contains the source for the desktop application built with Vue 3 and Electron. 
 
+Status: **Highly work in progress. Not yet ready for use.**
+
 
 ## Roadmap
 
