@@ -1,5 +1,5 @@
 <script setup>
-import BlockEditor from './components/BlockEditor.vue'
+import BlockEditorView from './components/BlockEditorView.vue'
 
 
 window.electronAPI.sendMessage('Hello from App.vue');
@@ -19,7 +19,7 @@ window.electronAPI.sendMessage('Hello from App.vue');
 
 <template>
 <main>
-  <BlockEditor />
+  <BlockEditorView />
 </main>
 </template>
 
