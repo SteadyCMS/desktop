@@ -193,6 +193,27 @@ function addNewBlock(array, value, name) {
         const html = converter.makeHtml(markdown);
     return html;
     }
+
+
+//     var data = {
+//       name: "cliff",
+//       age: "34",
+//       name: "ted",
+//       age: "42",
+//       name: "bob",
+//       age: "12"
+//     }
+
+// var jsonData = JSON.stringify(data);
+
+// var fs = require('fs');
+// fs.writeFile("test.txt", jsonData, function(err) {
+//     if (err) {
+//         console.log(err);
+//     }
+// });
+
+
 // Properties to be passed in for main blocks
 function currentblockproperties(_item) {
     let blockProperties = {};
@@ -292,8 +313,25 @@ function currentblockBarproperties(_item) {
         )
     })
 
-
 // this.$refs['sample-ref-1']
+
+
+// Convert to .json & .markdown
+function saveAsDraft(){
+
+blocks
+
+
+}
+
+
+
+
+
+
+
+
+
 </script>
 
 <template>
@@ -374,7 +412,13 @@ function currentblockBarproperties(_item) {
 </drop-list>
    
 <div class="w-1/3 flex flex-col h-screen">
-<div class="h-10"></div>    
+<div class="h-10">
+
+<button @click="saveAsDraft">Save as Draft</button> <!-- Convert to .json & .markdown-->
+<button @click="makeSitePreview">Preview</button> <!-- Do "Save as Draft" + run hugo and show -->
+<button @click="publishSite">Publish</button> <!-- All above + Push to server -->
+
+</div>    
 <div class="border-2 border-slate-200 rounded h-full">
 </div>
 </div>
