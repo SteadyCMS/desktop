@@ -1,0 +1,23 @@
+/* npx tailwindcss -i ./src/assets/input.css -o ./src/assets/main.css --watch */
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+
+body {
+    @apply font-sans;
+}
+
+
+
+
+.ql-container {
+    font-size: 1.2rem !important; 
+    @apply text-slate-800;
+}
+
+
+
+
+
