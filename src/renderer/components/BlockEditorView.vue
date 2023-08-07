@@ -2,7 +2,9 @@
   import {Drag, DropList} from "vue-easy-dnd";
   import { ref, computed } from 'vue';
   import TurndownService from 'turndown';
-  import Showdown from 'showdown';
+  //import Showdown from 'showdown';
+
+
   
   // blocks
   import textEditor from './blocks/textEditor.vue';
@@ -56,7 +58,8 @@
     },
   ]);
 
-  let blockTypes = ref([
+
+  const blockTypes = ref([
     {
       name: "heading",
       icon: "_",
@@ -98,8 +101,18 @@
     "image": image,
   };
 
-  // Save to Json in markdown blocks (loop and copy all to .markdown file for website builder)
-  // read the json into web blocks
+
+// Load in blocks and data from json on start if they exsist
+  (async () => {
+  const exists = await window.electronAPI.doesFileExist("websites\\my-new-website\\content\\posts\\my-blog-post.json")
+  window.electronAPI.sendMessage(exists);
+  if(exists){
+    const rawData = await window.electronAPI.readFile("websites\\my-new-website\\content\\posts\\my-blog-post.json")
+    const data = JSON.parse(rawData);
+    blocks.value = data['data']
+  }
+})();
+
 
   function addNewBlock(array, value, name) {
     let index = array.indexOf(value);
@@ -155,7 +168,7 @@
   function focusEditor(array, value, activeType) {
     if (!overTopbar) {
       if (activeType == "click") {
-        console.log("ON CLICK")
+       // console.log("ON CLICK")
         for (let i = 0; i < array.length; i++) {
           array[i].active = false;
         } 
@@ -163,18 +176,14 @@
         array[index].active = true;
 
       } else if (activeType == "out") {
-        console.log("ON OUT")
+        //console.log("ON OUT")
         for (let i = 0; i < array.length; i++) {
           array[i].active = false;
         } 
       }
-      console.log("ON");
+    //  console.log("ON");
     }
 
-    // console.log(htmlToMarkdown(markdownToHtml(value.content)))
-    // console.log(markdownToHtml(value.content))
-    // TODO disable all blocks not in uses
-    // show buttons and border on active one
   }
 
   function htmlToMarkdown(html) {
@@ -183,76 +192,11 @@
     return markdown;
   }
 
-  function markdownToHtml(markdown) {
-    const converter = new Showdown.Converter();
-    const html = converter.makeHtml(markdown);
-    return html;
-  }
-
-//     var data = {
-//       name: "cliff",
-//       age: "34",
-//       name: "ted",
-//       age: "42",
-//       name: "bob",
-//       age: "12"
-//     }
-
-// var jsonData = JSON.stringify(data);
-
-// var fs = require('fs');
-// fs.writeFile("test.txt", jsonData, function(err) {
-//     if (err) {
-//         console.log(err);
-//     }
-// });
-
-
-  // Properties to be passed in for main blocks
-  function currentblockproperties(_item) {
-    let blockProperties = {};
-
-    switch(_item.type) {
-      case "paragraph":
-        blockProperties = { item: _item };
-        break;
-      case "heading":
-        blockProperties = { item: _item };
-        break;
-      case "list":
-        blockProperties = { item: _item };
-        break;
-      case "image":
-        blockProperties = { item: _item };
-        break;
-      default:
-        blockProperties = { item: _item };
-    } 
-    return blockProperties;
-  }
-
-  // Properties to be passed in for blocks top bar
-  function currentblockBarproperties(_item) {
-    let blockProperties = {};
-
-    switch(_item.type) {
-      case "paragraph":
-        blockProperties = { item: _item };
-        break;
-      case "heading":
-        blockProperties = { item: _item };
-        break;
-      case "list":
-        blockProperties = { item: _item };
-        break;
-      case "image":
-        blockProperties = { item: _item };
-        break;
-      default:
-        blockProperties = { item: _item };
-    } 
-    return blockProperties;
-  }
+  // function markdownToHtml(markdown) {
+  //   const converter = new Showdown.Converter();
+  //   const html = converter.makeHtml(markdown);
+  //   return html;
+  // }
 
   function changeHeaderSize(size, value) {
     value.headingType = size;
@@ -301,14 +245,110 @@
     )
   })
 
-  // this.$refs['sample-ref-1']
 
+  // Properties to be passed in for main blocks
+  function currentblockproperties(_item) {
+    let blockProperties = {};
+
+    switch(_item.type) {
+      case "paragraph":
+        blockProperties = { item: _item };
+        break;
+      case "heading":
+        blockProperties = { item: _item };
+        break;
+      case "list":
+        blockProperties = { item: _item };
+        break;
+      case "image":
+        blockProperties = { item: _item };
+        break;
+      default:
+        blockProperties = { item: _item };
+    } 
+    return blockProperties;
+  }
+
+  // Properties to be passed in for blocks top bar
+  function currentblockBarproperties(_item) {
+    let blockProperties = {};
+
+    switch(_item.type) {
+      case "paragraph":
+        blockProperties = { item: _item };
+        break;
+      case "heading":
+        blockProperties = { item: _item };
+        break;
+      case "list":
+        blockProperties = { item: _item };
+        break;
+      case "image":
+        blockProperties = { item: _item };
+        break;
+      default:
+        blockProperties = { item: _item };
+    } 
+    return blockProperties;
+  }
 
   // Convert to .json & .markdown
   function saveAsDraft() {
-    blocks
+     let blocksData = blocks['_rawValue'];
+    
+    let jsonData = JSON.stringify(blocks['_rawValue'], null, 4);
+    window.electronAPI.writeToFile('{"data": ' + jsonData + '}', "websites\\my-new-website\\content\\post", "my-blog-post.json");
+
+
+    var data = '---\r\ndate: 2017-04-09T10:58:08-04:00\r\ndescription: "The Grand Hall"\r\nfeatured_image: "/images/Pope-Edouard-de-Beaumont-1844.jpg"\r\ntags: ["scene"]\r\ntitle: "Chapter I: The Grand Hall"\r\n---\r\n';
+    for (let i = 0; i < blocksData.length; i++) {
+
+      switch(blocksData[i].type) {
+      case "paragraph":
+      data = data + "\n\n" + htmlToMarkdown(blocksData[i].content);
+        break;
+      case "heading":
+        let ht =  blocksData[i].headingType + ">";
+        data = data + "\n\n" + htmlToMarkdown( "<" + ht + blocksData[i].content + "</" + ht);
+        break;
+      case "list":
+        data = data + "\n\n" + htmlToMarkdown(blocksData[i].content);
+        break;
+      case "image":
+        
+        break;
+      default:
+        data = data + "\n\n" + htmlToMarkdown(blocksData[i].content);
+    }
+
+      //  window.electronAPI.sendMessage(blocksData[i].type);
+    } 
+    
+    window.electronAPI.writeToFile(data, "websites\\my-new-website\\content\\post", "my-blog-post.markdown");
   }
 
+function makeSitePreview(){
+
+
+
+
+}
+
+
+function publishSite(){
+
+  // 1. [init hugo] like
+ // window.electronAPI.runHugo(['new', 'site', 'C:/Users/sundr/Documents/Projects/desktop/build/main/data/websites/my-new-website']);
+  // 2. add theme they picked TODO (or git submodule add https://github.com/theNewDynamic/gohugo-theme-ananke.git themes/ananke) (MUST have git)
+  // 3. set hugo.toml TODO (or echo "theme = 'ananke'" >> hugo.toml)
+  //let hugoToml = "baseURL = 'http://example.org/'\r\nlanguageCode = 'en-us'\r\ntitle = 'My New Hugo Site'\r\ntheme='stackt'"
+  //window.electronAPI.writeToFile(hugoToml, "websites\\my-new-website", "hugo.toml");
+  // 4. hugo server
+  window.electronAPI.runHugo(['server', '-s', 'C:/Users/sundr/Documents/Projects/desktop/build/main/data/websites/my-new-website']);
+  // 5. open in browser  http://localhost:1313
+
+ window.electronAPI.openInBrowser('http://localhost:1313/post/my-blog-post');
+}
 
 </script>
 
@@ -359,7 +399,7 @@
                   <div class="w-full h-full flex flex-col m-2 overflow-scroll">
                       <div v-for="(blockItems, i) in filteredBlocks" :key="i">
                         <span class="w-full flex flex-row" @click="addNewBlock(blocks, item, blockItems.name)">
-                          {{ blockItems.icon }}
+                            {{ blockItems.icon }}
                           <span  class="text-base text-slate-600">
                             {{ blockItems.name }}
                           </span>
@@ -384,13 +424,14 @@
      
     <div class="w-1/3 flex flex-col h-screen">
       <div class="h-10">
-    
-        <button @click="saveAsDraft">Save as Draft</button> <!-- Convert to .json & .markdown-->
-        <button @click="makeSitePreview">Preview</button> <!-- Do "Save as Draft" + run hugo and show -->
-        <button @click="publishSite">Publish</button> <!-- All above + Push to server -->
-    
       </div>    
       <div class="border-2 border-slate-200 rounded h-full">
+
+        
+        <button class="bg-blue-500 rounded p-2 m-2 text-white" @click="saveAsDraft">Save as Draft</button> <!-- Convert to .json & .markdown-->
+        <button class="bg-blue-500 rounded p-2 m-2 text-white" @click="makeSitePreview">Preview</button> <!-- Do "Save as Draft" + run hugo and show -->
+        <button class="bg-blue-500 rounded p-2 m-2 text-white" @click="publishSite">Publish (temp setup)</button> <!-- All above + Push to server -->
+    
       </div>
     </div>
   

@@ -19,4 +19,9 @@ electron_1.contextBridge.exposeInMainWorld('electronAPI', {
         const data = yield electron_1.ipcRenderer.invoke('readFromFile', path);
         return data;
     }),
+    doesFileExist: (path) => __awaiter(void 0, void 0, void 0, function* () {
+        const data = yield electron_1.ipcRenderer.invoke('doesFileExist', path);
+        return data;
+    }),
+    openInBrowser: (url) => electron_1.ipcRenderer.send('openInBrowser', url),
 });

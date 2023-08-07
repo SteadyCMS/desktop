@@ -13,6 +13,7 @@ const electron_1 = require("electron");
 const path_1 = require("path");
 const fs_1 = require("fs");
 const child_process_1 = require("child_process");
+//import open from 'open';
 function createWindow() {
     const mainWindow = new electron_1.BrowserWindow({
         width: 800,
@@ -55,21 +56,28 @@ electron_1.ipcMain.on('message', (event, message) => {
 });
 // Mine
 electron_1.ipcMain.handle('readFromFile', (event, path) => __awaiter(void 0, void 0, void 0, function* () {
-    const filePath = (0, path_1.join)(electron_1.app.getAppPath(), path);
+    const filePath = (0, path_1.join)(electron_1.app.getAppPath(), "\\data\\" + path);
     const data = (0, fs_1.readFileSync)(filePath);
     return data.toString();
 }));
 // Mine
 electron_1.ipcMain.on('writeToFile', (event, rawData, filePath, fileName) => {
-    (0, fs_1.mkdir)(electron_1.app.getAppPath() + "\\" + filePath, { recursive: true }, (err) => {
-        if (err)
+    (0, fs_1.mkdir)(electron_1.app.getAppPath() + "\\data\\" + filePath, { recursive: true }, (err) => {
+        if (err) {
             throw err;
-    });
-    (0, fs_1.writeFile)(electron_1.app.getAppPath() + "\\" + filePath + "\\" + fileName, rawData, (err) => {
-        if (err)
-            throw err;
+        }
+        else {
+            (0, fs_1.writeFile)(electron_1.app.getAppPath() + "\\data\\" + filePath + "\\" + fileName, rawData, (err) => {
+                if (err)
+                    throw err;
+            });
+        }
     });
 });
+// Mine
+electron_1.ipcMain.handle('doesFileExist', (event, path) => __awaiter(void 0, void 0, void 0, function* () {
+    return (0, fs_1.existsSync)(electron_1.app.getAppPath() + "\\data\\" + path);
+}));
 // mine
 electron_1.ipcMain.on('runHugo', (event, commands) => {
     let fun = function () {
@@ -80,4 +88,9 @@ electron_1.ipcMain.on('runHugo', (event, commands) => {
         });
     };
     fun();
+});
+// Mine
+electron_1.ipcMain.on('openInBrowser', (event, url) => {
+    require('electron').shell.openExternal(url);
+    //open(url);
 });

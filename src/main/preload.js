@@ -9,7 +9,9 @@ contextBridge.exposeInMainWorld('electronAPI', {
   const data = await ipcRenderer.invoke('readFromFile', path)
   return data;
 },
-
-
-
+doesFileExist: async (path) =>  {
+  const data = await ipcRenderer.invoke('doesFileExist', path)
+  return data;
+},
+openInBrowser: (url) => ipcRenderer.send('openInBrowser', url),
 })

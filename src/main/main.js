@@ -1,9 +1,9 @@
 import {app, BrowserWindow, ipcMain, session} from 'electron';
 import {join} from 'path';
 
-import {readFileSync, mkdir, writeFile} from 'fs';
+import {readFileSync, mkdir, writeFile, existsSync} from 'fs';
 import {execFile} from 'child_process';
-
+//import open from 'open';
 
 
 function createWindow () {
@@ -57,21 +57,30 @@ ipcMain.on('message', (event, message) => {
 
 // Mine
 ipcMain.handle('readFromFile',  async (event, path) => {
-  const filePath = join(app.getAppPath(), path);
+  const filePath = join(app.getAppPath(),  "\\data\\" + path);
   const data = readFileSync(filePath);
   return data.toString();
 })
 
+
 // Mine
 ipcMain.on('writeToFile', (event, rawData, filePath, fileName) => {
-  mkdir(app.getAppPath()  + "\\" + filePath, { recursive: true }, (err) => {
-    if (err) throw err;
+  mkdir(app.getAppPath() + "\\data\\" + filePath, { recursive: true }, (err) => {
+    if (err){
+      throw err;
+    } else {
+      writeFile(app.getAppPath() + "\\data\\" + filePath + "\\" + fileName, rawData, (err) => {
+          if (err) throw err;
+        }); 
+    }
   });
-  writeFile(app.getAppPath()  + "\\" + filePath + "\\" + fileName, rawData, (err) => {
-    if (err) throw err;
-  });  
+});
 
+// Mine
+ipcMain.handle('doesFileExist',  async (event, path) => {
+  return existsSync(app.getAppPath() + "\\data\\" + path);
 })
+
 
 // mine
 ipcMain.on('runHugo', (event, commands) => {
@@ -86,6 +95,11 @@ fun();
 })
 
 
+// Mine
+ipcMain.on('openInBrowser', (event, url) => {
+  require('electron').shell.openExternal(url);
+  //open(url);
+});
 
 
 

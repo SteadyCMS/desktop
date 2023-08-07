@@ -27,6 +27,7 @@
   },
   "dependencies": {
     "@vueup/vue-quill": "^1.2.0",
+    "open": "^9.1.0",
     "showdown": "^2.1.0",
     "turndown": "^7.1.2",
     "vue": "^3.2.47",
