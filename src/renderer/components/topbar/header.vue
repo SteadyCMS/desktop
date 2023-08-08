@@ -14,6 +14,7 @@ defineEmits(['sizeChanged'])
 
 <template>
 
+<div class="">
     <button @click="$emit('sizeChanged', 'h1', props.item )" :class="{ 'bg-slate-100': props.item.headingType == 'h1' }"
     class="hover:bg-slate-100 px-1.5 py-1 rounded-md duration-300">
         <h1Icon class="fill-slate-600 w-5 h-5"  :class="{ 'fill-slate-800': props.item.headingType == 'h1' }" />
@@ -43,5 +44,5 @@ defineEmits(['sizeChanged'])
     class="hover:bg-slate-100 px-1.5 py-1 rounded-md duration-300">
         <h6Icon class="fill-slate-600 w-5 h-5" :class="{ 'fill-slate-800': props.item.headingType == 'h6' }"/>
     </button>
-
+</div>
 </template>

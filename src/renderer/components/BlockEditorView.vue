@@ -4,8 +4,6 @@
   import TurndownService from 'turndown';
   //import Showdown from 'showdown';
 
-
-  
   // blocks
   import textEditor from './blocks/textEditor.vue';
   import headerEditor from './blocks/headerEditor.vue';
@@ -24,6 +22,7 @@
   let overTopbar = false;
   let blockButton = false;
   const filterText = ref('');
+  const pageTitle = ref('Untitled');
 
   let blocks = ref([
     {
@@ -102,16 +101,16 @@
   };
 
 
-// Load in blocks and data from json on start if they exsist
-  (async () => {
-  const exists = await window.electronAPI.doesFileExist("websites\\my-new-website\\content\\posts\\my-blog-post.json")
-  window.electronAPI.sendMessage(exists);
-  if(exists){
-    const rawData = await window.electronAPI.readFile("websites\\my-new-website\\content\\posts\\my-blog-post.json")
-    const data = JSON.parse(rawData);
-    blocks.value = data['data']
-  }
-})();
+  // Load in blocks and data from json on start if they exsist
+  //   (async () => {
+  //   const exists = await window.electronAPI.doesFileExist("websites\\my-new-website\\content\\posts\\my-blog-post.json")
+  //   window.electronAPI.sendMessage(exists);
+  //   if(exists){
+  //     const rawData = await window.electronAPI.readFile("websites\\my-new-website\\content\\posts\\my-blog-post.json")
+  //     const data = JSON.parse(rawData);
+  //     blocks.value = data['data']
+  //   }
+  // })();
 
 
   function addNewBlock(array, value, name) {
@@ -144,6 +143,7 @@
   function removeBlock(array, value) {
     let index = array.indexOf(value);
     array.splice(index, 1);
+    overTopbar = false;
   }
 
 
@@ -173,7 +173,9 @@
           array[i].active = false;
         } 
         let index = array.indexOf(value);
-        array[index].active = true;
+        if(index >= 0){
+          array[index].active = true;
+        }
 
       } else if (activeType == "out") {
         //console.log("ON OUT")
@@ -181,14 +183,14 @@
           array[i].active = false;
         } 
       }
-    //  console.log("ON");
+   
     }
 
   }
 
   function htmlToMarkdown(html) {
-    const turndownService = new TurndownService()
-    const markdown = turndownService.turndown(html)
+    const turndownService = new TurndownService();
+    const markdown = turndownService.turndown(html);
     return markdown;
   }
 
@@ -205,7 +207,7 @@
   // Open/Close the add new block box
   function openBlockBox(array, value, activeType) {
     if (activeType == "click") {
-      if(!blockButton) {
+      if (!blockButton) {
         console.log("open")
         let index = array.indexOf(value);
         array[index].menu = true;
@@ -218,20 +220,20 @@
       for (let i = 0; i < array.length; i++) {
         array[i].menu = false;
       } 
-      document.removeEventListener("mouseup", closeBoxOnOut)
+      document.removeEventListener("mouseup", closeBoxOnOut);
       filterText.value = "";
     }
   }
 
   // Close the add new block box (with above)
-  function closeBoxOnOut(e, array, value){
+  function closeBoxOnOut(e, array, value) {
     if (!blockButton) {
       console.log("closed 2")
       for (let i = 0; i < array.length; i++) {
         array[i].menu = false;
       } 
-      document.removeEventListener("mouseup", closeBoxOnOut)
-      focusEditor(array, value, 'out')
+      document.removeEventListener("mouseup", closeBoxOnOut);
+      focusEditor(array, value, 'out');
       filterText.value = "";
     }   
   }
@@ -292,63 +294,71 @@
     return blockProperties;
   }
 
+  /*** Output Funcsions ***/
+
   // Convert to .json & .markdown
   function saveAsDraft() {
-     let blocksData = blocks['_rawValue'];
+
+    saveJsonAndMarkdownToFile("-");
+
+  }
+
+  function makeSitePreview() {
+
+  }
+
+
+  function publishSite() {
+    setupHugo()
+    // 4. hugo server
+    window.electronAPI.runHugo(['server', '-s', 'C:/Users/sundr/Documents/Projects/desktop/build/main/data/websites/my-new-website']);
+    // 5. open in browser  http://localhost:1313
+
+  window.electronAPI.openInBrowser('http://localhost:1313/post/my-blog-post');
+  }
+
+  function setupHugo() {
+    // 1. [init hugo] like
+    window.electronAPI.runHugo(['new', 'site', 'C:/Users/sundr/Documents/Projects/desktop/build/main/data/websites/my-new-website']);
+    // 2. add theme they picked TODO (or git submodule add https://github.com/theNewDynamic/gohugo-theme-ananke.git themes/ananke) (MUST have git)
+    // 3. set hugo.toml TODO (or echo "theme = 'ananke'" >> hugo.toml)
+    // TODO set up hugoToml
+    let hugoToml = "baseURL = 'http://example.org/'\r\nlanguageCode = 'en-us'\r\ntitle = 'My New Hugo Site'\r\ntheme='stackt'";
+    window.electronAPI.writeToFile(hugoToml, "websites\\my-new-website", "hugo.toml");
+
+  }
+
+  function saveJsonAndMarkdownToFile(title) {
+    let blocksData = blocks['_rawValue'];
+
+    // TODO: get and add date (set up all)
+    let pageHead = '---\r\ndate: 2017-04-09T10:58:08-04:00\r\ndescription: "The Grand Hall"\r\nfeatured_image: "/images/Pope-Edouard-de-Beaumont-1844.jpg"\r\ntags: ["scene"]\r\ntitle: "Chapter I: The Grand Hall"\r\n---\r\n';
     
     let jsonData = JSON.stringify(blocks['_rawValue'], null, 4);
     window.electronAPI.writeToFile('{"data": ' + jsonData + '}', "websites\\my-new-website\\content\\post", "my-blog-post.json");
 
-
-    var data = '---\r\ndate: 2017-04-09T10:58:08-04:00\r\ndescription: "The Grand Hall"\r\nfeatured_image: "/images/Pope-Edouard-de-Beaumont-1844.jpg"\r\ntags: ["scene"]\r\ntitle: "Chapter I: The Grand Hall"\r\n---\r\n';
+    var data = pageHead;
     for (let i = 0; i < blocksData.length; i++) {
-
       switch(blocksData[i].type) {
-      case "paragraph":
-      data = data + "\n\n" + htmlToMarkdown(blocksData[i].content);
-        break;
-      case "heading":
-        let ht =  blocksData[i].headingType + ">";
-        data = data + "\n\n" + htmlToMarkdown( "<" + ht + blocksData[i].content + "</" + ht);
-        break;
-      case "list":
+        case "paragraph":
         data = data + "\n\n" + htmlToMarkdown(blocksData[i].content);
-        break;
-      case "image":
-        
-        break;
-      default:
-        data = data + "\n\n" + htmlToMarkdown(blocksData[i].content);
-    }
-
-      //  window.electronAPI.sendMessage(blocksData[i].type);
+          break;
+        case "heading":
+          let ht =  blocksData[i].headingType + ">";
+          data = data + "\n\n" + htmlToMarkdown( "<" + ht + blocksData[i].content + "</" + ht);
+          break;
+        case "list":
+          data = data + "\n\n" + htmlToMarkdown(blocksData[i].content);
+          break;
+        case "image":
+          
+          break;
+        default:
+          data = data + "\n\n" + htmlToMarkdown(blocksData[i].content);
+      }
     } 
-    
     window.electronAPI.writeToFile(data, "websites\\my-new-website\\content\\post", "my-blog-post.markdown");
   }
-
-function makeSitePreview(){
-
-
-
-
-}
-
-
-function publishSite(){
-
-  // 1. [init hugo] like
- // window.electronAPI.runHugo(['new', 'site', 'C:/Users/sundr/Documents/Projects/desktop/build/main/data/websites/my-new-website']);
-  // 2. add theme they picked TODO (or git submodule add https://github.com/theNewDynamic/gohugo-theme-ananke.git themes/ananke) (MUST have git)
-  // 3. set hugo.toml TODO (or echo "theme = 'ananke'" >> hugo.toml)
-  //let hugoToml = "baseURL = 'http://example.org/'\r\nlanguageCode = 'en-us'\r\ntitle = 'My New Hugo Site'\r\ntheme='stackt'"
-  //window.electronAPI.writeToFile(hugoToml, "websites\\my-new-website", "hugo.toml");
-  // 4. hugo server
-  window.electronAPI.runHugo(['server', '-s', 'C:/Users/sundr/Documents/Projects/desktop/build/main/data/websites/my-new-website']);
-  // 5. open in browser  http://localhost:1313
-
- window.electronAPI.openInBrowser('http://localhost:1313/post/my-blog-post');
-}
 
 </script>
 
@@ -361,17 +371,53 @@ function publishSite(){
       <div class="border-2 border-slate-200 rounded h-full"></div>
     </div>
   
+    <div class="flex flex-col mt-8">
+
+      <div class="flex flex-row">
+
+        <textarea 
+          type="text" 
+          placeholder="Add Post Title..." 
+          v-model="pageTitle" 
+          maxlength="72" 
+          class="h-auto resize-none mt-1 
+          px-3 py-2 block w-full mx-8 
+          bg-white outline-none border-0
+          border-none text-5xl 
+          placeholder-slate-500 
+          focus:placeholder-transparent 
+          font-semibold 
+          text-slate-700 break-words 
+          text-center">
+        </textarea>
+      </div>
+   
+
     <drop-list class="w-1/2 ms-10 me-10 mt-10" :items="blocks" @reorder="$event.apply(blocks)" @insert="insert1" mode="cut">
       <template v-slot:item="{item}">
-        <drag @click="focusEditor(blocks, item, 'click')" @focusout="focusEditor(blocks, item, 'out')" @dragstart="focusEditor(blocks, item, 'out')" :class="{ 'border-opacity-100': item.active }" class="group relative flex flex-row border-b-2 border-x-2 m-2 border-slate-100 rounded-b border-opacity-0 px-2 pb-2" :key="item.id" :data="item" @cut="remove(items1, item)" handle=".drag-handle">
+        <drag @click="focusEditor(blocks, item, 'click')" 
+          @focusout="focusEditor(blocks, item, 'out')" 
+          @dragstart="focusEditor(blocks, item, 'out')" 
+          :class="{ 'border-opacity-100': item.active }" 
+          class="group relative flex flex-row border-b-2 border-x-2 m-2 border-slate-100 rounded-b border-opacity-0 px-2 pb-2" 
+          :key="item.id" :data="item" 
+          @cut="remove(items1, item)" 
+          handle=".drag-handle">
           
           <!-- Block Top Bar -->
-          <div @mouseover="cancelCloseEvent(true)" @mouseleave="cancelCloseEvent(false)" class="flex flex-row bg-white -top-12 -left-2.5 -right-2.5 h-10 border-t-2 border-x-2 mt-2 mx-2 border-slate-100 rounded-t px-2 pt-2" :class="{ 'absolute': item.active, 'hidden':!item.active }">
+          <div @mouseover="cancelCloseEvent(true)" 
+            @mouseleave="cancelCloseEvent(false)" 
+            class="flex flex-row bg-white -top-12 -left-2.5 -right-2.5 
+            h-10 border-t-2 border-x-2 mt-2 mx-2 border-slate-100 rounded-t px-2 pt-2" 
+            :class="{ 'absolute': item.active, 'hidden':!item.active }">
             <div class="ml-1.5 flex grow justify-between">
               <!-- Top Bar Buttons -->
-              <div class="flex space-x-1 items-center">
+              <div class="flex space-x-1 items-center w-full">
                 <span class="tracking-tight text-sm font-medium text-slate-700 uppercase mr-4">{{ item.type }}</span> 
-                <component :is="blockBarTypes[item.type]" v-bind="currentblockBarproperties(item)" @size-changed="changeHeaderSize" :ref="'block_'+item.id" />
+                <component :is="blockBarTypes[item.type]" 
+                  v-bind="currentblockBarproperties(item)" 
+                  @size-changed="changeHeaderSize" 
+                  :ref="'block_'+item.id" />
               </div>
               <!-- Delete (Right Side)-->
               <div class="flex items-center"> <!--TODO  Fix remove -->
@@ -392,10 +438,13 @@ function publishSite(){
   
               <!-- Added Blocks Box -->
               <div class="relative flex">
-                <div class="absolute w-50 max-h-60 bg-white z-30 -bottom-62 -left-4 flex flex-col visible rounded-lg shadow-[0_5px_30px_-12px_rgba(0,0,0,0.45)]" 
-                  @mouseover="cancelCloseEvent(true), blockAddButton(true)" @mouseleave="cancelCloseEvent(false), blockAddButton(false)"
+                <div class="absolute w-50 max-h-60 bg-white z-30 -bottom-62 -left-4 
+                  flex flex-col visible rounded-lg shadow-[0_5px_30px_-12px_rgba(0,0,0,0.45)]" 
+                  @mouseover="cancelCloseEvent(true), blockAddButton(true)" 
+                  @mouseleave="cancelCloseEvent(false), blockAddButton(false)"
                   :class="{'hidden':!item.menu }">
-                  <input v-model="filterText" type="text" placeholder="Search Blocks..." class="m-3 outline-1 outline-slate-300 border-1 border-slate-400 p-2 rounded-sm" />
+                  <input v-model="filterText" type="text" placeholder="Search Blocks..." 
+                    class="m-3 outline-1 outline-slate-300 border-1 border-slate-400 p-2 rounded-sm" />
                   <div class="w-full h-full flex flex-col m-2 overflow-scroll">
                       <div v-for="(blockItems, i) in filteredBlocks" :key="i">
                         <span class="w-full flex flex-row" @click="addNewBlock(blocks, item, blockItems.name)">
@@ -413,7 +462,7 @@ function publishSite(){
           </div>
   
           <!-- Main Block getBlockType(item.type) -->
-          <div class="w-full">
+          <div class="w-50 flex flex-auto">
               <component :is="mainBlockTypes[item.type]" v-bind="currentblockproperties(item)" :ref="'block_'+item.id" />
           </div>
               
@@ -421,7 +470,7 @@ function publishSite(){
       </template>
       <template v-slot:feedback="{data}"></template>
     </drop-list>
-     
+   </div>
     <div class="w-1/3 flex flex-col h-screen">
       <div class="h-10">
       </div>    

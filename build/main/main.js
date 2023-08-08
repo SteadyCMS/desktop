@@ -16,8 +16,10 @@ const child_process_1 = require("child_process");
 //import open from 'open';
 function createWindow() {
     const mainWindow = new electron_1.BrowserWindow({
-        width: 800,
-        height: 600,
+        width: 1000,
+        height: 800,
+        minWidth: 800,
+        minHeight: 600,
         webPreferences: {
             preload: (0, path_1.join)(__dirname, 'preload.js'),
             nodeIntegration: false,
