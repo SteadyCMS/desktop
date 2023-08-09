@@ -14,9 +14,9 @@
   import image from './blockTopbar/ImageBlockTopbar.vue';
 
   // Icons
-  import dragHandleIcon from './icons/theDragHandleIcon.vue';
-  import plusIcon from './icons/plusIcon.vue';
-  import xSquareIcon from './icons/xSquareIcon.vue';
+  import IconDragHandle from './icons/IconDragHandle.vue';
+  import IconPlus from './icons/IconPlus.vue';
+  import IconX from './icons/IconX.vue';
 
   // Var
   let overTopbar = false;
@@ -422,7 +422,7 @@
               <!-- Delete (Right Side)-->
               <div class="flex items-center"> <!--TODO  Fix remove -->
                 <button @click="removeBlock(blocks, item)" class="hover:bg-slate-100 px-1.5 py-1 rounded-md duration-300">
-                  <xSquareIcon class="fill-slate-600 w-5 h-5" />     
+                  <IconX class="fill-slate-600 w-5 h-5" />     
                 </button> 
               </div>
             </div>
@@ -431,10 +431,10 @@
           <!-- Block Icons -->
           <div class="flex flex-col mt-4 " :class="{ 'visible':item.active, 'invisible':!item.active, 'group-hover:visible':!item.active }">
             <span class="drag-handle mb-1 hover:cursor-grab">
-                <dragHandleIcon class="w-8"/>
+                <IconDragHandle class="w-8"/>
             </span>
             <span @click="openBlockBox(blocks, item, 'click')" class="add-button">
-              <plusIcon class="w-8"/>
+              <IconPlus class="w-8"/>
   
               <!-- Added Blocks Box -->
               <div class="relative flex">
