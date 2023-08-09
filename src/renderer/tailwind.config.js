@@ -10,6 +10,19 @@ export default {
     },
     extend: {
       colors: {
+        // scms: {
+        //   light: {
+        //     blue: "#29C2E1",
+
+        //   },
+        //   dark: {
+        //     blue: "#0A2E36",
+
+        //   }
+
+        // },
+        
+
         accent: "#1C7384",
       }
     },

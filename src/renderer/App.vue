@@ -16,22 +16,33 @@ window.electronAPI.sendMessage('Hello from App.vue');
 </script>
 
 <template>
-<main> <!-- 
-  <header>
-    <nav>
-        <RouterLink to="/">main</RouterLink>
-        <RouterLink to="/test">test</RouterLink>
-    </nav>
-  </header> --> 
+<main> 
 
 
+  <div class="flex flex-row">
 
-  <BlockEditorView />
+    <div class=" h-screen w-1/4 bg-slate-950">
 
- <!-- 
-<RouterView />
- --> 
+        <div class="text-white flex flex-col">
+            <RouterLink class="bg-" to="/">Posts</RouterLink>
+            <RouterLink to="/pages">Pages</RouterLink>
+        </div>
  
+
+    </div>
+
+    <div class="flex h-screen w-3/4">
+      <RouterView />
+    </div>
+
+  </div>
+  
+
+
+   <!--  <BlockEditorView />  -->
+
+
+
 </main>
 </template>
 

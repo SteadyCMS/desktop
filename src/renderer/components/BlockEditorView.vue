@@ -4,21 +4,21 @@
   import TurndownService from 'turndown';
   //import Showdown from 'showdown';
 
-  // blocks
-  import textEditor from './blocks/textEditor.vue';
-  import headerEditor from './blocks/headerEditor.vue';
-  import imageBlock from './blocks/imageBlock.vue';
+  // Blocks
+  import textEditor from './blocks/ParagraphBlockEditor.vue';
+  import headerEditor from './blocks/HeaderBlockInput.vue';
+  import imageBlock from './blocks/ImageBlockInput.vue';
 
-  import header from './topbar/header.vue';
-  import paragraph from './topbar/paragraph.vue';
-  import image from './topbar/image.vue';
+  import header from './blockTopbar/HeaderBlockTopbar.vue';
+  import paragraph from './blockTopbar/ParagraphBlockTopbar.vue';
+  import image from './blockTopbar/ImageBlockTopbar.vue';
 
-  // icons
+  // Icons
   import dragHandleIcon from './icons/theDragHandleIcon.vue';
   import plusIcon from './icons/plusIcon.vue';
   import xSquareIcon from './icons/xSquareIcon.vue';
 
-  // var
+  // Var
   let overTopbar = false;
   let blockButton = false;
   const filterText = ref('');
