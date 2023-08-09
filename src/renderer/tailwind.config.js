@@ -14,6 +14,7 @@ export default {
           DEFAULT: "#29C2E1",
           glow: "#0A2E36",
         },
+        dark: "#121B1D",
       }
     },
   },
