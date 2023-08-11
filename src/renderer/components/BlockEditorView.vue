@@ -114,9 +114,11 @@
 
 
   function addNewBlock(array, value, name) {
-    let index = array.indexOf(value);
     let idNum =  Math.random().toString().slice(2,9).concat( Math.random().toString().slice(5,7)).concat( Math.random().toString().slice(4,6));
+    console.log(value)
 
+    if(value != 0){
+    let index = array.indexOf(value);
     switch(name) {
       case "paragraph":
         array.splice(index + 1, 0,  { type: "paragraph", content: "", id: idNum, active: false, menu: false });
@@ -135,6 +137,9 @@
             
     } 
     openBlockBox(array, value, 'out')
+  } else {
+    array.splice(0, 0,  { type: "paragraph", content: "", id: idNum, active: false, menu: false });
+  }
     console.log(blocks)
   }
 
@@ -360,6 +365,15 @@
     window.electronAPI.writeToFile(data, "websites\\my-new-website\\content\\post", "my-blog-post.markdown");
   }
 
+  // On enter create new paragraph block if called on paragraph or header
+  function addNewBlockOnEnter(array, value, name){
+    console.log("enter")
+    if(name == "paragraph" || name == "header"){
+      addNewBlock(array, value, name);
+    }
+  }
+
+
 </script>
 
 
@@ -376,6 +390,8 @@
       <div class="flex flex-row">
 
         <textarea 
+          @keydown.enter.exact.prevent
+          @keydown.enter.exact="addNewBlockOnEnter(blocks, 0, 'header')"
           type="text" 
           placeholder="Add Post Title..." 
           v-model="pageTitle" 
@@ -460,10 +476,13 @@
               </div>
             </span>
           </div>
-  
+         
           <!-- Main Block getBlockType(item.type) -->
-          <div class="w-50 flex flex-auto">
-              <component :is="mainBlockTypes[item.type]" v-bind="currentblockproperties(item)" :ref="'block_'+item.id" />
+          <div class="flex flex-auto">
+              <component :is="mainBlockTypes[item.type]" 
+              v-bind="currentblockproperties(item)" 
+              :ref="'block_'+item.id" 
+              @on-press-enter="addNewBlockOnEnter(blocks, item, item.type)" />
           </div>
               
         </drag>
@@ -486,3 +505,23 @@
   
   </div>
 </template>
+
+
+<!--
+// TODO:
+On down space create new block
+Resize header on change
+
+Make Image block
+Fix List block
+
+Fix block (Other than paragraph) width *
+Add style to add block box
+Genral style fix >*
+Decide what bottons we want on toolbar
+
+# Other #
+Set Window size
+
+-->
+
