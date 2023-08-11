@@ -6,24 +6,15 @@ export default {
   ],
   theme: {
     fontFamily:{
-      sans: ["Roboto", "arial", "sans-serif"],
+      sans: ["Roboto", "Arial", "sans-serif"],
     },
     extend: {
       colors: {
-        // scms: {
-        //   light: {
-        //     blue: "#29C2E1",
-
-        //   },
-        //   dark: {
-        //     blue: "#0A2E36",
-
-        //   }
-
-        // },
-        
-
-        accent: "#1C7384",
+        accent: {
+          DEFAULT: "#29C2E1",
+          glow: "#0A2E36",
+        },
+        dark: "#121B1D",
       }
     },
   },
