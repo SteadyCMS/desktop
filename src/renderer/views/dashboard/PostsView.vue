@@ -6,4 +6,21 @@
     </div>
     <hr class="border-gray-300 w-full my-4" />
   </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
 </template>

@@ -1,22 +1,54 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import PostsView from '../views/PostsView.vue'
+
+import AppDashboard from '../views/AppDashboard.vue'
+import PostsView from '../views/dashboard/PostsView.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
+
     {
       path: '/',
-      name: 'posts',
-      component: PostsView
+      name: 'dashboard',
+      component: AppDashboard,
+      children: [
+        {
+          path: 'posts',
+          name: 'posts',
+          component: PostsView
+        },
+        {
+          path: 'pages',
+          name: 'pages',
+          component: () => import('../views/dashboard/PagesView.vue')
+        },
+        {
+          path: 'tags',
+          name: 'tags',
+          component: () => import('../views/dashboard/TagsView.vue')
+        },
+      ]
     },
     {
-      path: '/pages',
-      name: 'pages',
-      // route level code-splitting
-      // this generates a separate chunk (About.[hash].js) for this route
-      // which is lazy-loaded when the route is visited.
-      component: () => import('../views/PagesView.vue')
-    }
+      path: '/new-website',
+      name: 'newwebsite',
+      component: () => import('../views/AppNewWebsite.vue')
+    },
+
+
+
+
+
+
+
+
+
+
+    {
+      path: "/:catchAll(.*)",
+      name: 'notfound',
+      component: () => import('../views/NotFound.vue')
+    },
   ]
 })
 

@@ -18,14 +18,17 @@ function createWindow() {
     const mainWindow = new electron_1.BrowserWindow({
         width: 1000,
         height: 800,
-        minWidth: 800,
-        minHeight: 600,
+        minWidth: 1000,
+        minHeight: 800,
+        icon: 'src/renderer/assets/images/steady-cms-logomark.png',
         webPreferences: {
             preload: (0, path_1.join)(__dirname, 'preload.js'),
             nodeIntegration: false,
             contextIsolation: true,
+            // devTools: false,
         }
     });
+    mainWindow.maximize();
     if (process.env.NODE_ENV === 'development') {
         const rendererPort = process.argv[2];
         mainWindow.loadURL(`http://localhost:${rendererPort}`);

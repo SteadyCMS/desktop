@@ -10,3 +10,13 @@ body {
     font-size: 1.2rem !important; 
     @apply text-slate-800;
 }
+
+.active-rl {
+    --tw-bg-opacity: 1;
+    background-color: rgb(10 46 54 / var(--tw-bg-opacity));
+
+    --tw-text-opacity: 1;
+    color: rgb(41 194 225 / var(--tw-text-opacity));
+    
+    fill: #29C2E1;
+}
