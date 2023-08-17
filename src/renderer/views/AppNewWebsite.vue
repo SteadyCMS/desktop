@@ -7,6 +7,8 @@
   import StepThree from '../components/createNewWebsite/StepThree.vue';
   import StepFour from '../components/createNewWebsite/StepFour.vue';
 
+  import LoadingScreen from "../components/LoadingScreen.vue";
+
   import AccentButton from '../components/buttons/AccentButton.vue';
   import SecondaryButton from '../components/buttons/SecondaryButton.vue';
 
@@ -20,7 +22,8 @@
 
   // For Component Step switching
   const num = ref("1");
-  const continueButtonText = ref("Continue");
+  const showLoadingScreen = ref(false);
+  const loadingScreenText = ref('Perparing...');
   // Step 1
   const websiteName = ref("");
   const nameInputError = ref("")
@@ -115,14 +118,23 @@
     }
   }
 
-  function buildWebsite() {
-    downloadFile('https://github.com/nanxiaobei/hugo-paper/archive/refs/heads/main.zip', '/sites/' + websiteName.value + '/temp/').then(files => {
-      extractFile('/sites/' + websiteName.value + '/temp/hugo-paper-main.zip', '/sites/' + websiteName.value).then(files => {
-        deleteFile('/sites/' + websiteName.value + '/temp/hugo-paper-main.zip');
+
+  function buildWebsite(){
+    showLoadingScreen.value = true;
+    const name = websiteName.value.replaceAll(' ', '_').toLowerCase();
+    loadingScreenText.value = "Downloading Template...";
+    downloadFile('https://github.com/nanxiaobei/hugo-paper/archive/refs/heads/main.zip', '/sites/' + name + '/temp/').then(files => {
+      loadingScreenText.value = "Prossesing Template...";
+      extractFile('/sites/' + name + '/temp/hugo-paper-main.zip', '/sites/' + name).then(files => {
+        deleteFile('/sites/' + name + '/temp/hugo-paper-main.zip').then(files => {
+          loadingScreenText.value = "Seting Up...";
+          router.go(-1);
+        });
       });
     });
    
   }
+
 
   function backToDashboard() {
     router.go(-1);
@@ -133,6 +145,7 @@
 </script>
 
 <template>
+  <LoadingScreen class="h-full w-full" v-if="showLoadingScreen" :loadingtext="loadingScreenText"></LoadingScreen>
   <div class="relative max-w-6xl mx-auto px-8">
     <div class="flex flex-row w-full h-screen py-8">
       <div class="w-5/6 md:w-2/3 flex flex-col justify-between">
@@ -149,14 +162,16 @@
           </div>
           <!-- Views -->
           <div>
+            <Transition name="fade" mode="out-in">
             <component :is="currentStepComponent" 
               :name="websiteName" 
               :isvalid="nameInputIsValid"
               :errortext="nameInputError"
               :websiteinfo="{ website: websiteName, template: templateName, path: templatePath}"
-              @on-change="(name) => {websiteName = name.replace(' ', '_');}"
+              @on-change="(name) => websiteName = name"
               @choose-template="(template, path) => {templateName = template; templatePath = path;}">
             </component>
+          </Transition>
           </div>
         </div>
         <div class="space-x-1 mb-2">
@@ -176,3 +191,15 @@
     </div>
   </div>
 </template>
+
+<style>
+  .fade-enter-active,
+  .fade-leave-active {
+    transition: opacity 0.3s ease;
+  }
+
+  .fade-enter-from,
+  .fade-leave-to {
+    opacity: 0;
+  }
+</style>
