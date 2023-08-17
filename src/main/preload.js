@@ -23,11 +23,12 @@
     return data;
   },
   openInBrowser: (url) => ipcRenderer.send('openInBrowser', url),
-  downloadFile: (url, directoryPath) => ipcRenderer.invoke('downloadFile', url, { properties: {directory: directoryPath} }),
+  downloadFile: (url, directoryPath) => ipcRenderer.invoke('downloadFile', url, { properties: {directory: directoryPath, showBadge: false, showProgressBar: true} }),
   extractFile: async (source, target) =>  {
     const data = await ipcRenderer.invoke('extractFile', source, target);
     return data;
   },
+  deleteFile: (path) => ipcRenderer.send('deleteFile', path),
 
   });
 //   ipcRenderer.send("download", {

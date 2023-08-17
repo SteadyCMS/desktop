@@ -16,6 +16,7 @@
     "url": "https://github.com/SteadyCMS"
   },
   "devDependencies": {
+    "@types/decompress": "^4.2.4",
     "@vitejs/plugin-vue": "^4.0.0",
     "chalk": "^4.1.2",
     "chokidar": "^3.5.3",
@@ -27,8 +28,8 @@
   },
   "dependencies": {
     "@vueup/vue-quill": "^1.2.0",
+    "decompress": "^4.2.1",
     "electron-dl": "^3.5.0",
-    "extract-zip": "^2.0.1",
     "open": "^9.1.0",
     "showdown": "^2.1.0",
     "turndown": "^7.1.2",

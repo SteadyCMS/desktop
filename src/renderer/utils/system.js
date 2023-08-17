@@ -35,14 +35,20 @@
             }
         }
 
-    // Download File
+    // Download File (TO DOCUMENTS)
     export async function downloadFile(url, directory) {
             const data = await window.electronAPI.downloadFile(url, directory);
             return data;
     }
 
-    // extract zip File
+    // extract zip File (IN DOCUMENTS)
     export async function extractFile(source, target) {
         const data = await window.electronAPI.extractFile(source, target);
         return data;
     }
+
+    // Delete File (IN DOCUMENTS)
+    export async function deleteFile(path) {
+        await window.electronAPI.deleteFile(path);
+        }
+

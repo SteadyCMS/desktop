@@ -8,7 +8,7 @@
   import StepThree from '../components/createNewWebsite/StepThree.vue';
   import StepFour from '../components/createNewWebsite/StepFour.vue';
 
-  import { downloadFile, extractFile } from '../utils/system.js'
+  import { downloadFile, extractFile, deleteFile } from '../utils/system.js'
 
   import LogoLight from '../components/logos/LogoLight.vue';
 
@@ -114,8 +114,12 @@
   }
 
   function buildWebsite(){
-   // downloadFile('https://github.com/nanxiaobei/hugo-paper/archive/refs/heads/main.zip', '\\here\\'); // has return
-   // extractFile('\\x\\hugo-paper-main.zip', '\\here\\x\\');
+    downloadFile('https://github.com/nanxiaobei/hugo-paper/archive/refs/heads/main.zip', '\\test\\new\\').then(files => {
+      extractFile('\\test\\new\\hugo-paper-main.zip', '\\here\\').then(files => {
+        deleteFile('\\test\\new\\hugo-paper-main.zip');
+      });
+    });
+   
   }
 
 

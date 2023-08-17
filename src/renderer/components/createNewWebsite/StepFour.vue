@@ -4,8 +4,8 @@ import { ref } from 'vue';
 const props =  defineProps(['websiteinfo']);
 
 /*
- # show loading page
- - download template
+ - show loading page
+ # download template / unzip / delete old zip
  - make dir
  - save web info as .json
  - set up .t file

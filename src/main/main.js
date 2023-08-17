@@ -1,10 +1,10 @@
   import {app, BrowserWindow, ipcMain, session} from 'electron';
   import {join} from 'path';
 
-  import {readFileSync, mkdir, writeFile, existsSync} from 'fs';
+  import {readFileSync, mkdir, writeFile, existsSync, rmSync} from 'fs';
   import {execFile} from 'child_process';
   import {download} from "electron-dl";
-  import {extract} from "extract-zip";
+  import decompress from "decompress";
   
   function createWindow () {
     const mainWindow = new BrowserWindow({
@@ -33,7 +33,6 @@
 
   app.whenReady().then(() => {
     createWindow();
-
     session.defaultSession.webRequest.onHeadersReceived((details, callback) => {
       callback({
         responseHeaders: {
@@ -111,7 +110,7 @@
     return existsSync(app.getAppPath() + "\\data\\" + path);
   });
 
-  // Run Hugo .exe
+  // Run Hugo.exe
   ipcMain.on('runHugo', (event, commands) => {
   let fun = function(){
     console.log("RUN hugo Command(s): " + commands);
@@ -123,35 +122,42 @@
   fun();
   });
 
-  // open url In Browser
+  // Open url In Browser
   ipcMain.on('openInBrowser', (event, url) => {
     require('electron').shell.openExternal(url);
   });
 
-  // Download File 
+  // Download File (TO DOCUMENTS)
   ipcMain.handle("downloadFile", async (event, url, info) => {
     info.properties.directory = app.getPath('documents') + info.properties.directory;
     await download(BrowserWindow.getFocusedWindow(), url, info.properties);
-    return "done"; // must return file name
+    return "done"; // TODO: must return file name
   });
 
-  // extract zip File 
+  // Extract Zip File (FROM DOCUMENTS)
   ipcMain.handle("extractFile", async (event, source, target) => {
-    try {
-
-      let pathS = app.getPath('documents') + '\\x\\hugo-paper-main.zip';
-      let pathT = app.getPath('documents') + '\\here\\';
-
-      await extract(pathS, { dir: pathT })
-      console.log('Extraction complete');
+     try {
+      let pathSource = app.getPath('documents') + source;
+      let pathTarget = app.getPath('documents') + target;
+     await decompress(pathSource, pathTarget);
       return true;
     } catch (err) {
-      // handle any errors
-      console.log("error!");
       console.log(err.message);
       return false;
     }
+  });
 
+  // Delete file (IN DOCUMENTS)
+  ipcMain.on('deleteFile', (event, path) => {
+    let pathSource = app.getPath('documents') + path;
+    try {
+      rmSync(pathSource, {
+        force: false,
+      });
+      //console.log('File is deleted.');
+    } catch (err) {
+      throw err
+    }
   });
 
 
