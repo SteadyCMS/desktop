@@ -1,5 +1,4 @@
-
-  <script setup>
+<script setup>
   import {  useRouter } from 'vue-router';
   import { ref, computed } from 'vue';
 
@@ -11,6 +10,7 @@
   import { downloadFile, extractFile, deleteFile } from '../utils/system.js'
 
   import LogoLight from '../components/logos/LogoLight.vue';
+  import LogoDark from '../components/logos/LogoDark.vue';
 
   // For Component Step switching
   const num = ref("1");
@@ -23,57 +23,54 @@
   const templateName = ref("x");
   const templatePath = ref("");
 
-  
-
-    const currentStepComponent = computed(() => {
-      if(num.value == "1"){
-        return StepOne;
-      }else if(num.value == "2"){
-        return StepTwo;
-      }else if(num.value == "3"){
-        return StepThree;
-      }else{
-        // Done :: set to done
-        return StepFour;
-      }
+  const currentStepComponent = computed(() => {
+    if (num.value == "1") {
+      return StepOne;
+    } else if (num.value == "2") {
+      return StepTwo;
+    } else if (num.value == "3") {
+      return StepThree;
+    } else {
+      // Done: set to done
+      return StepFour;
+    }
   });
   
   function changeCurrentStep(type){
-    if(type == "next"){
+    if (type == "next") {
       if (num.value == "1") {
         // validate user name input
-        if(validateUserInput()){
+        if (validateUserInput()) {
           // Go on to next step
           nameInputIsValid.value = true;
           num.value = "2";
           stepCount.value[1].done = true;
-        }else{
+        } else {
           // Show error
           nameInputIsValid.value = false;
         }
-      }else if(num.value == "2"){
+      } else if (num.value == "2") {
         num.value = "3";
         stepCount.value[2].done = true;
-      }else if(num.value == "3"){
+      } else if (num.value == "3") {
         num.value = "4";
         stepCount.value[3].done = true;
       }
-    }else{
+    } else {
       if (num.value == "1") {
         num.value = "1";
         stepCount.value[1].done = false;
-      }else if(num.value == "2"){
+      } else if (num.value == "2") {
         num.value = "1";
         stepCount.value[1].done = false;
-      }else if(num.value == "3"){
+      } else if (num.value == "3") {
         num.value = "2";
         stepCount.value[2].done = false;
-      }else if(num.value == "4"){
+      } else if (num.value == "4") {
         num.value = "3";
         stepCount.value[3].done = false;
       }
     }
-
   }
 
   const stepCount = ref([
@@ -95,17 +92,17 @@
     },
   ]);
 
-  function validateUserInput(){
+  function validateUserInput() {
     // check if is input empty
     if (websiteName.value.trim() == "" || websiteName.value == null || websiteName.value.trim().length < 2) {
-      nameInputError.value = "Name must contain at least two character.";
+      nameInputError.value = "Name must be at least two characters.";
       return false;
-    }else{
+    } else {
       var format = /[`!@#$%^&*()+\-=\[\]{};':"/|,<>\/?~]/;
       // Check if input has any special characters except "." or "_"
       if (!format.test(websiteName.value)) {
         return true;
-      }else{
+      } else {
         nameInputError.value = 'Name can not contain any special characters except "." and "_"';
         return false;
       }
@@ -132,47 +129,42 @@
   
 </script>
 
-  <template>
-  <div class="h-screen">
-    <div class="grid grid-rows-6 grid-flow-col gap-2 h-full my-4 mx-8">
-
-      <div class="bg-black my-8 mx-14 rounded-3xl row-span-6">
-        <LogoLight class="h-10 w-auto" />
-      </div>
-
-        <div class="col-span-5 flex flex-col w-full">
-          <h4 class="text-xl text-dark font-bold mt-14">Website Setup</h4>
-          <div class="flex flex-row space-x-2 my-2">
-              <div v-for="item in stepCount" class="flex rounded-md h-2 w-8" :class="{'bg-accent': item.done, 'bg-light-gray': !item.done }"></div>
+<template>
+  <div class="relative max-w-6xl mx-auto">
+    <div class="flex flex-row w-full h-screen py-8">
+      <div class="w-2/3 flex flex-col justify-between">
+        <div class="">
+          <!-- Steps -->
+          <div class="flex flex-col w-full mt-6">
+            <div>
+              <LogoDark class="h-9 w-auto" />
+            </div>
+            <div class="flex flex-row space-x-2 mt-4 mb-2">
+              <div v-for="item in stepCount" :key="item" class="flex rounded-md h-2 w-8" :class="{'bg-accent': item.done, 'bg-light-gray': !item.done }"></div>
+            </div>
+            <h6 class="text-xs font-medium text-slate-600">Step {{ num }} of 4</h6>
           </div>
-          <h6 class="text-sm font-medium text-slate-600">Step {{ num }} of 4</h6>
+          <!-- Views -->
+          <div class="">
+            <component :is="currentStepComponent" 
+              :name="websiteName" 
+              :isvalid="nameInputIsValid"
+              :errortext="nameInputError"
+              :websiteinfo="{ website: websiteName, template: templateName, path: templatePath}"
+              @on-change="(name) => {websiteName = name.replace(' ', '_');}"
+              @choose-template="(template, path) => {templateName = template; templatePath = path;}">
+            </component>
+          </div>
         </div>
-
-        <div class="col-span-5 row-span-4">
-          <component :is="currentStepComponent" 
-            :name="websiteName" 
-            :isvalid="nameInputIsValid"
-            :errortext="nameInputError"
-            :websiteinfo="{ website: websiteName, template: templateName, path: templatePath}"
-            @on-change="(name) => {websiteName = name.replace(' ', '_');}"
-            @choose-template="(template, path) => {templateName = template; templatePath = path;}">
-          </component>
-        </div>
-
-        <div class="col-span-5">
-          <button class="py-2.5 px-6 bg-accent text-dark text-sm font-bold rounded-lg" v-if="!(num == '1')"
+        <div class="space-x-1 mb-2">
+          <button class="py-3 px-6 bg-white text-dark border border-gray-300 text-sm font-bold rounded-lg" v-if="!(num == '1')"
           @click="changeCurrentStep('previous')">Back</button>
-
-          <button class="py-2.5 px-6 bg-accent text-dark text-sm font-bold rounded-lg" v-if="!(num == '4')"
+          <button class="py-3 px-6 bg-accent text-dark text-sm font-bold rounded-lg" v-if="!(num == '4')"
           @click="changeCurrentStep('next')">Continue</button>
-
-          <button class="py-2.5 px-6 bg-accent text-dark text-sm font-bold rounded-lg" v-if="(num == '4')"
+          <button class="py-3 px-6 bg-accent text-dark text-sm font-bold rounded-lg" v-if="(num == '4')"
           @click="buildWebsite">Build Website</button>
-        
         </div>
+      </div>
     </div>
   </div>
-  </template>
-
-
-
+</template>

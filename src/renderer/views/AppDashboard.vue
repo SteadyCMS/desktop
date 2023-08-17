@@ -1,28 +1,25 @@
 <script setup>
-import { ref } from 'vue';
-import { RouterLink, RouterView, useRouter} from 'vue-router';
+  import { ref } from 'vue';
+  import { RouterLink, RouterView, useRouter} from 'vue-router';
 
-import LogoLight from '../components/logos/LogoLight.vue';
-import LogoMark from '../components/logos/LogoMark.vue';
-import IconThreeDots from '../components/icons/IconThreeDots.vue';
-import IconPosts from '../components/icons/IconPosts.vue';
-import IconPages from '../components/icons/IconPages.vue';
-import IconTags from '../components/icons/IconTags.vue';
-import IconArrowDown from '../components/icons/IconArrowDown.vue';
-import IconPlus from '../components/icons/IconPlus.vue';
+  import LogoLight from '../components/logos/LogoLight.vue';
+  import LogoMark from '../components/logos/LogoMark.vue';
+  import IconThreeDots from '../components/icons/IconThreeDots.vue';
+  import IconPosts from '../components/icons/IconPosts.vue';
+  import IconPages from '../components/icons/IconPages.vue';
+  import IconTags from '../components/icons/IconTags.vue';
+  import IconArrowDown from '../components/icons/IconArrowDown.vue';
+  import IconPlus from '../components/icons/IconPlus.vue';
 
-const router = useRouter()
-const dropdownState = ref(false);
+  const router = useRouter()
+  const dropdownState = ref(false);
 
-// On load set view to posts
-router.push({path: '/posts'});
+  // On load set view to posts
+  router.push({path: '/posts'});
 
-
-function createNewWebsite() {
+  function createNewWebsite() {
     router.push({path: '/new-website'});
-}
-
-
+  }
 </script>
 
 <template>
@@ -101,6 +98,3 @@ function createNewWebsite() {
 
   </main>
 </template>
-
-<style scoped>
-</style>
