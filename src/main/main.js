@@ -62,25 +62,25 @@
 
   // Read From File (IN DOCUMENTS)
   ipcMain.handle('readFromFile',  async (event, path) => {
-    const filePath = join(app.getPath('documents') + "\\SteadyCMS\\data\\" + path);
+    const filePath = join(app.getPath('documents') + "/SteadyCMS/" + path);
     const data = readFileSync(filePath);
     return data.toString();
   });
 
   // Read From File (IN APP DIR)
   ipcMain.handle('readFromFileInAppDir',  async (event, path) => {
-    const filePath = join(app.getAppPath(),  "\\data\\" + path);
+    const filePath = join(app.getAppPath(),  "/SteadyCMS/" + path);
     const data = readFileSync(filePath);
     return data.toString();
   });
 
   // Write To File (IN DOCUMENTS)
   ipcMain.on('writeToFile', (event, rawData, filePath, fileName) => {
-    mkdir(app.getPath('documents') + "\\SteadyCMS\\data\\" + filePath, { recursive: true }, (err) => {
+    mkdir(app.getPath('documents') + "/SteadyCMS/" + filePath, { recursive: true }, (err) => {
       if (err){
         throw err;
       } else {
-        writeFile(app.getPath('documents') + "\\SteadyCMS\\data\\" + filePath + "\\" + fileName, rawData, (err) => {
+        writeFile(app.getPath('documents') + "/SteadyCMS/" + filePath + "/" + fileName, rawData, (err) => {
             if (err) throw err;
           }); 
       }
@@ -89,11 +89,11 @@
 
     // Write To File (IN APP DIR)
     ipcMain.on('writeToFileInAppDir', (event, rawData, filePath, fileName) => {
-      mkdir(app.getAppPath() + "\\data\\" + filePath, { recursive: true }, (err) => {
+      mkdir(app.getAppPath() + "/SteadyCMS/" + filePath, { recursive: true }, (err) => {
         if (err){
           throw err;
         } else {
-          writeFile(app.getAppPath() + "\\data\\" + filePath + "\\" + fileName, rawData, (err) => {
+          writeFile(app.getAppPath() + "/SteadyCMS/" + filePath + "/" + fileName, rawData, (err) => {
               if (err) throw err;
             }); 
         }
@@ -102,19 +102,19 @@
 
   // Check if File Exists (IN DOCUMENTS)
   ipcMain.handle('doesFileExist',  async (event, path) => {
-    return existsSync(app.getPath('documents') + "\\SteadyCMS\\data\\" + path);
+    return existsSync(app.getPath('documents') + "/SteadyCMS/" + path);
   });
 
   // Check if File Exists (IN APP DIR)
   ipcMain.handle('doesFileExistInAppDir',  async (event, path) => {
-    return existsSync(app.getAppPath() + "\\data\\" + path);
+    return existsSync(app.getAppPath() + "/SteadyCMS/" + path);
   });
 
   // Run Hugo.exe
   ipcMain.on('runHugo', (event, commands) => {
   let fun = function(){
     console.log("RUN hugo Command(s): " + commands);
-    execFile(app.getAppPath() + '\\static\\hugo.exe', commands, function(err, data) {
+    execFile(app.getAppPath() + '/static/hugo.exe', commands, function(err, data) {
           console.log(err);
           console.log(data.toString());
       });
@@ -129,7 +129,7 @@
 
   // Download File (TO DOCUMENTS)
   ipcMain.handle("downloadFile", async (event, url, info) => {
-    info.properties.directory = app.getPath('documents') + info.properties.directory;
+    info.properties.directory = app.getPath('documents') + '/SteadyCMS/' + info.properties.directory;
     await download(BrowserWindow.getFocusedWindow(), url, info.properties);
     return "done"; // TODO: must return file name
   });
@@ -137,8 +137,8 @@
   // Extract Zip File (FROM DOCUMENTS)
   ipcMain.handle("extractFile", async (event, source, target) => {
      try {
-      let pathSource = app.getPath('documents') + source;
-      let pathTarget = app.getPath('documents') + target;
+      let pathSource = app.getPath('documents') + '/SteadyCMS/' + source;
+      let pathTarget = app.getPath('documents') + '/SteadyCMS/' + target;
      await decompress(pathSource, pathTarget);
       return true;
     } catch (err) {
@@ -149,7 +149,7 @@
 
   // Delete file (IN DOCUMENTS)
   ipcMain.on('deleteFile', (event, path) => {
-    let pathSource = app.getPath('documents') + path;
+    let pathSource = app.getPath('documents') + '/SteadyCMS/' + path;
     try {
       rmSync(pathSource, {
         force: false,

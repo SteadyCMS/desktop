@@ -101,7 +101,7 @@
       nameInputError.value = "Name must contain at least two character.";
       return false;
     }else{
-      var format = /[`!@#$%^&*()+\-=\[\]{};':"\\|,<>\/?~]/;
+      var format = /[`!@#$%^&*()+\-=\[\]{};':"/|,<>\/?~]/;
       // Check if input has any special characters except "." or "_"
       if (!format.test(websiteName.value)) {
         return true;
@@ -110,13 +110,12 @@
         return false;
       }
     }
-
   }
 
   function buildWebsite(){
-    downloadFile('https://github.com/nanxiaobei/hugo-paper/archive/refs/heads/main.zip', '\\test\\new\\').then(files => {
-      extractFile('\\test\\new\\hugo-paper-main.zip', '\\here\\').then(files => {
-        deleteFile('\\test\\new\\hugo-paper-main.zip');
+    downloadFile('https://github.com/nanxiaobei/hugo-paper/archive/refs/heads/main.zip', '/sites/' + websiteName.value + '/temp/').then(files => {
+      extractFile('/sites/' + websiteName.value + '/temp/hugo-paper-main.zip', '/sites/' + websiteName.value).then(files => {
+        deleteFile('/sites/' + websiteName.value + '/temp/hugo-paper-main.zip');
       });
     });
    
@@ -155,7 +154,7 @@
             :isvalid="nameInputIsValid"
             :errortext="nameInputError"
             :websiteinfo="{ website: websiteName, template: templateName, path: templatePath}"
-            @on-change="(name) => websiteName = name"
+            @on-change="(name) => {websiteName = name.replace(' ', '_');}"
             @choose-template="(template, path) => {templateName = template; templatePath = path;}">
           </component>
         </div>

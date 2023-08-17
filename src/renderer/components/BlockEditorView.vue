@@ -103,10 +103,10 @@
 
   // Load in blocks and data from json on start if they exsist
   //   (async () => {
-  //   const exists = await window.electronAPI.doesFileExist("websites\\my-new-website\\content\\posts\\my-blog-post.json")
+  //   const exists = await window.electronAPI.doesFileExist("websites/my-new-website/content/posts/my-blog-post.json")
   //   window.electronAPI.sendMessage(exists);
   //   if(exists){
-  //     const rawData = await window.electronAPI.readFile("websites\\my-new-website\\content\\posts\\my-blog-post.json")
+  //     const rawData = await window.electronAPI.readFile("websites/my-new-website/content/posts/my-blog-post.json")
   //     const data = JSON.parse(rawData);
   //     blocks.value = data['data']
   //   }
@@ -329,7 +329,7 @@
     // 3. set hugo.toml TODO (or echo "theme = 'ananke'" >> hugo.toml)
     // TODO set up hugoToml
     let hugoToml = "baseURL = 'http://example.org/'\r\nlanguageCode = 'en-us'\r\ntitle = 'My New Hugo Site'\r\ntheme='stackt'";
-    window.electronAPI.writeToFile(hugoToml, "websites\\my-new-website", "hugo.toml");
+    window.electronAPI.writeToFile(hugoToml, "websites/my-new-website", "hugo.toml");
 
   }
 
@@ -340,7 +340,7 @@
     let pageHead = '---\r\ndate: 2017-04-09T10:58:08-04:00\r\ndescription: "The Grand Hall"\r\nfeatured_image: "/images/Pope-Edouard-de-Beaumont-1844.jpg"\r\ntags: ["scene"]\r\ntitle: "Chapter I: The Grand Hall"\r\n---\r\n';
     
     let jsonData = JSON.stringify(blocks['_rawValue'], null, 4);
-    window.electronAPI.writeToFile('{"data": ' + jsonData + '}', "websites\\my-new-website\\content\\post", "my-blog-post.json");
+    window.electronAPI.writeToFile('{"data": ' + jsonData + '}', "websites/my-new-website/content/post", "my-blog-post.json");
 
     var data = pageHead;
     for (let i = 0; i < blocksData.length; i++) {
@@ -362,7 +362,7 @@
           data = data + "\n\n" + htmlToMarkdown(blocksData[i].content);
       }
     } 
-    window.electronAPI.writeToFile(data, "websites\\my-new-website\\content\\post", "my-blog-post.markdown");
+    window.electronAPI.writeToFile(data, "websites/my-new-website/content/post", "my-blog-post.markdown");
   }
 
   // On enter create new paragraph block if called on paragraph or header
