@@ -27,6 +27,8 @@
   },
   "dependencies": {
     "@vueup/vue-quill": "^1.2.0",
+    "electron-dl": "^3.5.0",
+    "extract-zip": "^2.0.1",
     "open": "^9.1.0",
     "showdown": "^2.1.0",
     "turndown": "^7.1.2",

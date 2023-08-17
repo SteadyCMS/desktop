@@ -10,7 +10,6 @@ window.electronAPI.sendMessage('Hello from App.vue');
 //   window.electronAPI.sendMessage('Hello from App.vue ' + foo);
 // })();
 
-//  <BlockEditorView />
 </script>
 
 <template>

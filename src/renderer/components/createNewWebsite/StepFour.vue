@@ -1,3 +1,19 @@
+<script setup>
+import { ref } from 'vue';
+
+const props =  defineProps(['websiteinfo']);
+
+/*
+ # show loading page
+ - download template
+ - make dir
+ - save web info as .json
+ - set up .t file
+ - 
+*/
+
+</script>
+
 <template>
 
     <div class="flex flex-col">
@@ -7,7 +23,9 @@
         </div>
       </div>
   
-  
+  <p>website {{ props.websiteinfo.website }}</p>
+  <p>template {{ props.websiteinfo.template }}</p>
+  <p>path {{ props.websiteinfo.path }}</p>
   
   
   

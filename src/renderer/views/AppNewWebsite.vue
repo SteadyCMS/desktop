@@ -8,13 +8,22 @@
   import StepThree from '../components/createNewWebsite/StepThree.vue';
   import StepFour from '../components/createNewWebsite/StepFour.vue';
 
+  import { downloadFile, extractFile } from '../utils/system.js'
+
   import LogoLight from '../components/logos/LogoLight.vue';
 
   // For Component Step switching
   const num = ref("1");
+  const continueButtonText = ref("Continue");
+  // Step 1
   const websiteName = ref("");
   const nameInputError = ref("")
   const nameInputIsValid = ref(true)
+  // Step 2
+  const templateName = ref("x");
+  const templatePath = ref("");
+
+  
 
     const currentStepComponent = computed(() => {
       if(num.value == "1"){
@@ -67,31 +76,29 @@
 
   }
 
-const stepCount = ref([
-  {
-    number: 1,
-    done: true,
-  },
-  {
-    number: 2,
-    done: false,
-  },
-  {
-    number: 3,
-    done: false,
-  },
-  {
-    number: 4,
-    done: false,
-  },
-]);
-
-
+  const stepCount = ref([
+    {
+      number: 1,
+      done: true,
+    },
+    {
+      number: 2,
+      done: false,
+    },
+    {
+      number: 3,
+      done: false,
+    },
+    {
+      number: 4,
+      done: false,
+    },
+  ]);
 
   function validateUserInput(){
     // check if is input empty
-    if (websiteName.value.trim() == "" || websiteName.value == null) {
-      nameInputError.value = "Name must contain at least one character.";
+    if (websiteName.value.trim() == "" || websiteName.value == null || websiteName.value.trim().length < 2) {
+      nameInputError.value = "Name must contain at least two character.";
       return false;
     }else{
       var format = /[`!@#$%^&*()+\-=\[\]{};':"\\|,<>\/?~]/;
@@ -102,20 +109,24 @@ const stepCount = ref([
         nameInputError.value = 'Name can not contain any special characters except "." and "_"';
         return false;
       }
-
     }
 
+  }
+
+  function buildWebsite(){
+   // downloadFile('https://github.com/nanxiaobei/hugo-paper/archive/refs/heads/main.zip', '\\here\\'); // has return
+   // extractFile('\\x\\hugo-paper-main.zip', '\\here\\x\\');
   }
 
 
   /********************/
   const router = useRouter()
   function backToDashbord() {
-      router.go(-1);
-      // router.push({path: '/new-website/step-two'});
+    router.go(-1);
+    // router.push({path: '/new-website/step-two'});
+    //localStorage.setItem('todo_items', JSON.stringify(this.todo_items)); 
   }
   
-//localStorage.setItem('todo_items', JSON.stringify(this.todo_items)); 
 </script>
 
   <template>
@@ -129,7 +140,7 @@ const stepCount = ref([
         <div class="col-span-5 flex flex-col w-full">
           <h4 class="text-xl text-dark font-bold mt-14">Website Setup</h4>
           <div class="flex flex-row space-x-2 my-2">
-              <div v-for="item in stepCount" class="flex rounded-md h-2 w-8" :class="{'bg-accent': item.done, 'bg-gray': !item.done }"></div>
+              <div v-for="item in stepCount" class="flex rounded-md h-2 w-8" :class="{'bg-accent': item.done, 'bg-light-gray': !item.done }"></div>
           </div>
           <h6 class="text-sm font-medium text-slate-600">Step {{ num }} of 4</h6>
         </div>
@@ -139,16 +150,21 @@ const stepCount = ref([
             :name="websiteName" 
             :isvalid="nameInputIsValid"
             :errortext="nameInputError"
-            @on-change="(name) => websiteName = name">
+            :websiteinfo="{ website: websiteName, template: templateName, path: templatePath}"
+            @on-change="(name) => websiteName = name"
+            @choose-template="(template, path) => {templateName = template; templatePath = path;}">
           </component>
         </div>
 
         <div class="col-span-5">
-          <button class="py-2.5 px-6 bg-accent text-dark text-sm font-bold rounded-lg"  v-if="!(num == '1')"
+          <button class="py-2.5 px-6 bg-accent text-dark text-sm font-bold rounded-lg" v-if="!(num == '1')"
           @click="changeCurrentStep('previous')">Back</button>
 
-          <button class="py-2.5 px-6 bg-accent text-dark text-sm font-bold rounded-lg" 
+          <button class="py-2.5 px-6 bg-accent text-dark text-sm font-bold rounded-lg" v-if="!(num == '4')"
           @click="changeCurrentStep('next')">Continue</button>
+
+          <button class="py-2.5 px-6 bg-accent text-dark text-sm font-bold rounded-lg" v-if="(num == '4')"
+          @click="buildWebsite">Build Website</button>
         
         </div>
     </div>

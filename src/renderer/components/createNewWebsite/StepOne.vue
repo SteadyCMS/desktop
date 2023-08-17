@@ -6,8 +6,6 @@ defineEmits(['onChange']);
 const props =  defineProps(['name', 'isvalid', 'errortext']);
 webName.value = props.name;
 
-
-
 </script>
 
 <template>
@@ -25,7 +23,7 @@ webName.value = props.name;
         @input="$emit('onChange', webName)"
         placeholder="Website name..."
         :class="{'border-red-600': !props.isvalid }"
-        class="outline-none rounded-lg border-solid border-2 border-gray
+        class="outline-none rounded-lg border-solid border-2 border-light-gray
         focus:border-accent text-lg py-2 px-4 mx-2 my-4 max-w-md" />
 
         <div v-if="!props.isvalid" class="text-red-600 text-sm font-medium mx-4"> 
