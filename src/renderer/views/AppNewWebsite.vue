@@ -7,10 +7,16 @@
   import StepThree from '../components/createNewWebsite/StepThree.vue';
   import StepFour from '../components/createNewWebsite/StepFour.vue';
 
+  import AccentButton from '../components/buttons/AccentButton.vue';
+  import SecondaryButton from '../components/buttons/SecondaryButton.vue';
+
   import { downloadFile, extractFile, deleteFile } from '../utils/system.js'
 
   import LogoLight from '../components/logos/LogoLight.vue';
   import LogoDark from '../components/logos/LogoDark.vue';
+  import IconX from '../components/icons/IconX.vue';
+
+  const router = useRouter();
 
   // For Component Step switching
   const num = ref("1");
@@ -36,7 +42,7 @@
     }
   });
   
-  function changeCurrentStep(type){
+  function changeCurrentStep(type) {
     if (type == "next") {
       if (num.value == "1") {
         // validate user name input
@@ -95,7 +101,7 @@
   function validateUserInput() {
     // check if is input empty
     if (websiteName.value.trim() == "" || websiteName.value == null || websiteName.value.trim().length < 2) {
-      nameInputError.value = "Name must be at least two characters.";
+      nameInputError.value = "Name must be at least 2 characters.";
       return false;
     } else {
       var format = /[`!@#$%^&*()+\-=\[\]{};':"/|,<>\/?~]/;
@@ -109,7 +115,7 @@
     }
   }
 
-  function buildWebsite(){
+  function buildWebsite() {
     downloadFile('https://github.com/nanxiaobei/hugo-paper/archive/refs/heads/main.zip', '/sites/' + websiteName.value + '/temp/').then(files => {
       extractFile('/sites/' + websiteName.value + '/temp/hugo-paper-main.zip', '/sites/' + websiteName.value).then(files => {
         deleteFile('/sites/' + websiteName.value + '/temp/hugo-paper-main.zip');
@@ -118,10 +124,7 @@
    
   }
 
-
-  /********************/
-  const router = useRouter()
-  function backToDashbord() {
+  function backToDashboard() {
     router.go(-1);
     // router.push({path: '/new-website/step-two'});
     //localStorage.setItem('todo_items', JSON.stringify(this.todo_items)); 
@@ -130,10 +133,10 @@
 </script>
 
 <template>
-  <div class="relative max-w-6xl mx-auto">
+  <div class="relative max-w-6xl mx-auto px-8">
     <div class="flex flex-row w-full h-screen py-8">
-      <div class="w-2/3 flex flex-col justify-between">
-        <div class="">
+      <div class="w-5/6 md:w-2/3 flex flex-col justify-between">
+        <div>
           <!-- Steps -->
           <div class="flex flex-col w-full mt-6">
             <div>
@@ -145,7 +148,7 @@
             <h6 class="text-xs font-medium text-slate-600">Step {{ num }} of 4</h6>
           </div>
           <!-- Views -->
-          <div class="">
+          <div>
             <component :is="currentStepComponent" 
               :name="websiteName" 
               :isvalid="nameInputIsValid"
@@ -157,12 +160,17 @@
           </div>
         </div>
         <div class="space-x-1 mb-2">
-          <button class="py-3 px-6 bg-white text-dark border border-gray-300 text-sm font-bold rounded-lg" v-if="!(num == '1')"
-          @click="changeCurrentStep('previous')">Back</button>
-          <button class="py-3 px-6 bg-accent text-dark text-sm font-bold rounded-lg" v-if="!(num == '4')"
-          @click="changeCurrentStep('next')">Continue</button>
-          <button class="py-3 px-6 bg-accent text-dark text-sm font-bold rounded-lg" v-if="(num == '4')"
-          @click="buildWebsite">Build Website</button>
+          <SecondaryButton text="Cancel" v-if="(num == '1')" @click="backToDashboard" />
+          <SecondaryButton text="Back" v-if="!(num == '1')" @click="changeCurrentStep('previous')" />
+          <AccentButton text="Continue" v-if="!(num == '4')" @click="changeCurrentStep('next')" />
+          <AccentButton text="Create website" v-if="(num == '4')" @click="buildWebsite" />
+        </div>
+      </div>
+      <div class="w-1/6 md:w-1/3 flex flex-row justify-end mt-4">
+        <div>
+          <button class="py-3 px-6 bg-white text-dark" @click="backToDashboard">
+            <IconX class="fill-gray-400 w-8 h-8" />
+          </button>
         </div>
       </div>
     </div>

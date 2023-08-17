@@ -21,7 +21,7 @@
       </div>
     </div>
 
-    <div class="mt-10">
+    <div class="mt-8">
       <p>Website name: {{ props.websiteinfo.website }}</p>
       <p>Template: {{ props.websiteinfo.template }}</p>
       <p>Output path: {{ props.websiteinfo.path }}</p>

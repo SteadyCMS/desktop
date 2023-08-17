@@ -15,7 +15,7 @@
       </div>
     </div>
 
-    <div class="mt-10">
+    <div class="mt-8">
       <button class="py-10 px-10 border border-accent text-dark text-sm font-bold rounded-lg" 
         @click="$emit('chooseTemplate', 'Paper', 'https://github.com/nanxiaobei/hugo-paper/archive/refs/heads/main.zip')">
         Paper
