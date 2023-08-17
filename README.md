@@ -2,7 +2,7 @@
 
 The desktop app for SteadyCMS — a block-based, Hugo static site CMS for desktop and web.
 
-This repository contains the source for the desktop application built with Vue 3 and Electron. 
+This repository contains the source for the desktop application built with Vue 3, Electron, and Tailwindcss. 
 
 Status: **Highly work in progress. Not yet ready for use.**
 
@@ -11,8 +11,10 @@ Status: **Highly work in progress. Not yet ready for use.**
 
 For now the desktop application is our primary focus, then the web version. 
 
-The immediate goal is to create a simple, block-based frontend for creating and editing posts.
+The immediate goal is to create a simple frontend for creating a site and editing posts in a block-based editor.
 
+
+## Development
 
 ### Install dependencies
 
@@ -51,6 +53,8 @@ npm run build:linux # uses linux as build target
 ```
 
 Optional configuration options can be found in the [Electron Builder CLI docs](https://www.electron.build/cli.html).
+
+
 ## Project Structure
 
 ```bash
