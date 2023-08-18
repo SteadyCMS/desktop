@@ -112,14 +112,11 @@
 
   // Run Hugo.exe
   ipcMain.on('runHugo', (event, commands) => {
-  let fun = function(){
     console.log("RUN hugo Command(s): " + commands);
-    execFile(app.getAppPath() + '/static/hugo.exe', commands, function(err, data) {
+     execFile(app.getAppPath() + '/static/hugo.exe', commands, function(err, data) {
           console.log(err);
           console.log(data.toString());
       });
-  }
-  fun();
   });
 
   // Open url In Browser

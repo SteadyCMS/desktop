@@ -4,12 +4,14 @@
   const props =  defineProps(['websiteinfo']);
 
   /*
-  - show loading page
-  - download template / unzip / delete old zip
-  - make dir
-  - save web info as .json
+  # show loading page
+  # download template / unzip / delete old zip
+  # make dir
+  -/ save web info as .json
   - set up .t file
   - 
+  _ Read Dir for list of sites (must have .t file)
+
   */
 </script>
 

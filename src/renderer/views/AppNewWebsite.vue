@@ -12,7 +12,8 @@
   import AccentButton from '../components/buttons/AccentButton.vue';
   import SecondaryButton from '../components/buttons/SecondaryButton.vue';
 
-  import { downloadFile, extractFile, deleteFile } from '../utils/system.js'
+  import { downloadFile, extractFile, deleteFile, writeToFile } from '../utils/system.js'
+  import { createNewSite } from '../utils/hugo.js'
 
   import LogoLight from '../components/logos/LogoLight.vue';
   import LogoDark from '../components/logos/LogoDark.vue';
@@ -122,17 +123,27 @@
   function buildWebsite(){
     showLoadingScreen.value = true;
     const name = websiteName.value.replaceAll(' ', '_').toLowerCase();
+    // Run hugo
+    // download template
+    loadingScreenText.value = "Seting Up Site...";
+    createNewSite("C:/Users/sundr/Documents/SteadyCMS/sites/"  + name + "/").then(files => {
+
     loadingScreenText.value = "Downloading Template...";
-    downloadFile('https://github.com/nanxiaobei/hugo-paper/archive/refs/heads/main.zip', '/sites/' + name + '/temp/').then(files => {
-      loadingScreenText.value = "Prossesing Template...";
-      extractFile('/sites/' + name + '/temp/hugo-paper-main.zip', '/sites/' + name).then(files => {
-        deleteFile('/sites/' + name + '/temp/hugo-paper-main.zip').then(files => {
+    downloadFile('https://github.com/nanxiaobei/hugo-paper/archive/refs/heads/main.zip', '/sites/' + name + '/themes/').then(files => {
+      loadingScreenText.value = "Processing Template...";
+      extractFile('/sites/' + name + '/themes/hugo-paper-main.zip', '/sites/' + name + "/themes/").then(files => {
+        deleteFile('/sites/' + name + '/themes/hugo-paper-main.zip').then(files => {
           loadingScreenText.value = "Seting Up...";
-          router.go(-1);
+          // TODO: SET theme name in .toml
+          let hugoToml = "baseURL = 'http://example.org/'\r\nlanguageCode = 'en-us'\r\ntitle = '" + name.replaceAll("_", " ") +"'\r\ntheme='hugo-paper-main'";
+
+          writeToFile(hugoToml, "/sites/" + name, "hugo.toml");
+          backToDashboard()
         });
       });
     });
-   
+
+  });
   }
 
 
@@ -145,7 +156,9 @@
 </script>
 
 <template>
-  <LoadingScreen class="h-full w-full" v-if="showLoadingScreen" :loadingtext="loadingScreenText"></LoadingScreen>
+  <Transition name="fade" mode="out-in">
+    <LoadingScreen class="h-full w-full" v-if="showLoadingScreen" :loadingtext="loadingScreenText"></LoadingScreen>
+  </Transition>
   <div class="relative max-w-6xl mx-auto px-8">
     <div class="flex flex-row w-full h-screen py-8">
       <div class="w-5/6 md:w-2/3 flex flex-col justify-between">

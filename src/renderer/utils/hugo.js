@@ -1,15 +1,14 @@
 
 
-// For running Hugo
+// For running Hugo things
 
 export function startServer(pathToWebsite) {
     window.electronAPI.runHugo(['server', '-s', pathToWebsite ]);
   }
 
-export function createNewSite(pathToWebsite) {
-  window.electronAPI.runHugo(['new', 'site', pathToWebsite]);
+export async function createNewSite(pathToWebsite) {
+  await window.electronAPI.runHugo(['new', 'site', pathToWebsite]);
   }
-
 
 
 
