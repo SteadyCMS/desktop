@@ -101,7 +101,7 @@
   };
 
 
-  // Load in blocks and data from json on start if they exsist
+  // Load in blocks and data from json on start if they exist
   //   (async () => {
   //   const exists = await window.electronAPI.doesFileExist("websites/my-new-website/content/posts/my-blog-post.json")
   //   window.electronAPI.sendMessage(exists);
@@ -378,6 +378,15 @@
 
 
 <template>
+
+
+  <div class="relative">
+    
+
+  </div>
+
+
+
   <div class="flex flex-row">
 
     <div class="w-1/4 flex flex-col h-screen">

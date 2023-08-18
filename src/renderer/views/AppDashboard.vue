@@ -41,7 +41,7 @@
               @click="dropdownState =! dropdownState">
               <div class="flex items-center space-x-2">
                 <LogoMark class="w-5 h-5 border border-gray-800 rounded" />
-                <span class="text-white text-sm font-bold">Isaiah's Blog</span>
+                <span class="text-white text-sm font-semibold">Isaiah's Blog</span>
               </div>
               <IconArrowDown class="fill-gray-200 w-3 h-3 ml-1" :class="{'rotate-180 duration-300': dropdownState, 'duration-300' : !dropdownState}"/>
             </button>
@@ -51,13 +51,13 @@
                 <li class="flex flex-row flex-grow rounded-lg hover:bg-accent-glow hover:cursor-pointer px-4 py-2 duration-300">
                   <div class="flex flex-row items-center space-x-2">
                     <LogoMark class="w-5 h-5 border border-gray-800 rounded" />
-                    <span class="text-white text-sm font-bold">Tim's Blog</span>
+                    <span class="text-white text-sm font-semibold">Tim's Blog</span>
                   </div>
                 </li>
                 <li class="flex flex-row flex-grow rounded-lg hover:bg-accent-glow hover:cursor-pointer px-4 py-2 duration-300">
                   <div class="flex flex-row items-center space-x-2">
                     <LogoMark class="w-5 h-5 border border-gray-800 rounded" />
-                    <span class="text-white text-sm font-bold">John's Blog</span>
+                    <span class="text-white text-sm font-semibold">John's Blog</span>
                   </div>
                 </li>
               </ul>
@@ -70,17 +70,17 @@
         </div>
         <!-- Page links -->
         <div class="text-white flex flex-col space-y-1">
-          <RouterLink class="flex items-center rounded-lg px-4 py-2 font-bold"
+          <RouterLink class="flex items-center rounded-lg px-4 py-2 text-sm font-semibold"
             active-class="active-rl"
             to="/posts">
             <IconPosts class="w-4 h-4 mr-2" /> Posts
           </RouterLink>
-          <RouterLink class="flex items-center rounded-lg px-4 py-2 text-gray-300 fill-gray-300 font-bold"
+          <RouterLink class="flex items-center rounded-lg px-4 py-2 text-gray-300 fill-gray-300 text-sm font-semibold"
             active-class="active-rl" 
             to="/pages">
             <IconPages class="w-4 h-4 mr-2" /> Pages
           </RouterLink>
-          <RouterLink class="flex items-center rounded-lg px-4 py-2 text-gray-300 fill-gray-300 font-bold" 
+          <RouterLink class="flex items-center rounded-lg px-4 py-2 text-gray-300 fill-gray-300 text-sm font-semibold" 
             active-class="active-rl"
             to="/tags">
             <IconTags class="w-4 h-4 mr-2" /> Tags

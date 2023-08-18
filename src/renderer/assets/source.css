@@ -2,8 +2,29 @@
 @tailwind components;
 @tailwind utilities;
 
+@font-face {
+  font-family: "Inter";
+  src: url("../assets/inter/Inter-Regular.otf") format("opentype");
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "Inter";
+  src: url("../assets/inter/Inter-Semibold.otf") format("opentype");
+  font-weight: 600;
+  font-style: 600;
+}
+
+@font-face {
+  font-family: "Inter";
+  src: url("../assets/inter/Inter-Bold.otf") format("opentype");
+  font-weight: bold;
+  font-style: bold;
+}
+
 body {
-    @apply font-sans;
+    font-family: "Inter";
 }
 
 .ql-container {

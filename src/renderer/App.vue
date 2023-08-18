@@ -8,7 +8,7 @@ window.electronAPI.sendMessage('Hello from App.vue');
 <template>
   <main> 
 
-    <div class="">
+    <div class="subpixel-antialiased">
       <RouterView />
     </div>
 
