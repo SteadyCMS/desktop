@@ -33,43 +33,40 @@ function toolbarStlye(value){
 
 
    
-    const quillEditor = ref();
-    function onQuillReady() {
+    // const quillEditor = ref();
+    // function onQuillReady() {
         
-        quillEditor.keyboard.bindings[13].unshift({
-        key: 13,
-        handler: (range, context) => {
-            console.log('jjjj')
+    //     quillEditor.keyboard.bindings[13].unshift({
+    //     key: 13,
+    //     handler: (range, context) => {
+    //         console.log('jjjj')
 
-            if (this.popupVisible) {
-                return false;
-            }
-            return true;
-        }
-    });
+    //         if (this.popupVisible) {
+    //             return false;
+    //         }
+    //         return true;
+    //     }
+    // });
 
 
   // focus editor when it is ready
   //quillEditor.value.getQuill().blur();
-}
+//}
 
 
 
 </script>
 
 <template>
+    <QuillEditor v-model:content="props.item.content" 
+        :toolbar="toolbarStlye(props.item)"
+        @keydown.enter.exact.prevent
+        @keydown.enter.exact="$emit('onPressEnter')"
+        ref="quillEditor"
+        theme="bubble" 
+        placeholder="Write Here..." 
+        contentType="html"/>
 
-        <QuillEditor v-model:content="props.item.content" 
-          :toolbar="toolbarStlye(props.item)"
-          @keydown.enter.exact.prevent
-          @keydown.enter.exact="$emit('onPressEnter')"
-          @ready="onQuillReady"
-          ref="quillEditor"
-          theme="bubble" 
-          toolbar="essential" 
-          placeholder="Write Here..." 
-          contentType="html"/>
-  
 </template>
 
 
