@@ -4,8 +4,8 @@
         }
 
     // Write To File (IN DOCUMENTS)
-    export function writeToFile(content, path, fileName) {
-        window.electronAPI.writeToFile(content, path, fileName);
+    export async function writeToFile(content, path, fileName) {
+        return await window.electronAPI.writeToFile(content, path, fileName);
         }
 
     // Read From File (IN DOCUMENTS)
@@ -20,15 +20,15 @@
         }
 
     // Write To File (IN APP DIR)
-    export function writeToFileInAppDir(content, path, fileName) {
-        window.electronAPI.writeToFile(content, path, fileName);
+    export async function writeToFileInAppDir(content, path, fileName) {
+        return await window.electronAPI.writeToFileInAppDir(content, path, fileName);
         }
 
     // Read From File (IN APP DIR)
     export async function readFileInAppDir(path) {
-            const exists = await window.electronAPI.doesFileExist(path);
+            const exists = await window.electronAPI.doesFileExistInAppDir(path);
             if(exists){
-                const rawData = await window.electronAPI.readFile(path);
+                const rawData = await window.electronAPI.readFileInAppDir(path);
                 return { success: true, data: rawData };
             }else{
                 return { success: false, data: path + "File does not exists."};
@@ -41,7 +41,7 @@
             return data;
     }
 
-    // extract zip File (IN DOCUMENTS)
+    // Extract zip File (IN DOCUMENTS)
     export async function extractFile(source, target) {
         const data = await window.electronAPI.extractFile(source, target);
         return data;
@@ -52,3 +52,28 @@
         await window.electronAPI.deleteFile(path);
         }
 
+    // Check if file exsists (IN DOCUMENTS)
+    export async function doesFileExist(path) {
+        const data = await window.electronAPI.doesFileExist(path);
+        return data;
+        }
+
+    // Check if file exsists (IN APP DIR)
+    export async function doesFileExistInAppDir(path) {
+        const data = await window.electronAPI.doesFileExistInAppDir(path);
+        return data;
+        }
+        
+    // Get Paths
+    export async function getPathTo(place) {
+        const path = await window.electronAPI.getPathTo(place);
+        return path;
+        }
+        
+    // Get Dirs
+    export  function getDirsIn(rootDir) {
+        const dirs =  window.electronAPI.getDirsIn(rootDir);
+        return dirs;
+        }
+
+        

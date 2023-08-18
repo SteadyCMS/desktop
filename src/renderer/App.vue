@@ -1,6 +1,5 @@
 <script setup>
 import { RouterLink, RouterView } from 'vue-router';
-
 window.electronAPI.sendMessage('Hello from App.vue');
 
 </script>
@@ -12,7 +11,6 @@ window.electronAPI.sendMessage('Hello from App.vue');
       <RouterView />
     </div>
 
-    <!--  <BlockEditorView />  -->
   </main>
 </template>
 

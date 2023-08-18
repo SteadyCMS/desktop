@@ -2,6 +2,8 @@
   import { ref } from 'vue';
   import { RouterLink, RouterView, useRouter} from 'vue-router';
 
+  import { getDirsIn, doesFileExistInAppDir, readFileInAppDir, getPathTo, doesFileExist } from '../utils/system.js'
+
   import LogoLight from '../components/logos/LogoLight.vue';
   import LogoMark from '../components/logos/LogoMark.vue';
   import IconThreeDots from '../components/icons/IconThreeDots.vue';
@@ -17,9 +19,51 @@
   // On load set view to posts
   router.push({path: '/posts'});
 
+  const websites = ref([]);
+  const currentWebsite = ref('');
+
+  (function() {
+    doesFileExistInAppDir('steady.config.json').then(fileExsits => {
+      if (fileExsits) {
+          // Get the Current website
+        readFileInAppDir("steady.config.json").then(fileData => {
+          currentWebsite.value = cleanSiteName(JSON.parse(fileData.data).currentWebsite);
+      
+          // Get a list of all websites by looping over the dirs and add them to array for the dropdown
+          getPathTo('documents').then(path => {
+            getDirsIn(path + "/SteadyCMS/sites/").then( dirs => {
+              for (let i = 0; i < dirs.length; i++) {
+                doesFileExist("/sites/" + dirs[i] + '/hugo.toml').then(fileExsits => {
+                  if (fileExsits && dirs[i] != currentWebsite.value) {
+                    websites.value.splice(0,0, { "name": cleanSiteName(dirs[i]), "path": dirs[i], });
+                  }
+                });
+              }
+            });
+          });
+        });
+      } else { 
+        console.log("THEY have no websites!");
+        // THEY have no websites (have them make one)
+      }
+    });
+  })();
+
+  function cleanSiteName(name) {
+    const rawName = name[0].toUpperCase() + name.slice(1);
+    return rawName.replaceAll('_', ' ');
+  }
+
   function createNewWebsite() {
     router.push({path: '/new-website'});
   }
+
+  function changeWebsite(websiteName){
+    //TODO: load the site
+    console.log(websiteName);
+  }
+
+
 </script>
 
 <template>
@@ -40,24 +84,20 @@
             <button class="flex flex-grow items-center justify-between px-4 py-2 rounded-lg border border-gray-800 w-full hover:bg-accent-glow duration-300" 
               @click="dropdownState =! dropdownState">
               <div class="flex items-center space-x-2">
+
                 <LogoMark class="w-5 h-5 border border-gray-800 rounded" />
-                <span class="text-white text-sm font-bold">Isaiah's Blog</span>
+                <span class="text-white text-sm font-bold">{{ currentWebsite }}</span>
               </div>
+
               <IconArrowDown class="fill-gray-200 w-3 h-3 ml-1" :class="{'rotate-180 duration-300': dropdownState, 'duration-300' : !dropdownState}"/>
             </button>
             <!-- Dropdown menu -->
             <div class="absolute top-6 left-0 bg-black border border-gray-800 text-base z-50 list-none rounded-lg my-4 w-full" id="dropdown" :class="{'opacity-100': dropdownState, 'visible': dropdownState, 'opacity-0': !dropdownState, 'hidden': !dropdownState}">
               <ul class="py-1" aria-labelledby="dropdown">
-                <li class="flex flex-row flex-grow rounded-lg hover:bg-accent-glow hover:cursor-pointer px-4 py-2 duration-300">
+                <li v-for="sites in websites" @click="changeWebsite(sites.path)" class="flex flex-row flex-grow rounded-lg hover:bg-accent-glow hover:cursor-pointer px-4 py-2 duration-300">
                   <div class="flex flex-row items-center space-x-2">
                     <LogoMark class="w-5 h-5 border border-gray-800 rounded" />
-                    <span class="text-white text-sm font-bold">Tim's Blog</span>
-                  </div>
-                </li>
-                <li class="flex flex-row flex-grow rounded-lg hover:bg-accent-glow hover:cursor-pointer px-4 py-2 duration-300">
-                  <div class="flex flex-row items-center space-x-2">
-                    <LogoMark class="w-5 h-5 border border-gray-800 rounded" />
-                    <span class="text-white text-sm font-bold">John's Blog</span>
+                    <span class="text-white text-sm font-bold"> {{ sites.name }}</span>
                   </div>
                 </li>
               </ul>

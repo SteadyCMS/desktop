@@ -1,7 +1,7 @@
   import {app, BrowserWindow, ipcMain, session} from 'electron';
   import {join} from 'path';
 
-  import {readFileSync, mkdir, writeFile, existsSync, rmSync} from 'fs';
+  import {readFileSync, mkdir, writeFile, existsSync, rmSync, readdir, statSync, readdirSync} from 'fs';
   import {execFile} from 'child_process';
   import {download} from "electron-dl";
   import decompress from "decompress";
@@ -62,14 +62,14 @@
 
   // Read From File (IN DOCUMENTS)
   ipcMain.handle('readFromFile',  async (event, path) => {
-    const filePath = join(app.getPath('documents') + "/SteadyCMS/" + path);
+    const filePath = app.getPath('documents') + "/SteadyCMS/" + path;
     const data = readFileSync(filePath);
     return data.toString();
   });
 
   // Read From File (IN APP DIR)
-  ipcMain.handle('readFromFileInAppDir',  async (event, path) => {
-    const filePath = join(app.getAppPath(),  "/SteadyCMS/" + path);
+  ipcMain.handle('readFileInAppDir',  async (event, path) => {
+    const filePath = app.getAppPath()+  "/SteadyCMS/" + path;
     const data = readFileSync(filePath);
     return data.toString();
   });
@@ -156,6 +156,68 @@
       throw err
     }
   });
+
+  // Get Paths
+  ipcMain.handle('getPathTo', (event, place) => {
+ 
+    switch (place) {
+      case "documents": //  Directory for a user's "My Documents".
+        return app.getPath('documents');
+
+      case "appdir": // Our app directory path
+        return app.getAppPath();
+
+      case "home": //  User's home directory.
+        return app.getPath('home');
+
+      case "temp": // Temporary directory.
+        return app.getPath('temp');
+
+      case "userdata": //  The directory for storing your app's configuration files, which by default is the appData directory appended with your app's name. By convention files storing user data should be written to this directory, and it is not recommended to write large files here because some environments may backup this directory to cloud storage.
+        return app.getPath('userData');
+
+      case "desktop": // The current user's Desktop directory.
+        return app.getPath('desktop');
+        
+      case "downloads": //  Directory for a user's downloads.
+        return app.getPath('downloads');
+
+      case "music": // Directory for a user's music.
+        return app.getPath('music');
+
+      case "pictures": // Directory for a user's pictures.
+        return app.getPath('pictures');
+
+      case "videos": // Directory for a user's videos.
+        return app.getPath('videos');
+
+      case "steady": // To Steady CMS's main directory
+        return app.getPath('documents') + '/steadyCMS/';
+
+      default: // default : Our app directory path
+        console.log(place + "! Not Found. Returning default path [getPathTo:main.js]")
+        return app.getAppPath();
+    }
+  });
+
+  ipcMain.handle('getDirsIn', (event, rootDir) => {
+    return readdirSync(rootDir, { withFileTypes: true })
+    .filter(dirent => dirent.isDirectory())
+    .map(dirent => dirent.name)
+ });
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

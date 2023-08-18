@@ -29,9 +29,16 @@
     return data;
   },
   deleteFile: (path) => ipcRenderer.send('deleteFile', path),
+  getPathTo: async (place) =>  {
+    const data = await ipcRenderer.invoke('getPathTo', place);
+    return data;
+  },
+  getDirsIn: (rootDir) =>  {
+    const data =  ipcRenderer.invoke('getDirsIn', rootDir);
+    return data;
+  },
+
+
+
 
   });
-//   ipcRenderer.send("download", {
-//     url: "URL is here",
-//     properties: {directory: "Directory is here"}
-// });

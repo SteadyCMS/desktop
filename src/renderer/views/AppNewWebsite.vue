@@ -12,7 +12,7 @@
   import AccentButton from '../components/buttons/AccentButton.vue';
   import SecondaryButton from '../components/buttons/SecondaryButton.vue';
 
-  import { downloadFile, extractFile, deleteFile, writeToFile } from '../utils/system.js'
+  import { downloadFile, extractFile, deleteFile, writeToFile, getPathTo, doesFileExistInAppDir, readFileInAppDir, writeToFileInAppDir } from '../utils/system.js'
   import { createNewSite } from '../utils/hugo.js'
 
   import LogoLight from '../components/logos/LogoLight.vue';
@@ -120,32 +120,56 @@
   }
 
 
-  function buildWebsite(){
+
+  function buildWebsite(){ // TODO: Add A cancel and clean up
     showLoadingScreen.value = true;
     const name = websiteName.value.replaceAll(' ', '_').toLowerCase();
-    // Run hugo
-    // download template
+    
+    // Create New Hugo Site
     loadingScreenText.value = "Seting Up Site...";
-    createNewSite("C:/Users/sundr/Documents/SteadyCMS/sites/"  + name + "/").then(files => {
+    getPathTo('documents').then(path => {
+      createNewSite(path + "/SteadyCMS/sites/"  + name + "/").then(x => {
 
-    loadingScreenText.value = "Downloading Template...";
-    downloadFile('https://github.com/nanxiaobei/hugo-paper/archive/refs/heads/main.zip', '/sites/' + name + '/themes/').then(files => {
-      loadingScreenText.value = "Processing Template...";
-      extractFile('/sites/' + name + '/themes/hugo-paper-main.zip', '/sites/' + name + "/themes/").then(files => {
-        deleteFile('/sites/' + name + '/themes/hugo-paper-main.zip').then(files => {
-          loadingScreenText.value = "Seting Up...";
-          // TODO: SET theme name in .toml
-          let hugoToml = "baseURL = 'http://example.org/'\r\nlanguageCode = 'en-us'\r\ntitle = '" + name.replaceAll("_", " ") +"'\r\ntheme='hugo-paper-main'";
+      // Download Hugo Template, extract zip and delete .zip file
+      loadingScreenText.value = "Downloading Template..."; // TODO: Check for WIFI!!! 
+      downloadFile('https://github.com/nanxiaobei/hugo-paper/archive/refs/heads/main.zip', '/sites/' + name + '/themes/').then(x => {
+        loadingScreenText.value = "Processing Template...";
+        extractFile('/sites/' + name + '/themes/hugo-paper-main.zip', '/sites/' + name + "/themes/").then(x => {
+          deleteFile('/sites/' + name + '/themes/hugo-paper-main.zip').then(x => {
 
-          writeToFile(hugoToml, "/sites/" + name, "hugo.toml");
-          backToDashboard()
+            // Set up hugo.toml
+            loadingScreenText.value = "Configuring Site..."; // TODO: SET theme name in .toml
+            let hugoToml = "baseURL = 'http://example.org/'\r\nlanguageCode = 'en-us'\r\ntitle = '" + name.replaceAll("_", " ") +"'\r\ntheme='hugo-paper-main'";
+            writeToFile(hugoToml, "/sites/" + name, "hugo.toml").then(x => {
+
+              // Saving info to steady.config.json
+              loadingScreenText.value = "Finishing Up...";
+              doesFileExistInAppDir('steady.config.json').then(fileExsits => {
+                // If the file exsists add too
+                if (fileExsits) {
+                  readFileInAppDir("steady.config.json").then(fileData => {
+                    let fileObj = JSON.parse(fileData.data);
+                    fileObj.currentWebsite = name;
+                    writeToFileInAppDir(JSON.stringify(fileObj), "/", "steady.config.json").then(x => {
+                      backToDashboard();
+                    });
+                  });
+                } else {
+                // Else make the file and write info
+                  const obj = {"defultWebsite": "/", "currentWebsite": name};
+                  writeToFileInAppDir(JSON.stringify(obj), "/", "steady.config.json").then(x => {
+                    backToDashboard();
+                  });
+                }
+              });
+
+            });
+          });
         });
       });
     });
-
   });
   }
-
 
   function backToDashboard() {
     router.go(-1);
