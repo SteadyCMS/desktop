@@ -1,8 +1,11 @@
 <script setup>
+  import { useRouter } from 'vue-router';
   import {Drag, DropList} from 'vue-easy-dnd';
   import { ref, computed } from 'vue';
   import TurndownService from 'turndown';
   //import Showdown from 'showdown';
+
+  import AccentButton from '../components/buttons/AccentButton.vue';
 
   // Blocks
   import ParagraphBlock from '../components/blocks/ParagraphBlock.vue';
@@ -17,6 +20,8 @@
   import IconDragHandle from '../components/icons/IconDragHandle.vue';
   import IconPlus from '../components/icons/IconPlus.vue';
   import IconX from '../components/icons/IconX.vue';
+
+  const router = useRouter();
 
   // Var
   let overTopbar = false;
@@ -373,6 +378,10 @@
     }
   }
 
+  function goToDashboard() {
+    router.push({path: '/'});
+  }
+
 
 </script>
 
@@ -382,8 +391,8 @@
 
   <div class="relative">
     
-
   </div>
+    <AccentButton text="Posts" @click="goToDashboard" />
 
 
 
