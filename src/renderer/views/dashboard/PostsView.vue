@@ -21,7 +21,7 @@
 
       <div class="rounded-lg cursor-pointer py-5 px-6 bg-slate-50 hover:bg-slate-100 duration-500">
         <div class="flex flex-row justify-between items-center">
-          <h4 class="flex items-center text-xl text-dark font-bold">Sunshine and storm clouds <span class="text-sm text-slate-500 ml-1 font-bold">&mdash; Draft</span></h4>
+          <h4 class="flex items-center text-xl text-dark font-bold">Sunshine and storm clouds <span class="text-sm text-slate-500 ml-1 font-semibold">&mdash; Draft</span></h4>
           <span class="text-xs text-slate-500">Aug 17, 2023 5:12pm</span>
         </div>
         <p class="text-slate-500 text-sm mt-1 max-w-2xl truncate">Borders are a great way to distinguish two elements from one another, but using too many of them can make your design feel busy and cluttered.</p>
