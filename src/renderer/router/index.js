@@ -7,7 +7,6 @@ import PostsView from '../views/dashboard/PostsView.vue'
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
-
     {
       path: '/',
       name: 'dashboard',
@@ -34,29 +33,12 @@ const router = createRouter({
       path: '/new-website',
       name: 'newwebsite',
       component: () => import('../views/AppNewWebsite.vue'),
-      // children: [
-      //   {
-      //     path: 'step-one',
-      //     name: 'stepone',
-      //     component: () => import('../views/createNewWebsite/StepOne.vue')
-      //   },
-      //   {
-      //     path: 'step-two',
-      //     name: 'steptwo',
-      //     component: () => import('../views/createNewWebsite/StepTwo.vue')
-      //   },
-      // ]
     },
-
-
-
-
-
-
-
-
-
-
+    {
+      path: '/editor',
+      name: 'editor',
+      component: () => import('../views/BlockEditorView.vue'),
+    },
     {
       path: "/:catchAll(.*)",
       name: 'notfound',

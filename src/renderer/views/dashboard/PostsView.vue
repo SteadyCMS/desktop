@@ -1,12 +1,20 @@
 <script setup>
+  import { useRouter } from 'vue-router';
+
   import AccentButton from '../../components/buttons/AccentButton.vue';
+  
+  const router = useRouter();
+
+  function goToBlockEditor() {
+    router.push({path: '/editor'});
+  }
 </script>
 
 <template>
   <div class="w-full my-4 mx-8">
     <div class="flex flex-grow align-center items-center justify-between mx-6">
       <h1 class="text-4xl text-dark font-bold">Posts</h1>
-      <AccentButton text="Add Post" />
+      <AccentButton text="Add Post" @click="goToBlockEditor" />
     </div>
 
     <div class="flex flex-col mt-12 space-y-2">

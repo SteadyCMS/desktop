@@ -5,18 +5,18 @@
   //import Showdown from 'showdown';
 
   // Blocks
-  import textEditor from './blocks/ParagraphBlockEditor.vue';
-  import headerEditor from './blocks/HeaderBlockInput.vue';
-  import imageBlock from './blocks/ImageBlockInput.vue';
+  import textEditor from '../components/blocks/ParagraphBlockEditor.vue';
+  import headerEditor from '../components/blocks/HeaderBlockInput.vue';
+  import imageBlock from '../components/blocks/ImageBlockInput.vue';
 
-  import header from './blockTopbar/HeaderBlockTopbar.vue';
-  import paragraph from './blockTopbar/ParagraphBlockTopbar.vue';
-  import image from './blockTopbar/ImageBlockTopbar.vue';
+  import header from '../components/blockTopbar/HeaderBlockTopbar.vue';
+  import paragraph from '../components/blockTopbar/ParagraphBlockTopbar.vue';
+  import image from '../components/blockTopbar/ImageBlockTopbar.vue';
 
   // Icons
-  import IconDragHandle from './icons/IconDragHandle.vue';
-  import IconPlus from './icons/IconPlus.vue';
-  import IconX from './icons/IconX.vue';
+  import IconDragHandle from '../components/icons/IconDragHandle.vue';
+  import IconPlus from '../components/icons/IconPlus.vue';
+  import IconX from '../components/icons/IconX.vue';
 
   // Var
   let overTopbar = false;
