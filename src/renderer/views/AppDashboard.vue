@@ -43,8 +43,8 @@
           });
         });
       } else { 
-        console.log("THEY have no websites!");
-        // THEY have no websites (have them make one)
+        // They have no websites (have them make one)
+        createNewWebsite();
       }
     });
   })();

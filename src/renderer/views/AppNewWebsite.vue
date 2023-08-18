@@ -181,7 +181,7 @@
 
 <template>
   <Transition name="fade" mode="out-in">
-    <LoadingScreen class="h-full w-full" v-if="showLoadingScreen" :loadingtext="loadingScreenText"></LoadingScreen>
+    <LoadingScreen class="h-full w-full" v-if="showLoadingScreen" :title="'Building Website:'" :text="loadingScreenText"></LoadingScreen>
   </Transition>
   <div class="relative max-w-6xl mx-auto px-8">
     <div class="flex flex-row w-full h-screen py-8">

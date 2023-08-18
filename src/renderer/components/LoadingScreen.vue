@@ -1,9 +1,7 @@
 <script setup>
   import { ref } from 'vue';
 
-  const props =  defineProps(['loadingtext']);
-
-
+  const props =  defineProps(['title', 'text']);
 </script>
 
 <template>
@@ -18,8 +16,8 @@
           </svg>
         </div>
       </div>
-      <div class="text-center mt-6 text-lg text-gray-600 font-medium">Building Website:</div>
-      <div class="text-center mt-2 text-lg text-gray-600 font-medium">{{ props.loadingtext }}</div>
+      <div class="text-center mt-6 text-lg text-gray-600 font-medium">{{ props.title }}</div>
+      <div class="text-center mt-2 text-lg text-gray-600 font-medium">{{ props.text }}</div>
 
     </div>
   </Transition>
