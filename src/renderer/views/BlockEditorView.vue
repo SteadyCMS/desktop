@@ -1,13 +1,13 @@
 <script setup>
-  import {Drag, DropList} from "vue-easy-dnd";
+  import {Drag, DropList} from 'vue-easy-dnd';
   import { ref, computed } from 'vue';
   import TurndownService from 'turndown';
   //import Showdown from 'showdown';
 
   // Blocks
-  import textEditor from '../components/blocks/ParagraphBlockEditor.vue';
-  import headerEditor from '../components/blocks/HeaderBlockInput.vue';
-  import imageBlock from '../components/blocks/ImageBlockInput.vue';
+  import ParagraphBlock from '../components/blocks/ParagraphBlock.vue';
+  import HeadingBlock from '../components/blocks/HeadingBlock.vue';
+  import ImageBlock from '../components/blocks/ImageBlock.vue';
 
   import header from '../components/blockTopbar/HeaderBlockTopbar.vue';
   import paragraph from '../components/blockTopbar/ParagraphBlockTopbar.vue';
@@ -87,10 +87,10 @@
   ]);
 
   const mainBlockTypes = {
-    "paragraph": textEditor,
-    "heading": headerEditor,
-    "list": textEditor,
-    "image": imageBlock,
+    "paragraph": ParagraphBlock,
+    "heading": HeadingBlock,
+    "list": ParagraphBlock,
+    "image": ImageBlock,
   };
 
   const blockBarTypes = {
@@ -447,7 +447,7 @@
           <!-- Block Icons -->
           <div class="flex flex-col mt-4 " :class="{ 'visible':item.active, 'invisible':!item.active, 'group-hover:visible':!item.active }">
             <span class="drag-handle mb-1 hover:cursor-grab">
-                <IconDragHandle class="w-8"/>
+              <IconDragHandle class="w-8"/>
             </span>
             <span @click="openBlockBox(blocks, item, 'click')" class="add-button">
               <IconPlus class="w-8"/>
@@ -462,15 +462,15 @@
                   <input v-model="filterText" type="text" placeholder="Search Blocks..." 
                     class="m-3 outline-1 outline-slate-300 border-1 border-slate-400 p-2 rounded-sm" />
                   <div class="w-full h-full flex flex-col m-2 overflow-scroll">
-                      <div v-for="(blockItems, i) in filteredBlocks" :key="i">
-                        <span class="w-full flex flex-row" @click="addNewBlock(blocks, item, blockItems.name)">
-                            {{ blockItems.icon }}
-                          <span  class="text-base text-slate-600">
-                            {{ blockItems.name }}
-                          </span>
-                        </span> 
-                      </div>
-                      <span v-if="!filteredBlocks.length" class="text-base text-slate-600 ml-1">No Blocks Found</span>
+                    <div v-for="(blockItems, i) in filteredBlocks" :key="i">
+                      <span class="w-full flex flex-row" @click="addNewBlock(blocks, item, blockItems.name)">
+                          {{ blockItems.icon }}
+                        <span  class="text-base text-slate-600">
+                          {{ blockItems.name }}
+                        </span>
+                      </span> 
+                    </div>
+                    <span v-if="!filteredBlocks.length" class="text-base text-slate-600 ml-1">No Blocks Found</span>
                   </div>
                 </div>
               </div>
@@ -494,7 +494,6 @@
       <div class="h-10">
       </div>    
       <div class="border-2 border-slate-200 rounded h-full">
-
         
         <button class="bg-blue-500 rounded p-2 m-2 text-white" @click="saveAsDraft">Save as Draft</button> <!-- Convert to .json & .markdown-->
         <button class="bg-blue-500 rounded p-2 m-2 text-white" @click="makeSitePreview">Preview</button> <!-- Do "Save as Draft" + run hugo and show -->
