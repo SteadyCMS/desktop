@@ -5,6 +5,9 @@
   import TurndownService from 'turndown';
   //import Showdown from 'showdown';
 
+  import { writeToFile, openInBrowser, getPathTo } from '../utils/system.js'
+  import { startServer } from '../utils/hugo.js'
+ 
   import AccentButton from '../components/buttons/AccentButton.vue';
   import FlatButton from '../components/buttons/FlatButton.vue';
 
@@ -30,6 +33,8 @@
   let blockButton = false;
   const filterText = ref('');
   const pageTitle = ref('Untitled');
+  const isDraft = ref("false");
+  const setToDraft = false;
 
   let blocks = ref([
     {
@@ -240,7 +245,7 @@
   // Close the add new block box (with above)
   function closeBoxOnOut(e, array, value) {
     if (!blockButton) {
-      console.log("closed 2")
+     // console.log("closed 2")
       for (let i = 0; i < array.length; i++) {
         array[i].menu = false;
       } 
@@ -306,49 +311,91 @@
     return blockProperties;
   }
 
-  /*** Output Funcsions ***/
+  /*** Output  ***/
 
   // Convert to .json & .markdown
   function saveAsDraft() {
-
     saveJsonAndMarkdownToFile("-");
-
   }
 
-  function makeSitePreview() {
+  // On enter create new paragraph block if called on paragraph or header
+  function addNewBlockOnEnter(array, value, name){
+    console.log("enter")
+    if(name == "paragraph" || name == "header"){
+      addNewBlock(array, value, name);
+    }
+  }
 
+  function goToDashboard() {
+    router.push({path: '/'});
   }
 
 
-  function publishSite() {
-    setupHugo()
-    // 4. hugo server
-    window.electronAPI.runHugo(['server', '-s', 'C:/Users/sundr/Documents/Projects/desktop/build/main/data/websites/my-new-website']);
-    // 5. open in browser  http://localhost:1313
+// -------------------------------
 
-  window.electronAPI.openInBrowser('http://localhost:1313/post/my-blog-post');
+// TODO: if they change the post name delete the old files
+
+  function previewSite(){
+    let siteName = "test_site";
+
+    buildAndSavePost();
+    getPathTo('documents').then(path => { 
+      startServer(path + "/steadyCMS/sites/" + siteName);
+      openInBrowser('http://localhost:1313/post/' + titleToFileName(pageTitle.value));
+    });
   }
 
-  function setupHugo() {
-    // 1. [init hugo] like
-    window.electronAPI.runHugo(['new', 'site', 'C:/Users/sundr/Documents/Projects/desktop/build/main/data/websites/my-new-website']);
-    // 2. add theme they picked TODO (or git submodule add https://github.com/theNewDynamic/gohugo-theme-ananke.git themes/ananke) (MUST have git)
-    // 3. set hugo.toml TODO (or echo "theme = 'ananke'" >> hugo.toml)
-    // TODO set up hugoToml
-    let hugoToml = "baseURL = 'http://example.org/'\r\nlanguageCode = 'en-us'\r\ntitle = 'My New Hugo Site'\r\ntheme='stackt'";
-    window.electronAPI.writeToFile(hugoToml, "websites/my-new-website", "hugo.toml");
+  // Convert blocks to markdown and json 
+  function buildAndSavePost(){
+    let postTitle = pageTitle.value;
+    let siteName = "test_site";
 
-  }
+    // get date
+    Date.prototype.yyyymmdd = function() {
+      let mm = this.getMonth() + 1; // getMonth() is zero-based
+      let dd = this.getDate();
 
-  function saveJsonAndMarkdownToFile(title) {
-    let blocksData = blocks['_rawValue'];
+      return [this.getFullYear(),
+              (mm>9 ? '' : '0') + mm,
+              (dd>9 ? '' : '0') + dd
+            ].join('-');
+    };
 
-    // TODO: get and add date (set up all)
-    let pageHead = '---\r\ndate: 2017-04-09T10:58:08-04:00\r\ndescription: "The Grand Hall"\r\nfeatured_image: "/images/Pope-Edouard-de-Beaumont-1844.jpg"\r\ntags: ["scene"]\r\ntitle: "Chapter I: The Grand Hall"\r\n---\r\n';
-    
+    Date.prototype.hhmmss = function() {
+      let hh = this.getHours();
+      let mm = this.getMinutes();
+      let ss = this.getSeconds();
+
+      return [(hh>9 ? '' : '0') + hh,
+              (mm>9 ? '' : '0') + mm,
+              (ss>9 ? '' : '0') + ss
+            ].join(':');
+    };
+    let datex = new Date();
+
+    let date = datex.yyyymmdd() + "T" + datex.hhmmss();
+    let postDescription = "The Grand Hall";
+    let featuredImage = "/images/Pope-Edouard-de-Beaumont-1844.jpg";
+    let postTages = '"scene", "scene", "scene"';
+   
+
+    const blocksData = blocks['_rawValue'];
+   // let pageHead = '---\r\ndate: ${date} \r\ndescription: "${postDescription}"\r\nfeatured_image: "${featuredImage}"\r\ntags: [${postTages}]\r\ntitle: "${postTitle}"\r\n---\r\n';
+
+    let pageHead = '---\r\ndate: ' + date +
+    '\r\ndescription: "' + postDescription +
+    '"\r\nfeatured_image: "' + featuredImage +
+    '"\r\ntags: [' + postTages +
+    ']\r\ntitle: "' + postTitle +
+    '"\r\ndraft: ' + isDraft.value +
+    '\r\n---\r\n';
+  
+
+    // Save as Json
     let jsonData = JSON.stringify(blocks['_rawValue'], null, 4);
-    window.electronAPI.writeToFile('{"data": ' + jsonData + '}', "websites/my-new-website/content/post", "my-blog-post.json");
+    writeToFile('{"data": ' + jsonData + '}', "sites/" + siteName + "/content/post", titleToFileName(postTitle) + ".json");
 
+    // Save as markdown
     var data = pageHead;
     for (let i = 0; i < blocksData.length; i++) {
       switch(blocksData[i].type) {
@@ -369,20 +416,15 @@
           data = data + "\n\n" + htmlToMarkdown(blocksData[i].content);
       }
     } 
-    window.electronAPI.writeToFile(data, "websites/my-new-website/content/post", "my-blog-post.markdown");
+    writeToFile(data, "sites/" + siteName + "/content/post", titleToFileName(postTitle) + ".markdown");
+
   }
 
-  // On enter create new paragraph block if called on paragraph or header
-  function addNewBlockOnEnter(array, value, name){
-    console.log("enter")
-    if(name == "paragraph" || name == "header"){
-      addNewBlock(array, value, name);
-    }
+  function titleToFileName(postTitle) {
+    return postTitle.replaceAll(" ", "-").replace(/[`!@#$%^&*()+.=\[\]{};':"/|,<>\/?~]/g, "-").toLowerCase();
   }
 
-  function goToDashboard() {
-    router.push({path: '/'});
-  }
+
 
 </script>
 
@@ -397,7 +439,7 @@
         <p class="text-slate-400 text-sm">Draft</p>
       </div>
       <div class="flex flex-row items-center space-x-3">
-        <button @click="makeSitePreview">
+        <button @click="previewSite">
           Preview
         </button>
         <button @click="publishSite">
