@@ -6,6 +6,7 @@
   //import Showdown from 'showdown';
 
   import AccentButton from '../components/buttons/AccentButton.vue';
+  import FlatButton from '../components/buttons/FlatButton.vue';
 
   // Blocks
   import ParagraphBlock from '../components/blocks/ParagraphBlock.vue';
@@ -20,6 +21,7 @@
   import IconDragHandle from '../components/icons/IconDragHandle.vue';
   import IconPlus from '../components/icons/IconPlus.vue';
   import IconX from '../components/icons/IconX.vue';
+  import IconArrowLeft from '../components/icons/IconArrowLeft.vue';
 
   const router = useRouter();
 
@@ -382,144 +384,130 @@
     router.push({path: '/'});
   }
 
-
 </script>
 
-
 <template>
-
-
   <div class="relative">
-    
-  </div>
-    <AccentButton text="Posts" @click="goToDashboard" />
-
-
-
-  <div class="flex flex-row">
-
-    <div class="w-1/4 flex flex-col h-screen">
-      <div class="h-10"></div>
-      <div class="border-2 border-slate-200 rounded h-full"></div>
-    </div>
-  
-    <div class="flex flex-col mt-8">
-
-      <div class="flex flex-row">
-
-        <textarea 
-          @keydown.enter.exact.prevent
-          @keydown.enter.exact="addNewBlockOnEnter(blocks, 0, 'header')"
-          type="text" 
-          placeholder="Add Post Title..." 
-          v-model="pageTitle" 
-          maxlength="72" 
-          class="h-auto resize-none mt-1 
-          px-3 py-2 block w-full mx-8 
-          bg-white outline-none border-0
-          border-none text-5xl 
-          placeholder-slate-500 
-          focus:placeholder-transparent 
-          font-semibold 
-          text-slate-700 break-words 
-          text-center">
-        </textarea>
+    <!-- Topbar -->
+    <div class="flex flex-row max-w-7xl items-center justify-between mx-auto">
+      <div class="flex flex-row items-center">
+        <FlatButton text="Posts" @click="goToDashboard">
+          <IconArrowLeft class="w-2 h-2 mr-1 fill-slate-800" />
+        </FlatButton>
+        <p class="text-slate-400 text-sm">Draft</p>
       </div>
-   
+      <div class="flex flex-row items-center space-x-3">
+        <button @click="makeSitePreview">
+          Preview
+        </button>
+        <button @click="publishSite">
+          Publish
+        </button>
+      </div>
+    </div>
 
-    <drop-list class="w-1/2 ms-10 me-10 mt-10" :items="blocks" @reorder="$event.apply(blocks)" @insert="insert1" mode="cut">
-      <template v-slot:item="{item}">
-        <drag @click="focusEditor(blocks, item, 'click')" 
-          @focusout="focusEditor(blocks, item, 'out')" 
-          @dragstart="focusEditor(blocks, item, 'out')" 
-          :class="{ 'border-opacity-100': item.active }" 
-          class="group relative flex flex-row border-b-2 border-x-2 m-2 border-slate-100 rounded-b border-opacity-0 px-2 pb-2" 
-          :key="item.id" :data="item" 
-          @cut="remove(items1, item)" 
-          handle=".drag-handle">
-          
-          <!-- Block Top Bar -->
-          <div @mouseover="cancelCloseEvent(true)" 
-            @mouseleave="cancelCloseEvent(false)" 
-            class="flex flex-row bg-white -top-12 -left-2.5 -right-2.5 
-            h-10 border-t-2 border-x-2 mt-2 mx-2 border-slate-100 rounded-t px-2 pt-2" 
-            :class="{ 'absolute': item.active, 'hidden':!item.active }">
-            <div class="ml-1.5 flex grow justify-between">
-              <!-- Top Bar Buttons -->
-              <div class="flex space-x-1 items-center w-full">
-                <span class="tracking-tight text-sm font-medium text-slate-700 uppercase mr-4">{{ item.type }}</span> 
-                <component :is="blockBarTypes[item.type]" 
-                  v-bind="currentblockBarproperties(item)" 
-                  @size-changed="changeHeaderSize" 
-                  :ref="'block_'+item.id" />
-              </div>
-              <!-- Delete (Right Side)-->
-              <div class="flex items-center"> <!--TODO  Fix remove -->
-                <button @click="removeBlock(blocks, item)" class="hover:bg-slate-100 px-1.5 py-1 rounded-md duration-300">
-                  <IconX class="fill-slate-600 w-5 h-5" />     
-                </button> 
-              </div>
-            </div>
-          </div> 
-  
-          <!-- Block Icons -->
-          <div class="flex flex-col mt-4 " :class="{ 'visible':item.active, 'invisible':!item.active, 'group-hover:visible':!item.active }">
-            <span class="drag-handle mb-1 hover:cursor-grab">
-              <IconDragHandle class="w-8"/>
-            </span>
-            <span @click="openBlockBox(blocks, item, 'click')" class="add-button">
-              <IconPlus class="w-8"/>
-  
-              <!-- Added Blocks Box -->
-              <div class="relative flex">
-                <div class="absolute w-50 max-h-60 bg-white z-30 -bottom-62 -left-4 
-                  flex flex-col visible rounded-lg shadow-[0_5px_30px_-12px_rgba(0,0,0,0.45)]" 
-                  @mouseover="cancelCloseEvent(true), blockAddButton(true)" 
-                  @mouseleave="cancelCloseEvent(false), blockAddButton(false)"
-                  :class="{'hidden':!item.menu }">
-                  <input v-model="filterText" type="text" placeholder="Search Blocks..." 
-                    class="m-3 outline-1 outline-slate-300 border-1 border-slate-400 p-2 rounded-sm" />
-                  <div class="w-full h-full flex flex-col m-2 overflow-scroll">
-                    <div v-for="(blockItems, i) in filteredBlocks" :key="i">
-                      <span class="w-full flex flex-row" @click="addNewBlock(blocks, item, blockItems.name)">
-                          {{ blockItems.icon }}
-                        <span  class="text-base text-slate-600">
-                          {{ blockItems.name }}
-                        </span>
-                      </span> 
-                    </div>
-                    <span v-if="!filteredBlocks.length" class="text-base text-slate-600 ml-1">No Blocks Found</span>
-                  </div>
+    <div class="flex flex-row">
+      <textarea 
+        @keydown.enter.exact.prevent
+        @keydown.enter.exact="addNewBlockOnEnter(blocks, 0, 'header')"
+        type="text" 
+        placeholder="Add Post Title..." 
+        v-model="pageTitle" 
+        maxlength="72" 
+        class="h-auto resize-none mt-1 
+        px-3 py-2 block w-full mx-8 
+        bg-white outline-none border-0
+        border-none text-5xl 
+        placeholder-slate-500 
+        focus:placeholder-transparent 
+        font-semibold 
+        text-slate-700 break-words 
+        text-center">
+      </textarea>
+    </div>
+
+    <div class="flex flex-row mt-5">
+      <drop-list class="w-1/2 mx-auto" :items="blocks" @reorder="$event.apply(blocks)" @insert="insert1" mode="cut">
+        <template v-slot:item="{item}">
+          <drag @click="focusEditor(blocks, item, 'click')" 
+            @focusout="focusEditor(blocks, item, 'out')" 
+            @dragstart="focusEditor(blocks, item, 'out')" 
+            :class="{ 'border-opacity-100': item.active }" 
+            class="group relative flex flex-row border-b-2 border-x-2 m-2 border-slate-100 rounded-b border-opacity-0 px-2 pb-2" 
+            :key="item.id" :data="item" 
+            @cut="remove(items1, item)" 
+            handle=".drag-handle">
+            
+            <!-- Block Top Bar -->
+            <div @mouseover="cancelCloseEvent(true)" 
+              @mouseleave="cancelCloseEvent(false)" 
+              class="flex flex-row bg-white -top-12 -left-2.5 -right-2.5 
+              h-10 border-t-2 border-x-2 mt-2 mx-2 border-slate-100 rounded-t px-2 pt-2" 
+              :class="{ 'absolute': item.active, 'hidden':!item.active }">
+              <div class="ml-1.5 flex grow justify-between">
+                <!-- Top Bar Buttons -->
+                <div class="flex space-x-1 items-center w-full">
+                  <span class="tracking-tight text-sm font-medium text-slate-700 uppercase mr-4">{{ item.type }}</span> 
+                  <component :is="blockBarTypes[item.type]" 
+                    v-bind="currentblockBarproperties(item)" 
+                    @size-changed="changeHeaderSize" 
+                    :ref="'block_'+item.id" />
+                </div>
+                <!-- Delete (Right Side)-->
+                <div class="flex items-center"> <!--TODO  Fix remove -->
+                  <button @click="removeBlock(blocks, item)" class="hover:bg-slate-100 px-1.5 py-1 rounded-md duration-300">
+                    <IconX class="fill-slate-600 w-5 h-5" />     
+                  </button> 
                 </div>
               </div>
-            </span>
-          </div>
-         
-          <!-- Main Block getBlockType(item.type) -->
-          <div class="flex flex-auto">
-              <component :is="mainBlockTypes[item.type]" 
-              v-bind="currentblockproperties(item)" 
-              :ref="'block_'+item.id" 
-              @on-press-enter="addNewBlockOnEnter(blocks, item, item.type)" />
-          </div>
-              
-        </drag>
-      </template>
-      <template v-slot:feedback="{data}"></template>
-    </drop-list>
-   </div>
-    <div class="w-1/3 flex flex-col h-screen">
-      <div class="h-10">
-      </div>    
-      <div class="border-2 border-slate-200 rounded h-full">
-        
-        <button class="bg-blue-500 rounded p-2 m-2 text-white" @click="saveAsDraft">Save as Draft</button> <!-- Convert to .json & .markdown-->
-        <button class="bg-blue-500 rounded p-2 m-2 text-white" @click="makeSitePreview">Preview</button> <!-- Do "Save as Draft" + run hugo and show -->
-        <button class="bg-blue-500 rounded p-2 m-2 text-white" @click="publishSite">Publish (temp setup)</button> <!-- All above + Push to server -->
+            </div> 
     
-      </div>
+            <!-- Block Icons -->
+            <div class="flex flex-col mt-4 " :class="{ 'visible':item.active, 'invisible':!item.active, 'group-hover:visible':!item.active }">
+              <span class="drag-handle mb-1 hover:cursor-grab">
+                <IconDragHandle class="w-8"/>
+              </span>
+              <span @click="openBlockBox(blocks, item, 'click')" class="add-button">
+                <IconPlus class="w-8"/>
+    
+                <!-- Added Blocks Box -->
+                <div class="relative flex">
+                  <div class="absolute w-50 max-h-60 bg-white z-30 -bottom-62 -left-4 
+                    flex flex-col visible rounded-lg shadow-[0_5px_30px_-12px_rgba(0,0,0,0.45)]" 
+                    @mouseover="cancelCloseEvent(true), blockAddButton(true)" 
+                    @mouseleave="cancelCloseEvent(false), blockAddButton(false)"
+                    :class="{'hidden':!item.menu }">
+                    <input v-model="filterText" type="text" placeholder="Search Blocks..." 
+                      class="m-3 outline-1 outline-slate-300 border-1 border-slate-400 p-2 rounded-sm" />
+                    <div class="w-full h-full flex flex-col m-2 overflow-scroll">
+                      <div v-for="(blockItems, i) in filteredBlocks" :key="i">
+                        <span class="w-full flex flex-row" @click="addNewBlock(blocks, item, blockItems.name)">
+                            {{ blockItems.icon }}
+                          <span  class="text-base text-slate-600">
+                            {{ blockItems.name }}
+                          </span>
+                        </span> 
+                      </div>
+                      <span v-if="!filteredBlocks.length" class="text-base text-slate-600 ml-1">No Blocks Found</span>
+                    </div>
+                  </div>
+                </div>
+              </span>
+            </div>
+          
+            <!-- Main Block getBlockType(item.type) -->
+            <div class="flex flex-auto">
+                <component :is="mainBlockTypes[item.type]" 
+                v-bind="currentblockproperties(item)" 
+                :ref="'block_'+item.id" 
+                @on-press-enter="addNewBlockOnEnter(blocks, item, item.type)" />
+            </div>
+                
+          </drag>
+        </template>
+        <template v-slot:feedback="{data}"></template>
+      </drop-list>
     </div>
-  
   </div>
 </template>
 

@@ -24,7 +24,7 @@
   // For Component Step switching
   const num = ref("1");
   const showLoadingScreen = ref(false);
-  const loadingScreenText = ref('Perparing...');
+  const loadingScreenText = ref('Preparing...');
   // Step 1
   const websiteName = ref("");
   const nameInputError = ref("")
@@ -121,29 +121,29 @@
 
 
 
-  function buildWebsite(){ // TODO: Add A cancel and clean up
+  function buildWebsite() { // TODO: Add A cancel and clean up
     showLoadingScreen.value = true;
     const name = websiteName.value.replaceAll(' ', '_').toLowerCase();
     
     // Create New Hugo Site
-    loadingScreenText.value = "Seting Up Site...";
+    loadingScreenText.value = "Seting up site...";
     getPathTo('documents').then(path => {
       createNewSite(path + "/SteadyCMS/sites/"  + name + "/").then(x => {
 
       // Download Hugo Template, extract zip and delete .zip file
-      loadingScreenText.value = "Downloading Template..."; // TODO: Check for WIFI!!! 
+      loadingScreenText.value = "Downloading template..."; // TODO: Check for WIFI!!! 
       downloadFile('https://github.com/nanxiaobei/hugo-paper/archive/refs/heads/main.zip', '/sites/' + name + '/themes/').then(x => {
         loadingScreenText.value = "Processing Template...";
         extractFile('/sites/' + name + '/themes/hugo-paper-main.zip', '/sites/' + name + "/themes/").then(x => {
           deleteFile('/sites/' + name + '/themes/hugo-paper-main.zip').then(x => {
 
             // Set up hugo.toml
-            loadingScreenText.value = "Configuring Site..."; // TODO: SET theme name in .toml
+            loadingScreenText.value = "Configuring site..."; // TODO: SET theme name in .toml
             let hugoToml = "baseURL = 'http://example.org/'\r\nlanguageCode = 'en-us'\r\ntitle = '" + name.replaceAll("_", " ") +"'\r\ntheme='hugo-paper-main'";
             writeToFile(hugoToml, "/sites/" + name, "hugo.toml").then(x => {
 
               // Saving info to steady.config.json
-              loadingScreenText.value = "Finishing Up...";
+              loadingScreenText.value = "Finishing up...";
               doesFileExistInAppDir('steady.config.json').then(fileExsits => {
                 // If the file exsists add too
                 if (fileExsits) {
@@ -181,7 +181,7 @@
 
 <template>
   <Transition name="fade" mode="out-in">
-    <LoadingScreen class="h-full w-full" v-if="showLoadingScreen" :title="'Building Website:'" :text="loadingScreenText"></LoadingScreen>
+    <LoadingScreen class="h-full w-full" v-if="showLoadingScreen" :title="'Building website:'" :text="loadingScreenText"></LoadingScreen>
   </Transition>
   <div class="relative max-w-6xl mx-auto px-8">
     <div class="flex flex-row w-full h-screen py-8">
