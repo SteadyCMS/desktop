@@ -7,12 +7,7 @@ function back() {
   router.go(-1);
 }
 
-
-
 </script>
-
-
-
 
 <template>
     <div class="my-5 mx-8">
