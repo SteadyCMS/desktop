@@ -5,7 +5,7 @@
   import TurndownService from 'turndown';
   //import Showdown from 'showdown';
 
-  import { writeToFile, openInBrowser, getPathTo } from '../utils/system.js'
+  import { writeToFile, openInBrowser, getPathTo, deleteFile } from '../utils/system.js'
   import { startServer } from '../utils/hugo.js'
  
   import AccentButton from '../components/buttons/AccentButton.vue';
@@ -35,6 +35,8 @@
   const pageTitle = ref('Untitled');
   const isDraft = ref("false");
   const setToDraft = false;
+  const titleAtPerview = ref("");
+  // TODO: if post is being edited from published dont let them change the title
 
   let blocks = ref([
     {
@@ -313,9 +315,9 @@
 
   /*** Output  ***/
 
-  // Convert to .json & .markdown
+
   function saveAsDraft() {
-    saveJsonAndMarkdownToFile("-");
+   
   }
 
   // On enter create new paragraph block if called on paragraph or header
@@ -330,19 +332,31 @@
     router.push({path: '/'});
   }
 
-
 // -------------------------------
-
-// TODO: if they change the post name delete the old files
+// TODO: Make sure they dont have a post with the same name as this one
 
   function previewSite(){
     let siteName = "test_site";
 
-    buildAndSavePost();
-    getPathTo('documents').then(path => { 
-      startServer(path + "/steadyCMS/sites/" + siteName);
-      openInBrowser('http://localhost:1313/post/' + titleToFileName(pageTitle.value));
-    });
+    if(titleToFileName(pageTitle.value).length > 2){
+      // If they changed the title delete the old files with other title
+      if(titleAtPerview.value != ""){
+        if (titleAtPerview.value != pageTitle.value) {
+          deleteFile("sites/" + siteName + "/content/post/" + titleToFileName(titleAtPerview.value) + ".json");
+          deleteFile("sites/" + siteName + "/content/post/" + titleToFileName(titleAtPerview.value) + ".markdown");
+          titleAtPerview.value = pageTitle.value;
+        }
+      }
+      buildAndSavePost();
+      getPathTo('documents').then(path => { 
+        startServer(path + "/steadyCMS/sites/" + siteName);
+        openInBrowser('http://localhost:1313/post/' + titleToFileName(pageTitle.value));
+      });
+      titleAtPerview.value = pageTitle.value;
+    }else{
+      // The title is not right
+      console.log("Title must have more than 2 letters")
+    }
   }
 
   // Convert blocks to markdown and json 
@@ -350,39 +364,14 @@
     let postTitle = pageTitle.value;
     let siteName = "test_site";
 
-    // get date
-    Date.prototype.yyyymmdd = function() {
-      let mm = this.getMonth() + 1; // getMonth() is zero-based
-      let dd = this.getDate();
-
-      return [this.getFullYear(),
-              (mm>9 ? '' : '0') + mm,
-              (dd>9 ? '' : '0') + dd
-            ].join('-');
-    };
-
-    Date.prototype.hhmmss = function() {
-      let hh = this.getHours();
-      let mm = this.getMinutes();
-      let ss = this.getSeconds();
-
-      return [(hh>9 ? '' : '0') + hh,
-              (mm>9 ? '' : '0') + mm,
-              (ss>9 ? '' : '0') + ss
-            ].join(':');
-    };
-    let datex = new Date();
-
-    let date = datex.yyyymmdd() + "T" + datex.hhmmss();
     let postDescription = "The Grand Hall";
     let featuredImage = "/images/Pope-Edouard-de-Beaumont-1844.jpg";
     let postTages = '"scene", "scene", "scene"';
    
-
     const blocksData = blocks['_rawValue'];
    // let pageHead = '---\r\ndate: ${date} \r\ndescription: "${postDescription}"\r\nfeatured_image: "${featuredImage}"\r\ntags: [${postTages}]\r\ntitle: "${postTitle}"\r\n---\r\n';
 
-    let pageHead = '---\r\ndate: ' + date +
+    let pageHead = '---\r\ndate: ' + getTodaysDate() +
     '\r\ndescription: "' + postDescription +
     '"\r\nfeatured_image: "' + featuredImage +
     '"\r\ntags: [' + postTages +
@@ -421,9 +410,30 @@
   }
 
   function titleToFileName(postTitle) {
-    return postTitle.replaceAll(" ", "-").replace(/[`!@#$%^&*()+.=\[\]{};':"/|,<>\/?~]/g, "-").toLowerCase();
+    return postTitle.trim().replaceAll(" ", "-").replace(/[`!@#$%^&*()+.=\[\]{};':"/|,<>\/?~]/g, "-").toLowerCase();
   }
 
+  function getTodaysDate() {
+    Date.prototype.yyyymmdd = function() {
+      let mm = this.getMonth() + 1; // getMonth() is zero-based
+      let dd = this.getDate();
+      return [this.getFullYear(),
+              (mm>9 ? '' : '0') + mm,
+              (dd>9 ? '' : '0') + dd
+            ].join('-');
+    };
+    Date.prototype.hhmmss = function() {
+      let hh = this.getHours();
+      let mm = this.getMinutes();
+      let ss = this.getSeconds();
+      return [(hh>9 ? '' : '0') + hh,
+              (mm>9 ? '' : '0') + mm,
+              (ss>9 ? '' : '0') + ss
+            ].join(':');
+    };
+    let date = new Date();
+    return date.yyyymmdd() + "T" + date.hhmmss();
+  }
 
 
 </script>
