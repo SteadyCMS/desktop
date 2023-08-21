@@ -37,6 +37,7 @@
   const isDraft = ref("false");
   const setToDraft = false;
   const titleAtPerview = ref("");
+  const isFirstTime = ref(false);
   // TODO: if post is being edited from published dont let them change the title
 
   let blocks = ref([
@@ -349,14 +350,16 @@
           }
         }
         // TODO: IF they are updating a post skip this step (doesFileExist)
+        // Make sure they don't already have a post with this name
       doesFileExist("sites/" + siteName + "/content/post/" + titleToFileName(pageTitle.value) + ".json").then(fileExsits => {
-        if(!fileExsits){
+        if(!fileExsits && isFirstTime.value == false){
           buildAndSavePost();
           getPathTo('documents').then(path => { 
             startServer(path + "/steadyCMS/sites/" + siteName);
             openInBrowser('http://localhost:1313/post/' + titleToFileName(pageTitle.value));
           });
           titleAtPerview.value = pageTitle.value;
+          isFirstTime.value = true;
         }else{
           // The title is not right
           showWaringToast({ title: 'Post title must be unique', description: 'You already have a post with this title.'});
@@ -382,7 +385,7 @@
     let postTages = '"scene", "scene", "scene"';
    
     const blocksData = blocks['_rawValue'];
-    let pageHead = `---\r\ndate: ${date} \r\ndescription: "${postDescription}"\r\nfeatured_image: "${featuredImage}"\r\ntags: [${postTages}]\r\ntitle: "${postTitle}"\r\n---\r\n`;
+    let pageHead = `---\r\ndate: ${getTodaysDate()} \r\ndescription: "${postDescription}"\r\nfeatured_image: "${featuredImage}"\r\ntags: [${postTages}]\r\ntitle: "${postTitle}"\r\n---\r\n`;
 
     // let pageHead = '---\r\ndate: ' + getTodaysDate() +
     // '\r\ndescription: "' + postDescription +
