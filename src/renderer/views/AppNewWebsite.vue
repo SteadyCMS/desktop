@@ -6,7 +6,6 @@
   import StepTwo from '../components/createNewWebsite/StepTwo.vue';
   import StepThree from '../components/createNewWebsite/StepThree.vue';
   import StepFour from '../components/createNewWebsite/StepFour.vue';
-
   import LoadingScreen from "../components/LoadingScreen.vue";
 
   import AccentButton from '../components/buttons/AccentButton.vue';
@@ -21,7 +20,7 @@
 
   const router = useRouter();
 
-  // For Component Step switching
+  // For Component Step Switching
   const num = ref("1");
   const showLoadingScreen = ref(false);
   const loadingScreenText = ref('Preparing...');
@@ -30,7 +29,7 @@
   const nameInputError = ref("")
   const nameInputIsValid = ref(true)
   // Step 2
-  const templateName = ref("x");
+  const templateName = ref("");
   const templatePath = ref("");
 
   const currentStepComponent = computed(() => {
@@ -119,9 +118,7 @@
     }
   }
 
-
-
-  function buildWebsite() { // TODO: Add A cancel and clean up
+  function buildWebsite() { // TODO: Add a cancel and clean up
     showLoadingScreen.value = true;
     const name = websiteName.value.replaceAll(' ', '_').toLowerCase();
     
@@ -139,6 +136,7 @@
 
             // Set up hugo.toml
             loadingScreenText.value = "Configuring site..."; // TODO: SET theme name in .toml
+
             let hugoToml = "baseURL = 'http://example.org/'\r\nlanguageCode = 'en-us'\r\ntitle = '" + name.replaceAll("_", " ") +"'\r\ntheme='hugo-paper-main'";
             writeToFile(hugoToml, "/sites/" + name, "hugo.toml").then(x => {
 

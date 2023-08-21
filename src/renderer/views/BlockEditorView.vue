@@ -6,8 +6,8 @@
   import { createToast } from 'mosha-vue-toastify';
   //import Showdown from 'showdown';
 
-  import { writeToFile, openInBrowser, getPathTo, deleteFile, doesFileExist } from '../utils/system.js'
-  import { startServer } from '../utils/hugo.js'
+  import { writeToFile, openInBrowser, getPathTo, deleteFile, doesFileExist, readFileInAppDir } from '../utils/system.js'
+  import { startServer, buildNewSite } from '../utils/hugo.js'
  
   import AccentButton from '../components/buttons/AccentButton.vue';
   import FlatButton from '../components/buttons/FlatButton.vue';
@@ -33,12 +33,13 @@
   let overTopbar = false;
   let blockButton = false;
   const filterText = ref('');
-  const pageTitle = ref('Untitled');
-  const isDraft = ref("false");
-  const setToDraft = false;
+  const pageTitle = ref('');
+  // const isDraft = ref("false");
+  // const setToDraft = false;
   const titleAtPerview = ref("");
-  const isFirstTime = ref(false);
-  // TODO: if post is being edited from published dont let them change the title
+  const isFirstTime = ref(true);
+  const websiteName = ref('');
+  // TODO: if post is being edited from published don't let them change the title
 
   let blocks = ref([
     {
@@ -117,16 +118,26 @@
   };
 
 
-  // Load in blocks and data from json on start if they exist
-  //   (async () => {
-  //   const exists = await window.electronAPI.doesFileExist("websites/my-new-website/content/posts/my-blog-post.json")
-  //   window.electronAPI.sendMessage(exists);
-  //   if(exists){
-  //     const rawData = await window.electronAPI.readFile("websites/my-new-website/content/posts/my-blog-post.json")
-  //     const data = JSON.parse(rawData);
-  //     blocks.value = data['data']
-  //   }
-  // })();
+    
+  (async () => {
+    // Get current website
+    readFileInAppDir("steady.config.json").then(fileData => {
+      let fileObj = JSON.parse(fileData.data);
+      websiteName.value = titleToFileName(fileObj.currentWebsite);
+      console.log(websiteName.value)
+    });
+
+
+    //Load in blocks and data from json on start if they exist
+    // doesFileExist(`sites/${websiteName.value}/content/posts/my-blog-post.json`).then(exists => {
+    //   if(exists){
+    //       readFile(`sites/${websiteName.value}/content/posts/my-blog-post.json`).then(fileData => {
+    //       const data = JSON.parse(rawData);
+    //       blocks.value = data['data'];
+    //     });
+    //   }
+    // });
+  })();
 
 
   function addNewBlock(array, value, name) {
@@ -159,14 +170,12 @@
     console.log(blocks)
   }
 
-
   // Delete block
   function removeBlock(array, value) {
     let index = array.indexOf(value);
     array.splice(index, 1);
     overTopbar = false;
   }
-
 
   function insert1(event) {
     blocks.splice(event.index, 0, event.data);
@@ -206,7 +215,6 @@
       }
    
     }
-
   }
 
   function htmlToMarkdown(html) {
@@ -315,13 +323,6 @@
     return blockProperties;
   }
 
-  /*** Output  ***/
-
-
-  function saveAsDraft() {
-   
-  }
-
   // On enter create new paragraph block if called on paragraph or header
   function addNewBlockOnEnter(array, value, name){
     console.log("enter")
@@ -336,37 +337,50 @@
 
 // -------------------------------
 
-
   function previewSite(){
-    let siteName = "test_site";
-
     if(titleToFileName(pageTitle.value).length > 2){
         // If they changed the title delete the old files with other title
         if(titleAtPerview.value != ""){
           if (titleAtPerview.value != pageTitle.value) {
-            deleteFile("sites/" + siteName + "/content/post/" + titleToFileName(titleAtPerview.value) + ".json");
-            deleteFile("sites/" + siteName + "/content/post/" + titleToFileName(titleAtPerview.value) + ".markdown");
+            deleteFile("sites/" + websiteName.value + "/content/post/" + titleToFileName(titleAtPerview.value) + ".json");
+            deleteFile("sites/" + websiteName.value + "/content/post/" + titleToFileName(titleAtPerview.value) + ".markdown");
             titleAtPerview.value = pageTitle.value;
           }
         }
         // TODO: IF they are updating a post skip this step (doesFileExist)
         // Make sure they don't already have a post with this name
-      doesFileExist("sites/" + siteName + "/content/post/" + titleToFileName(pageTitle.value) + ".json").then(fileExsits => {
-        if(!fileExsits && isFirstTime.value == false){
-          buildAndSavePost();
-          getPathTo('documents').then(path => { 
-            startServer(path + "/steadyCMS/sites/" + siteName);
-            openInBrowser('http://localhost:1313/post/' + titleToFileName(pageTitle.value));
+      doesFileExist("sites/" + websiteName.value + "/content/post/" + titleToFileName(pageTitle.value) + ".json").then(fileExsits => {
+
+        // TODO: Improve this
+        const runbuild = ref(false);
+        if (fileExsits) { // If there is a file with the same name
+          if (isFirstTime.value == false) { // if this is the first time runinng perview 
+            runbuild.value = false;
+          }else{ // if this is NOT the first time runinng perview 
+            runbuild.value = true;
+          }
+        }else{ // If there is NOT a file with the same name
+          runbuild.value = true;
+        }
+
+        if(runbuild.value){ // If this is the first time pervining they can't use a name of a post
+          buildAndSavePost().then(x => { 
+            getPathTo('documents').then(path => { 
+             // buildNewSite(path + "/steadyCMS/sites/" + websiteName.value);
+
+              startServer('8080', path + "/steadyCMS/sites/" + websiteName.value);
+              openInBrowser('http://localhost:8080/post/' + titleToFileName(pageTitle.value) + '/');
+              titleAtPerview.value = pageTitle.value;
+              isFirstTime.value = false;
+            });
           });
-          titleAtPerview.value = pageTitle.value;
-          isFirstTime.value = true;
         }else{
-          // The title is not right
+          // The title is not unique
           showWaringToast({ title: 'Post title must be unique', description: 'You already have a post with this title.'});
         }
       });
     }else{
-      // The title is not right
+      // The title is too short
       showWaringToast({ title: 'Problem with title', description: 'Title must have more than 2 letters.'});
     }
   }
@@ -376,29 +390,19 @@
       }
 
   // Convert blocks to markdown and json 
-  function buildAndSavePost(){
-    let postTitle = pageTitle.value;
-    let siteName = "test_site";
-
+  async function buildAndSavePost(){
     let postDescription = "The Grand Hall";
     let featuredImage = "/images/Pope-Edouard-de-Beaumont-1844.jpg";
     let postTages = '"scene", "scene", "scene"';
    
     const blocksData = blocks['_rawValue'];
-    let pageHead = `---\r\ndate: ${getTodaysDate()} \r\ndescription: "${postDescription}"\r\nfeatured_image: "${featuredImage}"\r\ntags: [${postTages}]\r\ntitle: "${postTitle}"\r\n---\r\n`;
-
-    // let pageHead = '---\r\ndate: ' + getTodaysDate() +
-    // '\r\ndescription: "' + postDescription +
-    // '"\r\nfeatured_image: "' + featuredImage +
-    // '"\r\ntags: [' + postTages +
-    // ']\r\ntitle: "' + postTitle +
-    // '"\r\ndraft: ' + isDraft.value +
-    // '\r\n---\r\n';
-  
+    // TODO: Add render = never for drafts
+    // TODO: Don't change date on update
+    let pageHead = `---\r\ndate: ${getTodaysDate()} \r\ndescription: "${postDescription}"\r\nfeatured_image: "${featuredImage}"\r\ntags: [${postTages}]\r\ntitle: "${pageTitle.value}"\r\n---\r\n`;
 
     // Save as Json
     let jsonData = JSON.stringify(blocks['_rawValue'], null, 4);
-    writeToFile('{"data": ' + jsonData + '}', "sites/" + siteName + "/content/post", titleToFileName(postTitle) + ".json");
+    await writeToFile('{"data": ' + jsonData + '}', "sites/" + websiteName.value + "/content/post", titleToFileName(pageTitle.value) + ".json");
 
     // Save as markdown
     var data = pageHead;
@@ -421,7 +425,7 @@
           data = data + "\n\n" + htmlToMarkdown(blocksData[i].content);
       }
     } 
-    writeToFile(data, "sites/" + siteName + "/content/post", titleToFileName(postTitle) + ".markdown");
+    await writeToFile(data, "sites/" + websiteName.value + "/content/post", titleToFileName(pageTitle.value) + ".markdown");
 
   }
 
@@ -451,6 +455,10 @@
     return date.yyyymmdd() + "T" + date.hhmmss();
   }
 
+
+function publishSite(){
+  closeServer();
+}
 
 </script>
 
