@@ -34,7 +34,7 @@
             getDirsIn(path + "/SteadyCMS/sites/").then( dirs => {
               for (let i = 0; i < dirs.length; i++) {
                 doesFileExist("/sites/" + dirs[i] + '/hugo.toml').then(fileExsits => {
-                  if (fileExsits && dirs[i] != currentWebsite.value) {
+                  if (fileExsits && dirs[i] != currentWebsite.value.toLowerCase()) {
                     websites.value.splice(0,0, { "name": cleanSiteName(dirs[i]), "path": dirs[i], });
                   }
                 });

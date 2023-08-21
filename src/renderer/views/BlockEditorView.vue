@@ -3,9 +3,10 @@
   import {Drag, DropList} from 'vue-easy-dnd';
   import { ref, computed } from 'vue';
   import TurndownService from 'turndown';
+  import { createToast } from 'mosha-vue-toastify';
   //import Showdown from 'showdown';
 
-  import { writeToFile, openInBrowser, getPathTo, deleteFile } from '../utils/system.js'
+  import { writeToFile, openInBrowser, getPathTo, deleteFile, doesFileExist } from '../utils/system.js'
   import { startServer } from '../utils/hugo.js'
  
   import AccentButton from '../components/buttons/AccentButton.vue';
@@ -333,31 +334,43 @@
   }
 
 // -------------------------------
-// TODO: Make sure they dont have a post with the same name as this one
+
 
   function previewSite(){
     let siteName = "test_site";
 
     if(titleToFileName(pageTitle.value).length > 2){
-      // If they changed the title delete the old files with other title
-      if(titleAtPerview.value != ""){
-        if (titleAtPerview.value != pageTitle.value) {
-          deleteFile("sites/" + siteName + "/content/post/" + titleToFileName(titleAtPerview.value) + ".json");
-          deleteFile("sites/" + siteName + "/content/post/" + titleToFileName(titleAtPerview.value) + ".markdown");
-          titleAtPerview.value = pageTitle.value;
+        // If they changed the title delete the old files with other title
+        if(titleAtPerview.value != ""){
+          if (titleAtPerview.value != pageTitle.value) {
+            deleteFile("sites/" + siteName + "/content/post/" + titleToFileName(titleAtPerview.value) + ".json");
+            deleteFile("sites/" + siteName + "/content/post/" + titleToFileName(titleAtPerview.value) + ".markdown");
+            titleAtPerview.value = pageTitle.value;
+          }
         }
-      }
-      buildAndSavePost();
-      getPathTo('documents').then(path => { 
-        startServer(path + "/steadyCMS/sites/" + siteName);
-        openInBrowser('http://localhost:1313/post/' + titleToFileName(pageTitle.value));
+        // TODO: IF they are updating a post skip this step (doesFileExist)
+      doesFileExist("sites/" + siteName + "/content/post/" + titleToFileName(pageTitle.value) + ".json").then(fileExsits => {
+        if(!fileExsits){
+          buildAndSavePost();
+          getPathTo('documents').then(path => { 
+            startServer(path + "/steadyCMS/sites/" + siteName);
+            openInBrowser('http://localhost:1313/post/' + titleToFileName(pageTitle.value));
+          });
+          titleAtPerview.value = pageTitle.value;
+        }else{
+          // The title is not right
+          showWaringToast({ title: 'Post title must be unique', description: 'You already have a post with this title.'});
+        }
       });
-      titleAtPerview.value = pageTitle.value;
     }else{
       // The title is not right
-      console.log("Title must have more than 2 letters")
+      showWaringToast({ title: 'Problem with title', description: 'Title must have more than 2 letters.'});
     }
   }
+
+  const showWaringToast = (message) => {
+          createToast(message, {type: 'warning', /* toastBackgroundColor: 'color',*/ showCloseButton: true, swipeClose: true, transition: 'slide', showIcon: false, position: 'top-right'})
+      }
 
   // Convert blocks to markdown and json 
   function buildAndSavePost(){
@@ -369,15 +382,15 @@
     let postTages = '"scene", "scene", "scene"';
    
     const blocksData = blocks['_rawValue'];
-   // let pageHead = '---\r\ndate: ${date} \r\ndescription: "${postDescription}"\r\nfeatured_image: "${featuredImage}"\r\ntags: [${postTages}]\r\ntitle: "${postTitle}"\r\n---\r\n';
+    let pageHead = `---\r\ndate: ${date} \r\ndescription: "${postDescription}"\r\nfeatured_image: "${featuredImage}"\r\ntags: [${postTages}]\r\ntitle: "${postTitle}"\r\n---\r\n`;
 
-    let pageHead = '---\r\ndate: ' + getTodaysDate() +
-    '\r\ndescription: "' + postDescription +
-    '"\r\nfeatured_image: "' + featuredImage +
-    '"\r\ntags: [' + postTages +
-    ']\r\ntitle: "' + postTitle +
-    '"\r\ndraft: ' + isDraft.value +
-    '\r\n---\r\n';
+    // let pageHead = '---\r\ndate: ' + getTodaysDate() +
+    // '\r\ndescription: "' + postDescription +
+    // '"\r\nfeatured_image: "' + featuredImage +
+    // '"\r\ntags: [' + postTages +
+    // ']\r\ntitle: "' + postTitle +
+    // '"\r\ndraft: ' + isDraft.value +
+    // '\r\n---\r\n';
   
 
     // Save as Json
@@ -410,7 +423,7 @@
   }
 
   function titleToFileName(postTitle) {
-    return postTitle.trim().replaceAll(" ", "-").replace(/[`!@#$%^&*()+.=\[\]{};':"/|,<>\/?~]/g, "-").toLowerCase();
+    return postTitle.trim().replaceAll(" ", "-").replace(/[`_!@#$%^&*()+.=\[\]{};':"/|,<>\/?~]/g, "-").toLowerCase();
   }
 
   function getTodaysDate() {
