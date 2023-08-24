@@ -8,6 +8,8 @@
 
   import { writeToFile, openInBrowser, getPathTo, deleteFile, doesFileExist, readFileInAppDir, readFile } from '../utils/system.js'
   import { startServer, buildNewSite } from '../utils/hugo.js'
+  import { titleToFileName } from '../utils/utils.js'
+  
  
   import AccentButton from '../components/buttons/AccentButton.vue';
   import FlatButton from '../components/buttons/FlatButton.vue';
@@ -210,7 +212,6 @@
         if(index >= 0){
           array[index].active = true;
         }
-
       } else if (activeType == "out") {
         //console.log("ON OUT")
         for (let i = 0; i < array.length; i++) {
@@ -344,8 +345,6 @@
     router.push({path: '/'});
   }
 
-// -------------------------------
-
   function previewSite(){
     if(titleToFileName(pageTitle.value).length > 2){
         // If they changed the title delete the old files with other title
@@ -364,7 +363,11 @@
         const runbuild = ref(true);
         if (fileExsits) { // If there is a file with the same name
           if (isFirstTime.value == true) { // if this is the first time runinng perview 
-            runbuild.value = false;
+            if(titleCanNotBeChanged){ // i.e they are editing a post
+              runbuild.value = true;
+            }else{
+              runbuild.value = false;
+            }
           }else{ // if this is NOT the first time runinng perview 
             runbuild.value = true;
           }
@@ -398,13 +401,30 @@
           createToast(message, {type: 'warning', /* toastBackgroundColor: 'color',*/ showCloseButton: true, swipeClose: true, transition: 'slide', showIcon: false, position: 'top-right'})
       }
 
+  // Get 150 characters of the first paragraph for a post description
+  function getPostDescription(blocksData) {
+    let found;
+    let i = 0;
+    do {
+      if(blocksData[i].type == "paragraph"){
+        found = true;
+        return blocksData[i].content.substr(0, 150).replace(/<[^>]+>/g, '').trim();
+      }else{
+        found = false;
+      }
+      i++;
+    } while (found == false);  
+  }
+
   // Convert blocks to markdown and json 
   async function buildAndSavePost(){
-    let postDescription = "The Grand Hall";
-    let featuredImage = "/images/Pope-Edouard-de-Beaumont-1844.jpg";
-    let postTages = '"scene", "scene", "scene"';
-   
     const blocksData = blocks['_rawValue'];
+
+    let postDescription = getPostDescription(blocksData);
+    let featuredImage = "/images/Pope-Edouard-de-Beaumont-1844.jpg";
+    let postTages = '"scene", "fun", "time"';
+   
+
     // TODO: Add render = never for drafts
     // TODO: Don't change date on update
     let pageHead = `---\r\ndate: ${getTodaysDate()} \r\ndescription: "${postDescription}"\r\nfeatured_image: "${featuredImage}"\r\ntags: [${postTages}]\r\ntitle: "${pageTitle.value}"\r\n---\r\n`;
@@ -435,11 +455,6 @@
       }
     } 
     await writeToFile(data, "sites/" + websiteName.value + "/content/post", titleToFileName(pageTitle.value) + ".markdown");
-
-  }
-
-  function titleToFileName(postTitle) {
-    return postTitle.trim().replaceAll(" ", "-").replace(/[`_!@#$%^&*()+.=\[\]{};':"/|,<>\/?~]/g, "-").toLowerCase();
   }
 
   function getTodaysDate() {

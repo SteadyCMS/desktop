@@ -155,7 +155,7 @@
                 } else {
                 // Else make the file and write info
                   const obj = {"defultWebsite": "/", "currentWebsite": name};
-                  writeToFileInAppDir(JSON.stringify(obj), "/", "steady.config.json").then(x => {
+                    writeToFileInAppDir(JSON.stringify(obj), "/", "steady.config.json").then(x => {
                     backToDashboard();
                   });
                 }
@@ -170,9 +170,7 @@
   }
 
   function backToDashboard() {
-    router.go(-1);
-    // router.push({path: '/new-website/step-two'});
-    //localStorage.setItem('todo_items', JSON.stringify(this.todo_items)); 
+    router.go(-1); 
   }
   
 </script>

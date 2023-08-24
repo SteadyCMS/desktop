@@ -3,6 +3,7 @@
   import { useRouter } from 'vue-router';
 
   import { doesFileExistInAppDir, readFileInAppDir, getPathTo, getFilesIn, readFile } from '../../utils/system.js'
+  import { fileNameToTitle } from '../../utils/utils.js'
 
   import AccentButton from '../../components/buttons/AccentButton.vue';
   
@@ -18,7 +19,6 @@
     router.push({name: 'editor'});
   }
 
- 
   const website = ref([]);
   const currentWebsite = ref('');
   const isPosts = ref(false);
@@ -27,17 +27,12 @@
     updatePostList();
   })();
 
-  function cleanSiteName(name) { // TODO 
-    const rawName = name[0].toUpperCase() + name.slice(1);
-    return rawName.replaceAll('_', ' ').replaceAll('-', ' ');
-  }
-
   function updatePostList() {
     doesFileExistInAppDir('steady.config.json').then(fileExsits => {
       if (fileExsits) {
         // Get the Current website
         readFileInAppDir("steady.config.json").then(fileData => {
-          currentWebsite.value = cleanSiteName(JSON.parse(fileData.data).currentWebsite);
+          currentWebsite.value = fileNameToTitle(JSON.parse(fileData.data).currentWebsite);
           getPathTo('documents').then(path => {
             console.log(currentWebsite.value);
             //const pathToPosts = `${path}/SteadyCMS/sites/${currentWebsite.value.toLocaleLowerCase()}/content/post/`;
@@ -46,7 +41,7 @@
               if (dirs.length >= 1) {
                 for (let i = 0; i < dirs.length; i++) {
                   parseFile(pathToPosts, dirs[i]).then(fileData => {
-                  website.value.splice(0,0, { "title": cleanSiteName(dirs[i]).replace(".markdown", ""), "name": dirs[i], "date":  fileData.date, "text": fileData.description });
+                  website.value.splice(0,0, { "title": fileNameToTitle(dirs[i]).replace(".markdown", ""), "name": dirs[i], "date":  fileData.date, "text": fileData.description });
                   });
                 }
                 isPosts.value = true;
