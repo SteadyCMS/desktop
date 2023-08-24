@@ -10,15 +10,13 @@
     switch(value.type) {
       case "paragraph":
         toolbarType = [
-          ['bold', 'italic', 'underline', 'strike'],        // toggled buttons
-          ['blockquote', 'code-block'],
-          [{ 'script': 'sub'}, { 'script': 'super' }],      // superscript/subscript
-          [{ 'indent': '-1'}, { 'indent': '+1' }],          // outdent/indent       
+          ['bold', 'italic', 'strike'],        // toggled buttons
+          ['blockquote', 'code-block'], 
           ['clean'] 
         ];
         break;
       case "list":
-        toolbarType = [{ 'list': 'ordered' }, { 'list': 'bullet'}, { 'indent': '-1' }, { 'indent': '+1' }];
+        toolbarType = [{ 'list': 'ordered' }, { 'list': 'bullet'} ];
         break;
       default:
         toolbarType = ['bold', 'italic', 'underline'];

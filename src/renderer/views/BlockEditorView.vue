@@ -6,7 +6,7 @@
   import { createToast } from 'mosha-vue-toastify';
   //import Showdown from 'showdown';
 
-  import { writeToFile, openInBrowser, getPathTo, deleteFile, doesFileExist, readFileInAppDir } from '../utils/system.js'
+  import { writeToFile, openInBrowser, getPathTo, deleteFile, doesFileExist, readFileInAppDir, readFile } from '../utils/system.js'
   import { startServer, buildNewSite } from '../utils/hugo.js'
  
   import AccentButton from '../components/buttons/AccentButton.vue';
@@ -39,6 +39,7 @@
   const titleAtPerview = ref("");
   const isFirstTime = ref(true);
   const websiteName = ref('');
+  const titleCanNotBeChanged = ref(false);
   // TODO: if post is being edited from published don't let them change the title
 
   let blocks = ref([
@@ -57,18 +58,25 @@
       active: false,
       menu: false
     },
-    {
-      type: "image",
-      caption: "A image of something",
-      src: "",
-      id: 51951226658,
-      active: false,
-      menu: false
-    },
+    // {
+    //   type: "image",
+    //   caption: "A image of something",
+    //   src: "",
+    //   id: 51951226658,
+    //   active: false,
+    //   menu: false
+    // },
     {
       type: "list",
       content: "We live in a busy culture of work and pleasure. A “selfie” generation of people who only care about what they can get, how much they can get, how much people like them, and what would benefit them the most. As much as we would like to say that we are not one of those people, we are not perfect. Being self-less rather than self-ish is a difficult task.",
       id: 51951209688,
+      active: false,
+      menu: false
+    },
+    {
+      type: "paragraph",
+      content: "After hours of driving through Iowa, we came into Minnesota…just in time to wait. There we were with a low battery on our phone (which we were using for GPS), slowly creeping along the road with a long line of vehicles ahead of us. We had hit a construction standstill.",
+      id: 73127606971,
       active: false,
       menu: false
     },
@@ -116,34 +124,31 @@
     "list": header,
     "image": image,
   };
-
-
     
   (async () => {
-    // Get current website
-    readFileInAppDir("steady.config.json").then(fileData => {
-      let fileObj = JSON.parse(fileData.data);
-      websiteName.value = titleToFileName(fileObj.currentWebsite);
-      console.log(websiteName.value)
-    });
-
-
-    //Load in blocks and data from json on start if they exist
-    // doesFileExist(`sites/${websiteName.value}/content/posts/my-blog-post.json`).then(exists => {
-    //   if(exists){
-    //       readFile(`sites/${websiteName.value}/content/posts/my-blog-post.json`).then(fileData => {
-    //       const data = JSON.parse(rawData);
-    //       blocks.value = data['data'];
-    //     });
-    //   }
-    // });
+    // Check if they are opening a post or creating a new one
+    const currentPost = localStorage.getItem("activeSiteData_currentPost");
+    websiteName.value = localStorage.getItem("activeSiteData_currentSite");
+    // If there editing load it else don't
+    console.log(currentPost)
+    if (currentPost == "newsteadycmspost"){}else{
+      titleCanNotBeChanged.value = true;
+      pageTitle.value = currentPost.replace('.markdown', '');
+      //Load in blocks and data to post from json on start if they exist
+      //`sites/${websiteName.value.toLocaleLowerCase()}/content/post/${currentPost.replace('.markdown', '.json')}`
+      readFile("sites/" + websiteName.value.toLocaleLowerCase() + "/content/post/" + currentPost.replace('.markdown', '.json')).then(fileData => {
+        if (fileData.success) {
+          const data = JSON.parse(fileData.data);
+          blocks.value = data['data'];
+        } else {
+          console.log(fileData.data);
+        }
+      });
+    }
   })();
-
 
   function addNewBlock(array, value, name) {
     let idNum =  Math.random().toString().slice(2,9).concat( Math.random().toString().slice(5,7)).concat( Math.random().toString().slice(4,6));
-    console.log(value)
-
     if(value != 0){
     let index = array.indexOf(value);
     switch(name) {
@@ -159,7 +164,6 @@
       case "image":
         array.splice(index + 1, 0,  { type: "image", caption: "", src: "", id: idNum, active: false, menu: false });
         break;
-
       default:
             
     } 
@@ -167,7 +171,7 @@
   } else {
     array.splice(0, 0,  { type: "paragraph", content: "", id: idNum, active: false, menu: false });
   }
-    console.log(blocks)
+    //console.log(blocks)
   }
 
   // Delete block
@@ -218,7 +222,13 @@
   }
 
   function htmlToMarkdown(html) {
-    const turndownService = new TurndownService();
+    const turndownService = new TurndownService({emDelimiter: '*'});
+    turndownService.addRule('strikethrough', {
+      filter: ['del', 's', 'strike'],
+      replacement: function (content) {
+        return '~~' + content + '~~'
+      }
+    });
     const markdown = turndownService.turndown(html);
     return markdown;
   }
@@ -274,8 +284,7 @@
     return blockTypes.value.filter( poke => 
         poke.name.toLowerCase().includes(filter.toLowerCase())
     )
-  })
-
+  });
 
   // Properties to be passed in for main blocks
   function currentblockproperties(_item) {
@@ -303,7 +312,6 @@
   // Properties to be passed in for blocks top bar
   function currentblockBarproperties(_item) {
     let blockProperties = {};
-
     switch(_item.type) {
       case "paragraph":
         blockProperties = { item: _item };
@@ -332,6 +340,7 @@
   }
 
   function goToDashboard() {
+    // TODO: ask if they want to save it first
     router.push({path: '/'});
   }
 
@@ -352,9 +361,9 @@
       doesFileExist("sites/" + websiteName.value + "/content/post/" + titleToFileName(pageTitle.value) + ".json").then(fileExsits => {
 
         // TODO: Improve this
-        const runbuild = ref(false);
+        const runbuild = ref(true);
         if (fileExsits) { // If there is a file with the same name
-          if (isFirstTime.value == false) { // if this is the first time runinng perview 
+          if (isFirstTime.value == true) { // if this is the first time runinng perview 
             runbuild.value = false;
           }else{ // if this is NOT the first time runinng perview 
             runbuild.value = true;
@@ -455,7 +464,6 @@
     return date.yyyymmdd() + "T" + date.hhmmss();
   }
 
-
 function publishSite(){
   closeServer();
 }
@@ -484,12 +492,13 @@ function publishSite(){
 
     <div class="flex flex-row">
       <textarea 
+        :disabled="titleCanNotBeChanged ? true : null"
         @keydown.enter.exact.prevent
         @keydown.enter.exact="addNewBlockOnEnter(blocks, 0, 'header')"
         type="text" 
         placeholder="Add Post Title..." 
         v-model="pageTitle" 
-        maxlength="72" 
+        maxlength="72"
         class="h-auto resize-none mt-1 
         px-3 py-2 block w-full mx-8 
         bg-white outline-none border-0

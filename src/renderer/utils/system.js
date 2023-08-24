@@ -15,7 +15,7 @@
                 const rawData = await window.electronAPI.readFile(path);
                 return { success: true, data: rawData };
             }else{
-                return { success: false, data: path + "File does not exists."};
+                return { success: false, data: path + " File does not exists."};
             }
         }
 
@@ -71,9 +71,14 @@
         }
         
     // Get Dirs
-    export  function getDirsIn(rootDir) {
+    export function getDirsIn(rootDir) {
         const dirs =  window.electronAPI.getDirsIn(rootDir);
         return dirs;
         }
 
-        
+    // Get Files
+    export function getFilesIn(dir) {
+        const files =  window.electronAPI.getFilesIn(dir);
+        return files;
+        }
+  

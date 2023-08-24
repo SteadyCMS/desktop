@@ -1,7 +1,7 @@
   import {app, BrowserWindow, ipcMain, session} from 'electron';
   import {join} from 'path';
 
-  import {readFileSync, mkdir, writeFile, existsSync, rmSync, readdir, statSync, readdirSync} from 'fs';
+  import {readFileSync, mkdir, writeFile, existsSync, rmSync, readdirSync} from 'fs';
   import {execFile} from 'child_process';
   import {download} from "electron-dl";
   import decompress from "decompress";
@@ -200,27 +200,19 @@
     }
   });
 
+  // Gets a list of dir in dir
   ipcMain.handle('getDirsIn', (event, rootDir) => {
     return readdirSync(rootDir, { withFileTypes: true })
     .filter(dirent => dirent.isDirectory())
-    .map(dirent => dirent.name)
- });
+    .map(dirent => dirent.name);
+  });
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+  // Gets a list of files in dir (Only .markdown)
+  ipcMain.handle('getFilesIn', (event, dir) => {
+    return readdirSync(dir, { withFileTypes: true })
+    .filter(dirent => dirent.name.endsWith(".markdown"))
+    .map(dirent => dirent.name);
+  });
 
 
 

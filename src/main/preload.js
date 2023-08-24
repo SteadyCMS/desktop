@@ -34,11 +34,15 @@
     return data;
   },
   getDirsIn: (rootDir) =>  {
-    const data =  ipcRenderer.invoke('getDirsIn', rootDir);
-    return data;
+    const dirs =  ipcRenderer.invoke('getDirsIn', rootDir);
+    return dirs;
+  },
+  getFilesIn: (dir) =>  {
+    const files =  ipcRenderer.invoke('getFilesIn', dir);
+    return files;
   },
 
 
 
-
   });
+  

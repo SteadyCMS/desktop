@@ -1,5 +1,5 @@
 <script setup>
-  import { ref } from 'vue';
+  import { ref, provide } from 'vue';
   import { RouterLink, RouterView, useRouter} from 'vue-router';
 
   import { getDirsIn, doesFileExistInAppDir, readFileInAppDir, getPathTo, doesFileExist } from '../utils/system.js'
@@ -15,12 +15,12 @@
 
   const router = useRouter()
   const dropdownState = ref(false);
+  const websites = ref([]);
+  const currentWebsite = ref('');
+
 
   // On load set view to posts
   router.push({path: '/posts'});
-
-  const websites = ref([]);
-  const currentWebsite = ref('');
 
   (function() {
     doesFileExistInAppDir('steady.config.json').then(fileExsits => {
@@ -49,7 +49,7 @@
     });
   })();
 
-  function cleanSiteName(name) {
+  function cleanSiteName(name) { // TODO 
     const rawName = name[0].toUpperCase() + name.slice(1);
     return rawName.replaceAll('_', ' ');
   }
