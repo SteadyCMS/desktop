@@ -8,7 +8,7 @@
 
   import { writeToFile, openInBrowser, getPathTo, deleteFile, doesFileExist, readFileInAppDir, readFile } from '../utils/system.js'
   import { startServer, buildNewSite } from '../utils/hugo.js'
-  import { titleToFileName } from '../utils/utils.js'
+  import { titleToFileName, fileNameToTitle } from '../utils/utils.js'
   
  
   import AccentButton from '../components/buttons/AccentButton.vue';
@@ -36,13 +36,11 @@
   let blockButton = false;
   const filterText = ref('');
   const pageTitle = ref('');
-  // const isDraft = ref("false");
-  // const setToDraft = false;
   const titleAtPerview = ref("");
   const isFirstTime = ref(true);
   const websiteName = ref('');
-  const titleCanNotBeChanged = ref(false);
-  // TODO: if post is being edited from published don't let them change the title
+  const isNotANewPost = ref(false);
+  const isDraft = ref(true);
 
   let blocks = ref([
     {
@@ -131,13 +129,13 @@
     // Check if they are opening a post or creating a new one
     const currentPost = localStorage.getItem("activeSiteData_currentPost");
     websiteName.value = localStorage.getItem("activeSiteData_currentSite");
+    isDraft.value = localStorage.getItem("activeSiteData_iscurrentPostADraft");
     // If there editing load it else don't
     console.log(currentPost)
     if (currentPost == "newsteadycmspost"){}else{
-      titleCanNotBeChanged.value = true;
-      pageTitle.value = currentPost.replace('.markdown', '');
+      isNotANewPost.value = true;
+      pageTitle.value = fileNameToTitle(currentPost.replace('.markdown', ''));
       //Load in blocks and data to post from json on start if they exist
-      //`sites/${websiteName.value.toLocaleLowerCase()}/content/post/${currentPost.replace('.markdown', '.json')}`
       readFile("sites/" + websiteName.value.toLocaleLowerCase() + "/content/post/" + currentPost.replace('.markdown', '.json')).then(fileData => {
         if (fileData.success) {
           const data = JSON.parse(fileData.data);
@@ -218,7 +216,6 @@
           array[i].active = false;
         } 
       }
-   
     }
   }
 
@@ -268,7 +265,6 @@
   // Close the add new block box (with above)
   function closeBoxOnOut(e, array, value) {
     if (!blockButton) {
-     // console.log("closed 2")
       for (let i = 0; i < array.length; i++) {
         array[i].menu = false;
       } 
@@ -341,13 +337,25 @@
   }
 
   function goToDashboard() {
-    // TODO: ask if they want to save it first
-    router.push({path: '/'});
+    if(isNotANewPost.value){ // i.e Are they editing the post or is this a new one
+      // TODO: If they are editing a published post ask if they want to publish their changes
+      if(isDraft.value){// i.e Is it a draft or published post
+      buildAndSavePostAs("save-draft").then(x => { 
+        // TODO: show loading screen
+        router.push({path: '/'});
+      });
+    }else{
+      // TODO: ...
+    }
+    }else{
+       // TODO: ask if they want to save their post first
+       router.push({path: '/'});
+    }
   }
 
-  function previewSite(){
+  function previewPost(){
     if(titleToFileName(pageTitle.value).length > 2){
-        // If they changed the title delete the old files with other title
+        // If they changed the title delete the old files with other title (not when editing a saved post)
         if(titleAtPerview.value != ""){
           if (titleAtPerview.value != pageTitle.value) {
             deleteFile("sites/" + websiteName.value + "/content/post/" + titleToFileName(titleAtPerview.value) + ".json");
@@ -363,7 +371,7 @@
         const runbuild = ref(true);
         if (fileExsits) { // If there is a file with the same name
           if (isFirstTime.value == true) { // if this is the first time runinng perview 
-            if(titleCanNotBeChanged){ // i.e they are editing a post
+            if(isNotANewPost.value){ // i.e Are editing a post or creating a new one
               runbuild.value = true;
             }else{
               runbuild.value = false;
@@ -376,7 +384,7 @@
         }
 
         if(runbuild.value){ // If this is the first time pervining they can't use a name of a post
-          buildAndSavePost().then(x => { 
+          buildAndSavePostAs("perview-draft").then(x => { 
             getPathTo('documents').then(path => { 
              // buildNewSite(path + "/steadyCMS/sites/" + websiteName.value);
 
@@ -416,18 +424,47 @@
     } while (found == false);  
   }
 
-  // Convert blocks to markdown and json 
-  async function buildAndSavePost(){
+  // Convert blocks to markdown and json
+  async function buildAndSavePostAs(buildType){
     const blocksData = blocks['_rawValue'];
+
+    const buildTypeSettings = ref({})
+
+    switch (buildType) {
+      case 'published': // Build as pubished post (render = "always" & draft = "false")
+      buildTypeSettings.value = {
+      'isDraft': false,
+      'render': 'always',
+      }
+        break;
+      case 'perview-draft': // Build as a draft for previewing (render = "always" & draft = "false")
+      buildTypeSettings.value = {
+      'isDraft': false,
+      'render': 'always',
+      }
+        break;
+      case 'save-draft': // Build as a draft for saving (render = "never" & draft = "true")
+      buildTypeSettings.value = {
+      'isDraft': true,
+      'render': 'never',
+      }
+        break;
+      default:
+      buildTypeSettings.value = {
+      'isDraft': false,
+      'render': 'always',
+      }
+      console.log("Error: Using default [buildAndSavePost: BlockEditorVue.vue]")
+        break;
+    }
 
     let postDescription = getPostDescription(blocksData);
     let featuredImage = "/images/Pope-Edouard-de-Beaumont-1844.jpg";
     let postTages = '"scene", "fun", "time"';
-   
 
     // TODO: Add render = never for drafts
     // TODO: Don't change date on update
-    let pageHead = `---\r\ndate: ${getTodaysDate()} \r\ndescription: "${postDescription}"\r\nfeatured_image: "${featuredImage}"\r\ntags: [${postTages}]\r\ntitle: "${pageTitle.value}"\r\n---\r\n`;
+    let pageHead = `---\r\ndate: ${getTodaysDate()} \r\ndescription: "${postDescription}"\r\nfeatured_image: "${featuredImage}"\r\ntags: [${postTages}]\r\ntitle: "${pageTitle.value}"\r\ndraft: ${buildTypeSettings.value.isDraft}\r\n_build:\r\n  render: ${buildTypeSettings.value.render}\r\n  list: ${buildTypeSettings.value.render}\r\n---\r\n`;
 
     // Save as Json
     let jsonData = JSON.stringify(blocks['_rawValue'], null, 4);
@@ -480,7 +517,7 @@
   }
 
 function publishSite(){
-  closeServer();
+  
 }
 
 </script>
@@ -496,7 +533,7 @@ function publishSite(){
         <p class="text-slate-400 text-sm">Draft</p>
       </div>
       <div class="flex flex-row items-center space-x-3">
-        <button @click="previewSite">
+        <button @click="previewPost">
           Preview
         </button>
         <button @click="publishSite">
@@ -507,7 +544,7 @@ function publishSite(){
 
     <div class="flex flex-row">
       <textarea 
-        :disabled="titleCanNotBeChanged ? true : null"
+        :disabled="isNotANewPost ? true : null"
         @keydown.enter.exact.prevent
         @keydown.enter.exact="addNewBlockOnEnter(blocks, 0, 'header')"
         type="text" 

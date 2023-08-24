@@ -16,6 +16,8 @@
       localStorage.setItem('activeSiteData_currentPost', name); 
     }
     localStorage.setItem('activeSiteData_currentSite', currentWebsite.value); 
+    // TODO: get and set this value
+    localStorage.setItem('activeSiteData_iscurrentPostADraft', true); 
     router.push({name: 'editor'});
   }
 
