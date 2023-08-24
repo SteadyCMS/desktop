@@ -3,7 +3,7 @@
   import { useRouter } from 'vue-router';
 
   import { doesFileExistInAppDir, readFileInAppDir, getPathTo, getFilesIn, readFile } from '../../utils/system.js'
-  import { fileNameToTitle } from '../../utils/utils.js'
+  import { siteToFolderName, fileNameToTitle } from '../../utils/utils.js'
 
   import AccentButton from '../../components/buttons/AccentButton.vue';
   
@@ -34,10 +34,10 @@
       if (fileExsits) {
         // Get the Current website
         readFileInAppDir("steady.config.json").then(fileData => {
-          currentWebsite.value = fileNameToTitle(JSON.parse(fileData.data).currentWebsite);
+          currentWebsite.value = siteToFolderName(JSON.parse(fileData.data).currentWebsite);
           getPathTo('documents').then(path => {
             console.log(currentWebsite.value);
-            const pathToPosts =  "sites/" + currentWebsite.value.toLocaleLowerCase() + "/content/post/";
+            const pathToPosts =  "sites/" + currentWebsite.value+ "/content/post/";
             getFilesIn(path + "/SteadyCMS/" + pathToPosts).then( dirs => {
               if (dirs.length >= 1 && dirs != "error") {
                 for (let i = 0; i < dirs.length; i++) {

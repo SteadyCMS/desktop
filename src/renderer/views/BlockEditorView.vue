@@ -8,7 +8,7 @@
 
   import { writeToFile, openInBrowser, getPathTo, deleteFile, doesFileExist, readFileInAppDir, readFile } from '../utils/system.js'
   import { startServer, buildNewSite } from '../utils/hugo.js'
-  import { titleToFileName, fileNameToTitle } from '../utils/utils.js'
+  import { titleToFileName, fileNameToTitle, siteToFolderName } from '../utils/utils.js'
   
  
   import AccentButton from '../components/buttons/AccentButton.vue';
@@ -128,7 +128,7 @@
   (async () => {
     // Check if they are opening a post or creating a new one
     const currentPost = localStorage.getItem("activeSiteData_currentPost");
-    websiteName.value = siteNameToFileName(localStorage.getItem("activeSiteData_currentSite"));
+    websiteName.value = siteToFolderName(localStorage.getItem("activeSiteData_currentSite"));
 
     isDraft.value = localStorage.getItem("activeSiteData_iscurrentPostADraft");
     // If there editing load it else don't
@@ -148,9 +148,7 @@
     }
   })();
 
-  function siteNameToFileName(name) {
-    return name.trim().replaceAll(" ", "_").replace(/[`_!@#$%^&*()+.=\[\]{};':"/|,<>\/?~]/g, "_").toLowerCase();
-  }
+
 
   function addNewBlock(array, value, name) {
     let idNum =  Math.random().toString().slice(2,9).concat( Math.random().toString().slice(5,7)).concat(Math.random().toString().slice(4,6));

@@ -34,16 +34,18 @@
           // Get a list of all websites by looping over the dirs and add them to array for the dropdown
           getPathTo('documents').then(path => {
             getDirsIn(path + "/SteadyCMS/sites/").then( dirs => {
-              console.log(dirs)
-              
-              for (let i = 0; i < dirs.length; i++) {
-                doesFileExist("/sites/" + dirs[i] + '/hugo.toml').then(fileExsits => {
-                  if (fileExsits && dirs[i] != currentWebsite.value.toLowerCase()) {
-                    websites.value.splice(0,0, { "name": fileNameToTitle(dirs[i]), "path": dirs[i], });
-                  }
-                });
+              if(dirs != "error"){
+                for (let i = 0; i < dirs.length; i++) {
+                  doesFileExist("/sites/" + dirs[i] + '/hugo.toml').then(fileExsits => {
+                    if (fileExsits && dirs[i] != currentWebsite.value.toLowerCase()) {
+                      websites.value.splice(0,0, { "name": fileNameToTitle(dirs[i]), "path": dirs[i], });
+                    }
+                  });
+                }
+              }else{
+                  // They have no websites (have them make one)
+                  createNewWebsite();
               }
-
             });
           });
         });
