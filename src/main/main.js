@@ -202,16 +202,25 @@
 
   // Gets a list of dir in dir
   ipcMain.handle('getDirsIn', (event, rootDir) => {
-    return readdirSync(rootDir, { withFileTypes: true })
-    .filter(dirent => dirent.isDirectory())
-    .map(dirent => dirent.name);
+    try {
+      return readdirSync(rootDir, { withFileTypes: true })
+      .filter(dirent => dirent.isDirectory())
+      .map(dirent => dirent.name);
+    } catch (error) {
+      return "error";
+    }
   });
 
   // Gets a list of files in dir (Only .markdown)
   ipcMain.handle('getFilesIn', (event, dir) => {
-    return readdirSync(dir, { withFileTypes: true })
-    .filter(dirent => dirent.name.endsWith(".markdown"))
-    .map(dirent => dirent.name);
+    try {
+      return readdirSync(dir, { withFileTypes: true })
+      .filter(dirent => dirent.name.endsWith(".markdown"))
+      .map(dirent => dirent.name);
+    } catch (error) {
+      return "error";
+    }
+
   });
 
 

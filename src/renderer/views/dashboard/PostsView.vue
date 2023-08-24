@@ -15,7 +15,7 @@
     } else {
       localStorage.setItem('activeSiteData_currentPost', name); 
     }
-    localStorage.setItem('activeSiteData_currentSite', currentWebsite.value); 
+    localStorage.setItem('activeSiteData_currentSite', currentWebsite.value);
     // TODO: get and set this value
     localStorage.setItem('activeSiteData_iscurrentPostADraft', true); 
     router.push({name: 'editor'});
@@ -37,10 +37,9 @@
           currentWebsite.value = fileNameToTitle(JSON.parse(fileData.data).currentWebsite);
           getPathTo('documents').then(path => {
             console.log(currentWebsite.value);
-            //const pathToPosts = `${path}/SteadyCMS/sites/${currentWebsite.value.toLocaleLowerCase()}/content/post/`;
             const pathToPosts =  "sites/" + currentWebsite.value.toLocaleLowerCase() + "/content/post/";
             getFilesIn(path + "/SteadyCMS/" + pathToPosts).then( dirs => {
-              if (dirs.length >= 1) {
+              if (dirs.length >= 1 && dirs != "error") {
                 for (let i = 0; i < dirs.length; i++) {
                   parseFile(pathToPosts, dirs[i]).then(fileData => {
                   website.value.splice(0,0, { "title": fileNameToTitle(dirs[i]).replace(".markdown", ""), "name": dirs[i], "date":  fileData.date, "text": fileData.description });

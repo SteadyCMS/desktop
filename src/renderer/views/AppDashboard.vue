@@ -1,8 +1,10 @@
 <script setup>
-  import { ref, provide } from 'vue';
+  import { ref } from 'vue';
   import { RouterLink, RouterView, useRouter} from 'vue-router';
 
   import { getDirsIn, doesFileExistInAppDir, readFileInAppDir, getPathTo, doesFileExist } from '../utils/system.js'
+  import { titleToFileName, fileNameToTitle } from '../utils/utils.js'
+
 
   import LogoLight from '../components/logos/LogoLight.vue';
   import LogoMark from '../components/logos/LogoMark.vue';
@@ -23,22 +25,25 @@
   router.push({path: '/posts'});
 
   (function() {
+    // TODO: make sure the current site is there
     doesFileExistInAppDir('steady.config.json').then(fileExsits => {
       if (fileExsits) {
           // Get the Current website
         readFileInAppDir("steady.config.json").then(fileData => {
-          currentWebsite.value = cleanSiteName(JSON.parse(fileData.data).currentWebsite);
-      
+          currentWebsite.value = fileNameToTitle(JSON.parse(fileData.data).currentWebsite);
           // Get a list of all websites by looping over the dirs and add them to array for the dropdown
           getPathTo('documents').then(path => {
             getDirsIn(path + "/SteadyCMS/sites/").then( dirs => {
+              console.log(dirs)
+              
               for (let i = 0; i < dirs.length; i++) {
                 doesFileExist("/sites/" + dirs[i] + '/hugo.toml').then(fileExsits => {
                   if (fileExsits && dirs[i] != currentWebsite.value.toLowerCase()) {
-                    websites.value.splice(0,0, { "name": cleanSiteName(dirs[i]), "path": dirs[i], });
+                    websites.value.splice(0,0, { "name": fileNameToTitle(dirs[i]), "path": dirs[i], });
                   }
                 });
               }
+
             });
           });
         });
@@ -49,10 +54,7 @@
     });
   })();
 
-  function cleanSiteName(name) { // TODO 
-    const rawName = name[0].toUpperCase() + name.slice(1);
-    return rawName.replaceAll('_', ' ');
-  }
+
 
   function createNewWebsite() {
     router.push({path: '/new-website'});

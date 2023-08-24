@@ -128,7 +128,8 @@
   (async () => {
     // Check if they are opening a post or creating a new one
     const currentPost = localStorage.getItem("activeSiteData_currentPost");
-    websiteName.value = localStorage.getItem("activeSiteData_currentSite");
+    websiteName.value = siteNameToFileName(localStorage.getItem("activeSiteData_currentSite"));
+
     isDraft.value = localStorage.getItem("activeSiteData_iscurrentPostADraft");
     // If there editing load it else don't
     console.log(currentPost)
@@ -147,8 +148,12 @@
     }
   })();
 
+  function siteNameToFileName(name) {
+    return name.trim().replaceAll(" ", "_").replace(/[`_!@#$%^&*()+.=\[\]{};':"/|,<>\/?~]/g, "_").toLowerCase();
+  }
+
   function addNewBlock(array, value, name) {
-    let idNum =  Math.random().toString().slice(2,9).concat( Math.random().toString().slice(5,7)).concat( Math.random().toString().slice(4,6));
+    let idNum =  Math.random().toString().slice(2,9).concat( Math.random().toString().slice(5,7)).concat(Math.random().toString().slice(4,6));
     if(value != 0){
     let index = array.indexOf(value);
     switch(name) {
@@ -169,7 +174,7 @@
     } 
     openBlockBox(array, value, 'out')
   } else {
-    array.splice(0, 0,  { type: "paragraph", content: "", id: idNum, active: false, menu: false });
+    array.splice(0, 0, { type: "paragraph", content: "", id: idNum, active: false, menu: false });
   }
     //console.log(blocks)
   }
@@ -354,6 +359,9 @@
   }
 
   function previewPost(){
+
+    console.log(websiteName.value)
+
     if(titleToFileName(pageTitle.value).length > 2){
         // If they changed the title delete the old files with other title (not when editing a saved post)
         if(titleAtPerview.value != ""){
