@@ -1,8 +1,9 @@
 <script setup>
   import { ref } from 'vue';
   import { RouterLink, RouterView, useRouter} from 'vue-router';
-
-  import { getDirsIn, doesFileExistInAppDir, readFileInAppDir, getPathTo, doesFileExist } from '../utils/system.js'
+  import { storeToRefs } from 'pinia'
+  import { useGeneralStore } from '../stores/general.js'
+  import { getDirsIn, doesFileExistInAppDir, readFileInAppDir, getPathTo, doesFileExist, writeToFileInAppDir } from '../utils/system.js'
   import { titleToFileName, fileNameToTitle } from '../utils/utils.js'
 
 
@@ -15,22 +16,31 @@
   import IconArrowDown from '../components/icons/IconArrowDown.vue';
   import IconPlus from '../components/icons/IconPlus.vue';
 
-  const router = useRouter()
+  const generalStore = useGeneralStore();
+  const { currentSite } = storeToRefs(generalStore);
+  const { changeCurrentSite } = generalStore; 
+
+
+  const router = useRouter();
   const dropdownState = ref(false);
   const websites = ref([]);
   const currentWebsite = ref('');
 
-
-  // On load set view to posts
-  router.push({path: '/posts'});
-
   (function() {
+    // On load, set view to posts
+    router.push({path: '/posts'});
+    // And load content
+    loadSiteContent();
+  })();
+
+  function loadSiteContent() {
     // TODO: make sure the current site is there
     doesFileExistInAppDir('steady.config.json').then(fileExsits => {
       if (fileExsits) {
           // Get the Current website
         readFileInAppDir("steady.config.json").then(fileData => {
           currentWebsite.value = fileNameToTitle(JSON.parse(fileData.data).currentWebsite);
+          currentSite.value = currentWebsite.value;
           // Get a list of all websites by looping over the dirs and add them to array for the dropdown
           getPathTo('documents').then(path => {
             getDirsIn(path + "/SteadyCMS/sites/").then( dirs => {
@@ -54,18 +64,40 @@
         createNewWebsite();
       }
     });
-  })();
+  }
 
 
+  function changeCurrentWebsite(websiteName){
+    //TODO: load the site
+    console.log(websiteName);
+     const obj = {"currentWebsite": websiteName};
+      writeToFileInAppDir(JSON.stringify(obj), "/", "steady.config.json").then(x => {
+        websites.value = [];
+        router.push({path: '/posts'});
+        dropdownState.value = false;
+        loadSiteContent();
+        changeCurrentSite(websiteName);
+    });
+  }
 
   function createNewWebsite() {
     router.push({path: '/new-website'});
   }
+// wifi needed tp perform this acsion. please check your  internet cunnectsion and try agin
 
-  function changeWebsite(websiteName){
-    //TODO: load the site
-    console.log(websiteName);
-  }
+
+
+// cartStore.$subscribe((mutation, state) => {
+//   // import { MutationType } from 'pinia'
+//   mutation.type // 'direct' | 'patch object' | 'patch function'
+//   // same as cartStore.$id
+//   mutation.storeId // 'cart'
+//   // only available with mutation.type === 'patch object'
+//   mutation.payload // patch object passed to cartStore.$patch()
+
+//   // persist the whole state to the local storage whenever it changes
+//   localStorage.setItem('cart', JSON.stringify(state))
+// })
 
 
 </script>
@@ -98,7 +130,7 @@
             <!-- Dropdown menu -->
             <div class="absolute top-6 left-0 bg-black border border-gray-800 text-base z-50 list-none rounded-lg my-4 w-full" id="dropdown" :class="{'opacity-100': dropdownState, 'visible': dropdownState, 'opacity-0': !dropdownState, 'hidden': !dropdownState}">
               <ul class="py-1" aria-labelledby="dropdown">
-                <li v-for="sites in websites" @click="changeWebsite(sites.path)" class="flex flex-row flex-grow rounded-lg hover:bg-accent-glow hover:cursor-pointer px-4 py-2 duration-300">
+                <li v-for="sites in websites" @click="changeCurrentWebsite(sites.path)" class="flex flex-row flex-grow rounded-lg hover:bg-accent-glow hover:cursor-pointer px-4 py-2 duration-300">
                   <div class="flex flex-row items-center space-x-2">
                     <LogoMark class="w-5 h-5 border border-gray-800 rounded" />
                     <span class="text-white text-sm font-bold"> {{ sites.name }}</span>

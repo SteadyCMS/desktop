@@ -5,6 +5,8 @@
   import {execFile} from 'child_process';
   import {download} from "electron-dl";
   import decompress from "decompress";
+
+  //process.env['ELECTRON_DISABLE_SECURITY_WARNINGS'] = 'true';
   
   function createWindow () {
     const mainWindow = new BrowserWindow({
@@ -12,7 +14,7 @@
       height: 800,
       minWidth: 1000,
       minHeight: 800,
-      icon: 'src/renderer/assets/images/steady-cms-logomark.png', // TODO Better Icon
+      icon: 'src/renderer/assets/images/steady-cms-logomark.png', 
       webPreferences: {
         preload: join(__dirname, 'preload.js'),
         nodeIntegration: false,
@@ -223,6 +225,6 @@
 
   });
 
-
+  
 
 }); // On ready

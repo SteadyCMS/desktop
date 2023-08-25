@@ -1,6 +1,7 @@
 <script setup>
-  import { ref, inject } from 'vue';
+  import { ref } from 'vue';
   import { useRouter } from 'vue-router';
+  import { useGeneralStore } from '../../stores/general.js'
 
   import { doesFileExistInAppDir, readFileInAppDir, getPathTo, getFilesIn, readFile } from '../../utils/system.js'
   import { siteToFolderName, fileNameToTitle } from '../../utils/utils.js'
@@ -8,6 +9,7 @@
   import AccentButton from '../../components/buttons/AccentButton.vue';
   
   const router = useRouter();
+  const generalStore = useGeneralStore();
 
   function goToBlockEditor(name) {
     if (name == "newsteadycmspost") {
@@ -28,6 +30,16 @@
   (function() {
     updatePostList();
   })();
+
+  generalStore.$onAction(
+  ({name}) => {
+    if (name === 'changeCurrentSite') {
+      website.value = [];
+      updatePostList();
+    }
+  }
+);
+
 
   function updatePostList() {
     doesFileExistInAppDir('steady.config.json').then(fileExsits => {
@@ -68,7 +80,6 @@
         let frontMatter = /---([^;]*)---/.exec(fileData.data);
         let description = /(?<=description: )"(?:[^\\"]+|\\.)*"/.exec(frontMatter)[0].slice(1,-1);
         let date = /[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(\.[0-9]+)?([Zz]|([\+-])([01]\d|2[0-3]):?([0-5]\d)?)?/.exec(frontMatter)[0];
-        //"Aug 17, 2023 5:12pm"
         let returnData = {
           "description": description, 
           "date": formatDate(date)

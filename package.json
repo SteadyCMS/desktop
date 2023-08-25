@@ -32,6 +32,7 @@
     "electron-dl": "^3.5.0",
     "mosha-vue-toastify": "^1.0.23",
     "open": "^9.1.0",
+    "pinia": "^2.1.6",
     "showdown": "^2.1.0",
     "turndown": "^7.1.2",
     "vue": "^3.2.47",
