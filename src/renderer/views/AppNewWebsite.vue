@@ -21,6 +21,9 @@
 
   const router = useRouter();
 
+
+// TODO: On start up remove the x and cancel buttonsa
+
   function backToDashboard() {
     router.go(-1); 
   }
@@ -126,6 +129,10 @@
 
   function cancelAndCleanUp() {
     loadingScreenText.value = "Canceling...";
+    setTimeout(deleteOldFiles, 5000);
+  }
+
+  function deleteOldFiles() {
     const name = websiteName.value.replaceAll(' ', '_').toLowerCase();
     console.log(name);
     deleteDir('sites/' + name).then(x => {

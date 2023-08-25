@@ -1,7 +1,7 @@
   import {app, BrowserWindow, ipcMain, session} from 'electron';
   import {join} from 'path';
 
-  import {readFileSync, mkdir, rmdirSync, writeFile, existsSync, rmSync, readdirSync} from 'fs';
+  import {readFileSync, mkdir, rmdirSync, writeFile, existsSync, rmSync, readdirSync, lstatSync, unlinkSync} from 'fs';
   import {execFile} from 'child_process';
   import {download} from "electron-dl";
   import decompress from "decompress";
@@ -163,14 +163,27 @@
     ipcMain.on('deleteDir', (event, path) => {
       let pathSource = app.getPath('documents') + '/SteadyCMS/' + path;
       try {
-        rmdirSync(pathSource, {
-          force: false,
-        });
+        const deleteFolderRecursive = function (directoryPath) {
+          if (existsSync(directoryPath)) {
+              readdirSync(directoryPath).forEach((file, index) => {
+                const curPath = join(directoryPath, file);
+                if (lstatSync(curPath).isDirectory()) {
+                 // recurse
+                  deleteFolderRecursive(curPath);
+                } else {
+                  // delete file
+                  unlinkSync(curPath);
+                }
+              });
+              rmdirSync(directoryPath);
+            }
+          };
+          deleteFolderRecursive(pathSource);
       } catch (err) {
         throw err
       }
     });
-  
+
   // Get Paths
   ipcMain.handle('getPathTo', (event, place) => {
  
