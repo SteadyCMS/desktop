@@ -146,6 +146,18 @@
     }
   });
 
+  // Delete file (IN APP DIR)
+  ipcMain.on('deleteFileInAppDir', (event, path) => {
+    let pathSource = app.getAppPath() + "/SteadyCMS/" + path;
+    try {
+      rmSync(pathSource, {
+        force: false,
+      });
+    } catch (err) {
+      throw err
+    }
+  });
+
   // Delete file (IN DOCUMENTS)
   ipcMain.on('deleteFile', (event, path) => {
     let pathSource = app.getPath('documents') + '/SteadyCMS/' + path;
@@ -153,7 +165,6 @@
       rmSync(pathSource, {
         force: false,
       });
-      //console.log('File is deleted.');
     } catch (err) {
       throw err
     }

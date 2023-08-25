@@ -29,6 +29,7 @@
     return data;
   },
   deleteFile: (path) => ipcRenderer.send('deleteFile', path),
+  deleteFileInAppDir: (path) => ipcRenderer.send('deleteFileInAppDir', path),
   deleteDir: (path) => ipcRenderer.send('deleteDir', path),
   getPathTo: async (place) =>  {
     const data = await ipcRenderer.invoke('getPathTo', place);

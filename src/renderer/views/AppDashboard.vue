@@ -3,9 +3,8 @@
   import { RouterLink, RouterView, useRouter} from 'vue-router';
   import { storeToRefs } from 'pinia'
   import { useGeneralStore } from '../stores/general.js'
-  import { getDirsIn, doesFileExistInAppDir, readFileInAppDir, getPathTo, doesFileExist, writeToFileInAppDir } from '../utils/system.js'
-  import { titleToFileName, fileNameToTitle } from '../utils/utils.js'
-
+  import { getDirsIn, doesFileExistInAppDir, readFileInAppDir, getPathTo, doesFileExist, writeToFileInAppDir, deleteFileInAppDir } from '../utils/system.js'
+  import { fileNameToTitle } from '../utils/utils.js'
 
   import LogoLight from '../components/logos/LogoLight.vue';
   import LogoMark from '../components/logos/LogoMark.vue';
@@ -44,7 +43,9 @@
           // Get a list of all websites by looping over the dirs and add them to array for the dropdown
           getPathTo('documents').then(path => {
             getDirsIn(path + "/SteadyCMS/sites/").then( dirs => {
-              if(dirs != "error"){
+              console.log(dirs)
+              if(dirs != "error" && dirs.length != 0){
+
                 for (let i = 0; i < dirs.length; i++) {
                   doesFileExist("/sites/" + dirs[i] + '/hugo.toml').then(fileExsits => {
                     if (fileExsits && dirs[i] != currentWebsite.value.toLowerCase()) {
@@ -53,8 +54,11 @@
                   });
                 }
               }else{
+                  // Delete steady.config.json
+                  deleteFileInAppDir("steady.config.json").then(x => {
                   // They have no websites (have them make one)
                   createNewWebsite();
+                });
               }
             });
           });
@@ -66,9 +70,7 @@
     });
   }
 
-
-  function changeCurrentWebsite(websiteName){
-    //TODO: load the site
+  function changeCurrentWebsite(websiteName){ // TODO: when changing site the server must be stop before changed
     console.log(websiteName);
      const obj = {"currentWebsite": websiteName};
       writeToFileInAppDir(JSON.stringify(obj), "/", "steady.config.json").then(x => {
@@ -83,22 +85,6 @@
   function createNewWebsite() {
     router.push({path: '/new-website'});
   }
-// wifi needed tp perform this acsion. please check your  internet cunnectsion and try agin
-
-
-
-// cartStore.$subscribe((mutation, state) => {
-//   // import { MutationType } from 'pinia'
-//   mutation.type // 'direct' | 'patch object' | 'patch function'
-//   // same as cartStore.$id
-//   mutation.storeId // 'cart'
-//   // only available with mutation.type === 'patch object'
-//   mutation.payload // patch object passed to cartStore.$patch()
-
-//   // persist the whole state to the local storage whenever it changes
-//   localStorage.setItem('cart', JSON.stringify(state))
-// })
-
 
 </script>
 
@@ -162,7 +148,6 @@
             <IconTags class="w-4 h-4 mr-2" /> Tags
           </RouterLink>
         </div>
-
       </div>
 
       <div class="flex h-screen w-3/4">
@@ -170,7 +155,5 @@
       </div>
 
     </div>
-    
-
   </main>
 </template>

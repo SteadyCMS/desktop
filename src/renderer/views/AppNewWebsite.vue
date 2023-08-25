@@ -1,7 +1,7 @@
 <script setup>
   import {  useRouter } from 'vue-router';
   import { ref, computed } from 'vue';
-  import { createToast } from 'mosha-vue-toastify';
+  import { createToast, clearToasts } from 'mosha-vue-toastify';
 
   import StepOne from '../components/createNewWebsite/StepOne.vue';
   import StepTwo from '../components/createNewWebsite/StepTwo.vue';
@@ -22,7 +22,7 @@
   const router = useRouter();
 
 
-// TODO: On start up remove the x and cancel buttonsa
+// TODO: On start up remove the x and cancel buttons
 
   function backToDashboard() {
     router.go(-1); 
@@ -33,6 +33,7 @@
   const showLoadingScreen = ref(false);
   const loadingScreenText = ref('Preparing...');
   const isUsingInternet = ref(false);
+  const isCancelAndCleanUp = ref(false);
   // Step 1
   const websiteName = ref("");
   const nameInputError = ref("")
@@ -133,12 +134,12 @@
   }
 
   function deleteOldFiles() {
-    const name = websiteName.value.replaceAll(' ', '_').toLowerCase();
-    console.log(name);
-    deleteDir('sites/' + name).then(x => {
-    showLoadingScreen.value = false;
-    loadingScreenText.value = 'Preparing...';
-  });
+      const name = websiteName.value.replaceAll(' ', '_').toLowerCase();
+      deleteDir('sites/' + name).then(x => {
+      showLoadingScreen.value = false;
+      loadingScreenText.value = 'Preparing...';
+      isCancelAndCleanUp.value = false;
+    });
   }
 
   function buildWebsite() { 
@@ -179,14 +180,13 @@
                       });
                     });
                   } else {
-                  // Else make the file and write info
+                    // Else make the file and write info
                     const obj = {"defultWebsite": "/", "currentWebsite": name};
                       writeToFileInAppDir(JSON.stringify(obj), "/", "steady.config.json").then(x => {
                       backToDashboard();
                     });
                   }
                 });
-
               });
             });
           });
@@ -208,13 +208,16 @@
     return navigator.onLine;
   }
   
+  // If they user gose offline when the app is using it cancel can clean up
   window.addEventListener("offline", (e) => {
-    if(isUsingInternet){
-      console.log("isUsingInternet")
-      showWaringToast({ title: 'Internet Connection Was Lost', description: 'Please check your internet connection and try again.'});
-      cancelAndCleanUp();
+    if(isUsingInternet.value){
+        if(isCancelAndCleanUp.value == false){
+        isCancelAndCleanUp.value = true;
+        console.log('called');
+        showWaringToast({ title: 'Internet Connection Was Lost', description: 'Please check your internet connection and try again.'});
+        cancelAndCleanUp(); // TODO: Fix this. Doesn't work sometimes because the downloading prosses is not stopped
+      }
     }
-    console.log("X isUsingInternet")
   });
 
 </script>

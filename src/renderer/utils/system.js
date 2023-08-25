@@ -47,6 +47,11 @@
         return data;
     }
 
+    // Delete File (IN APP DIR)
+    export async function deleteFileInAppDir(path) {
+        await window.electronAPI.deleteFileInAppDir(path);
+        }
+
     // Delete File (IN DOCUMENTS)
     export async function deleteFile(path) {
         await window.electronAPI.deleteFile(path);
