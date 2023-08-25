@@ -1,7 +1,7 @@
   import {app, BrowserWindow, ipcMain, session} from 'electron';
   import {join} from 'path';
 
-  import {readFileSync, mkdir, writeFile, existsSync, rmSync, readdirSync} from 'fs';
+  import {readFileSync, mkdir, rmdirSync, writeFile, existsSync, rmSync, readdirSync} from 'fs';
   import {execFile} from 'child_process';
   import {download} from "electron-dl";
   import decompress from "decompress";
@@ -130,7 +130,7 @@
   ipcMain.handle("downloadFile", async (event, url, info) => {
     info.properties.directory = app.getPath('documents') + '/SteadyCMS/' + info.properties.directory;
     await download(BrowserWindow.getFocusedWindow(), url, info.properties);
-    return "done"; // TODO: must return file name
+    return "done"; // TODO?: must return file name
   });
 
   // Extract Zip File (FROM DOCUMENTS)
@@ -159,6 +159,18 @@
     }
   });
 
+    // Delete Dir (IN DOCUMENTS)
+    ipcMain.on('deleteDir', (event, path) => {
+      let pathSource = app.getPath('documents') + '/SteadyCMS/' + path;
+      try {
+        rmdirSync(pathSource, {
+          force: false,
+        });
+      } catch (err) {
+        throw err
+      }
+    });
+  
   // Get Paths
   ipcMain.handle('getPathTo', (event, place) => {
  
@@ -224,7 +236,5 @@
     }
 
   });
-
-  
-
+ 
 }); // On ready

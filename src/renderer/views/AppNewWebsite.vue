@@ -1,6 +1,7 @@
 <script setup>
   import {  useRouter } from 'vue-router';
   import { ref, computed } from 'vue';
+  import { createToast } from 'mosha-vue-toastify';
 
   import StepOne from '../components/createNewWebsite/StepOne.vue';
   import StepTwo from '../components/createNewWebsite/StepTwo.vue';
@@ -11,7 +12,7 @@
   import AccentButton from '../components/buttons/AccentButton.vue';
   import SecondaryButton from '../components/buttons/SecondaryButton.vue';
 
-  import { downloadFile, extractFile, deleteFile, writeToFile, getPathTo, doesFileExistInAppDir, readFileInAppDir, writeToFileInAppDir } from '../utils/system.js'
+  import { downloadFile, extractFile, deleteFile, deleteDir, writeToFile, getPathTo, doesFileExistInAppDir, readFileInAppDir, writeToFileInAppDir } from '../utils/system.js'
   import { createNewSite } from '../utils/hugo.js'
 
   import LogoLight from '../components/logos/LogoLight.vue';
@@ -20,10 +21,15 @@
 
   const router = useRouter();
 
+  function backToDashboard() {
+    router.go(-1); 
+  }
+
   // For Component Step Switching
   const num = ref("1");
   const showLoadingScreen = ref(false);
   const loadingScreenText = ref('Preparing...');
+  const isUsingInternet = ref(false);
   // Step 1
   const websiteName = ref("");
   const nameInputError = ref("")
@@ -118,61 +124,92 @@
     }
   }
 
-  function buildWebsite() { // TODO: Add a cancel and clean up
-    showLoadingScreen.value = true;
+  function cancelAndCleanUp() {
+    loadingScreenText.value = "Canceling...";
     const name = websiteName.value.replaceAll(' ', '_').toLowerCase();
-    
-    // Create New Hugo Site
-    loadingScreenText.value = "Seting up site...";
-    getPathTo('documents').then(path => {
-      createNewSite(path + "/SteadyCMS/sites/"  + name + "/").then(x => {
+    console.log(name);
+    deleteDir('sites/' + name).then(x => {
+    showLoadingScreen.value = false;
+    loadingScreenText.value = 'Preparing...';
+  });
+  }
 
-      // Download Hugo Template, extract zip and delete .zip file
-      loadingScreenText.value = "Downloading template..."; // TODO: Check for WIFI!!! 
-      downloadFile('https://github.com/nanxiaobei/hugo-paper/archive/refs/heads/main.zip', '/sites/' + name + '/themes/').then(x => {
-        loadingScreenText.value = "Processing Template...";
-        extractFile('/sites/' + name + '/themes/hugo-paper-main.zip', '/sites/' + name + "/themes/").then(x => {
-          deleteFile('/sites/' + name + '/themes/hugo-paper-main.zip').then(x => {
+  function buildWebsite() { 
+      if(isOnline()){
+      showLoadingScreen.value = true;
+      const name = websiteName.value.replaceAll(' ', '_').toLowerCase();
+      
+      // Create New Hugo Site
+      loadingScreenText.value = "Seting up site...";
+      getPathTo('documents').then(path => {
+        createNewSite(path + "/SteadyCMS/sites/"  + name + "/").then(x => {
 
-            // Set up hugo.toml
-            loadingScreenText.value = "Configuring site..."; // TODO: SET theme name in .toml
+        // Download Hugo Template, extract zip and delete .zip file
+        isUsingInternet.value = true;
+        loadingScreenText.value = "Downloading template..."; 
+        downloadFile('https://github.com/nanxiaobei/hugo-paper/archive/refs/heads/main.zip', '/sites/' + name + '/themes/').then(x => {
+          loadingScreenText.value = "Processing Template...";
+          isUsingInternet.value = false;
+          extractFile('sites/' + name + '/themes/hugo-paper-main.zip', 'sites/' + name + "/themes/").then(x => {
+            deleteFile('sites/' + name + '/themes/hugo-paper-main.zip').then(x => {
 
-            let hugoToml = "baseURL = 'http://example.org/'\r\nlanguageCode = 'en-us'\r\ntitle = '" + name.replaceAll("_", " ") +"'\r\ntheme='hugo-paper-main'";
-            writeToFile(hugoToml, "/sites/" + name, "hugo.toml").then(x => {
+              // Set up hugo.toml
+              loadingScreenText.value = "Configuring site..."; // TODO: SET theme name in .toml
 
-              // Saving info to steady.config.json
-              loadingScreenText.value = "Finishing up...";
-              doesFileExistInAppDir('steady.config.json').then(fileExsits => {
-                // If the file exsists add too
-                if (fileExsits) {
-                  readFileInAppDir("steady.config.json").then(fileData => {
-                    let fileObj = JSON.parse(fileData.data);
-                    fileObj.currentWebsite = name;
-                    writeToFileInAppDir(JSON.stringify(fileObj), "/", "steady.config.json").then(x => {
+              let hugoToml = "baseURL = 'http://example.org/'\r\nlanguageCode = 'en-us'\r\ntitle = '" + name.replaceAll("_", " ") +"'\r\ntheme='hugo-paper-main'";
+              writeToFile(hugoToml, "/sites/" + name, "hugo.toml").then(x => {
+
+                // Saving info to steady.config.json
+                loadingScreenText.value = "Finishing up...";
+                doesFileExistInAppDir('steady.config.json').then(fileExsits => {
+                  // If the file exsists add too
+                  if (fileExsits) {
+                    readFileInAppDir("steady.config.json").then(fileData => {
+                      let fileObj = JSON.parse(fileData.data);
+                      fileObj.currentWebsite = name;
+                      writeToFileInAppDir(JSON.stringify(fileObj), "/", "steady.config.json").then(x => {
+                        backToDashboard();
+                      });
+                    });
+                  } else {
+                  // Else make the file and write info
+                    const obj = {"defultWebsite": "/", "currentWebsite": name};
+                      writeToFileInAppDir(JSON.stringify(obj), "/", "steady.config.json").then(x => {
                       backToDashboard();
                     });
-                  });
-                } else {
-                // Else make the file and write info
-                  const obj = {"defultWebsite": "/", "currentWebsite": name};
-                    writeToFileInAppDir(JSON.stringify(obj), "/", "steady.config.json").then(x => {
-                    backToDashboard();
-                  });
-                }
-              });
+                  }
+                });
 
+              });
             });
           });
         });
       });
     });
-  });
+    }else{
+      // They are offline
+      showWaringToast({ title: 'Internet Connection Needed', description: 'Please check your internet connection and try again.'})
+    }
   }
 
-  function backToDashboard() {
-    router.go(-1); 
+  const showWaringToast = (message) => {
+          createToast(message, {type: 'warning', /* toastBackgroundColor: 'color',*/ showCloseButton: true, swipeClose: true, transition: 'slide', showIcon: false, position: 'top-right'})
+      }
+
+  // Check if uses is connected to the internet
+  function isOnline() {
+    return navigator.onLine;
   }
   
+  window.addEventListener("offline", (e) => {
+    if(isUsingInternet){
+      console.log("isUsingInternet")
+      showWaringToast({ title: 'Internet Connection Was Lost', description: 'Please check your internet connection and try again.'});
+      cancelAndCleanUp();
+    }
+    console.log("X isUsingInternet")
+  });
+
 </script>
 
 <template>

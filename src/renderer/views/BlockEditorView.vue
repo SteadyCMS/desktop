@@ -658,7 +658,7 @@ function publishSite(){
 <!--
 // TODO:
 On down space create new block
-Resize header on change
+Resize header on change 1/2
 
 Make Image block
 Fix List block

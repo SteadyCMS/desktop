@@ -52,6 +52,11 @@
         await window.electronAPI.deleteFile(path);
         }
 
+    // Delete Dir (IN DOCUMENTS)
+    export async function deleteDir(path) {
+        await window.electronAPI.deleteDir(path);
+        }
+
     // Check if file exsists (IN DOCUMENTS)
     export async function doesFileExist(path) {
         const data = await window.electronAPI.doesFileExist(path);
