@@ -13,6 +13,7 @@
  
   import AccentButton from '../components/buttons/AccentButton.vue';
   import FlatButton from '../components/buttons/FlatButton.vue';
+  import Dialog from "../components/Dialog.vue";
 
   // Blocks
   import ParagraphBlock from '../components/blocks/ParagraphBlock.vue';
@@ -30,7 +31,7 @@
   import IconArrowLeft from '../components/icons/IconArrowLeft.vue';
 
   const router = useRouter();
-
+ 
   // Var
   let overTopbar = false;
   let blockButton = false;
@@ -41,6 +42,7 @@
   const websiteName = ref('');
   const isNotANewPost = ref(false);
   const isDraft = ref(true);
+  const dialogState = ref(false);
 
   let blocks = ref([
     {
@@ -352,6 +354,8 @@
     }
     }else{
        // TODO: ask if they want to save their post first
+
+
        router.push({path: '/'});
     }
   }
@@ -468,7 +472,7 @@
     let featuredImage = "/images/Pope-Edouard-de-Beaumont-1844.jpg";
     let postTages = '"scene", "fun", "time"';
 
-    // TODO: Add render = never for drafts
+  
     // TODO: Don't change date on update
     let pageHead = `---\r\ndate: ${getTodaysDate()} \r\ndescription: "${postDescription}"\r\nfeatured_image: "${featuredImage}"\r\ntags: [${postTages}]\r\ntitle: "${pageTitle.value}"\r\ndraft: ${buildTypeSettings.value.isDraft}\r\n_build:\r\n  render: ${buildTypeSettings.value.render}\r\n  list: ${buildTypeSettings.value.render}\r\n---\r\n`;
 
@@ -523,12 +527,13 @@
   }
 
 function publishSite(){
-  
+  dialogState.value = true;
 }
 
 </script>
 
 <template>
+  <Dialog :dialogState="dialogState" title="Publish You Site" content="This is a test dialog." button="Close" @close-dialog="dialogState = false"></Dialog>
   <div class="relative">
     <!-- Topbar -->
     <div class="flex flex-row max-w-7xl py-2 items-center justify-between mx-auto">
@@ -598,7 +603,7 @@ function publishSite(){
                     :ref="'block_'+item.id" />
                 </div>
                 <!-- Delete (Right Side)-->
-                <div class="flex items-center"> <!--TODO  Fix remove -->
+                <div class="flex items-center"> 
                   <button @click="removeBlock(blocks, item)" class="hover:bg-slate-100 px-1.5 py-1 rounded-md duration-300">
                     <IconX class="fill-slate-600 w-5 h-5" />     
                   </button> 
