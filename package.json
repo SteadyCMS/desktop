@@ -30,6 +30,7 @@
     "@vueup/vue-quill": "^1.2.0",
     "decompress": "^4.2.1",
     "electron-dl": "^3.5.0",
+    "gitart-vue-dialog": "^3.1.0",
     "mosha-vue-toastify": "^1.0.23",
     "open": "^9.1.0",
     "pinia": "^2.1.6",
