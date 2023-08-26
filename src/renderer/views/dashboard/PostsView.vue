@@ -101,18 +101,18 @@
 <template>
   <div class="w-full my-4 mx-8">
     <div class="flex flex-grow align-center items-center justify-between mx-6">
-      <h1 class="text-4xl text-dark font-bold">Posts</h1>
+      <h1 class="text-4xl text-tint-10 font-bold">Posts</h1>
       <AccentButton text="Add Post" @click="goToBlockEditor('newsteadycmspost')" />
     </div>
 
     <div class="flex flex-col mt-12 space-y-2">
 
-      <div v-for="posts in website" @click="goToBlockEditor(posts.name)" class="rounded-lg cursor-pointer py-5 px-6 bg-slate-50 hover:bg-slate-100 duration-500">
+      <div v-for="post in website" :key="post.name" @click="goToBlockEditor(post.name)" class="rounded-lg cursor-pointer py-5 px-6 bg-tint-0 hover:bg-tint-1 duration-500">
         <div class="flex flex-row justify-between items-center">
-          <h4 class="flex items-center text-xl text-dark font-bold">{{ posts.title }}<span class="text-sm text-slate-500 ml-1 font-semibold">&mdash; Draft</span></h4>
-          <span class="text-xs text-slate-500">{{ posts.date }}</span>
+          <h4 class="flex items-center text-xl text-tint-10 font-bold">{{ post.title }}<span class="text-sm text-tint-7 ml-1 font-semibold">&mdash; Draft</span></h4>
+          <span class="text-xs text-tint-7">{{ post.date }}</span>
         </div>
-        <p class="text-slate-500 text-sm mt-1 max-w-2xl truncate">{{ posts.text }}</p>
+        <p class="text-tint-7 text-sm mt-1 max-w-2xl truncate">{{ post.text }}</p>
       </div>
 
       <div v-if="!isPosts" class="rounded-lg cursor-pointer py-5 px-6 bg-slate-50 hover:bg-slate-100 duration-500">
