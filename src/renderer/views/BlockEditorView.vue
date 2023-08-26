@@ -531,40 +531,41 @@ function publishSite(){
 <template>
   <div class="relative">
     <!-- Topbar -->
-    <div class="flex flex-row max-w-7xl items-center justify-between mx-auto">
+    <div class="flex flex-row max-w-7xl py-2 items-center justify-between mx-auto">
       <div class="flex flex-row items-center">
-        <FlatButton text="Posts" @click="goToDashboard">
-          <IconArrowLeft class="w-2 h-2 mr-1 fill-slate-800" />
-        </FlatButton>
-        <p class="text-slate-400 text-sm">Draft</p>
+        <button @click="goToDashboard" class="flex items-center py-2 pl-6 pr-4 text-sm font-medium text-tint-10 hover:text-tint-9 duration-500">
+          <IconArrowLeft class="w-2 h-2 mr-1 fill-tint-9" /> Posts
+        </button>
+        <p class="text-tint-7 text-sm font-medium">Draft</p>
       </div>
-      <div class="flex flex-row items-center space-x-3">
-        <button @click="previewPost">
+      <div class="flex flex-row items-center space-x-1">
+        <button @click="previewPost" class="py-2 px-6 text-sm font-medium text-tint-10 hover:text-tint-9 duration-500">
           Preview
         </button>
-        <button @click="publishSite">
+        <button @click="publishSite" class="py-2 px-6 text-sm font-medium bg-accent rounded-lg">
           Publish
         </button>
       </div>
     </div>
 
-    <div class="flex flex-row">
+    <div class="flex flex-row mt-2">
+      <!-- TODO: allow editing title -->
       <textarea 
         :disabled="isNotANewPost ? true : null"
         @keydown.enter.exact.prevent
         @keydown.enter.exact="addNewBlockOnEnter(blocks, 0, 'header')"
         type="text" 
-        placeholder="Add Post Title..." 
+        placeholder="Add title" 
         v-model="pageTitle" 
         maxlength="72"
         class="h-auto resize-none mt-1 
         px-3 py-2 block w-full mx-8 
         bg-white outline-none border-0
         border-none text-5xl 
-        placeholder-slate-500 
+        placeholder-tint-6 
         focus:placeholder-transparent 
         font-semibold 
-        text-slate-700 break-words 
+        text-tint-10 break-words 
         text-center">
       </textarea>
     </div>
