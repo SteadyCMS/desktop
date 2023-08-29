@@ -4,9 +4,6 @@
 const props =  defineProps(['item']);
 
 </script>
-
-
-
 <template>
 
 

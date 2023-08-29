@@ -43,7 +43,7 @@
           // Get a list of all websites by looping over the dirs and add them to array for the dropdown
           getPathTo('documents').then(path => {
             getDirsIn(path + "/SteadyCMS/sites/").then( dirs => {
-              console.log(dirs)
+             // console.log(dirs)
               if(dirs != "error" && dirs.length != 0){
 
                 for (let i = 0; i < dirs.length; i++) {

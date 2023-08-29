@@ -112,7 +112,7 @@
   ]);
 
   function validateUserInput() {
-    // check if is input empty
+    // Check if is input empty
     if (websiteName.value.trim() == "" || websiteName.value == null || websiteName.value.trim().length < 2) {
       nameInputError.value = "Name must be at least 2 characters.";
       return false;
@@ -181,7 +181,7 @@
                     });
                   } else {
                     // Else make the file and write info
-                    const obj = {"defultWebsite": "/", "currentWebsite": name};
+                    const obj = { "currentWebsite": name};
                       writeToFileInAppDir(JSON.stringify(obj), "/", "steady.config.json").then(x => {
                       backToDashboard();
                     });
@@ -213,9 +213,9 @@
     if(isUsingInternet.value){
         if(isCancelAndCleanUp.value == false){
         isCancelAndCleanUp.value = true;
-        console.log('called');
+        //console.log('called');
         showWaringToast({ title: 'Internet Connection Was Lost', description: 'Please check your internet connection and try again.'});
-        cancelAndCleanUp(); // TODO: Fix this. Doesn't work sometimes because the downloading prosses is not stopped
+        cancelAndCleanUp(); // TODO: Doesn't work sometimes because the downloading progress is not stopped
       }
     }
   });

@@ -31,6 +31,7 @@
     updatePostList();
   })();
 
+  // Event
   generalStore.$onAction(
   ({name}) => {
     if (name === 'changeCurrentSite') {
@@ -39,7 +40,6 @@
     }
   }
 );
-
 
   function updatePostList() {
     doesFileExistInAppDir('steady.config.json').then(fileExsits => {

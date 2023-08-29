@@ -1,19 +1,15 @@
-<script setup>
+<script setup> 
   import { useRouter } from 'vue-router';
   import {Drag, DropList} from 'vue-easy-dnd';
-  import { ref, computed } from 'vue';
+  import { ref, computed, watch } from 'vue';
   import TurndownService from 'turndown';
   import { createToast } from 'mosha-vue-toastify';
   //import Showdown from 'showdown';
 
   import { writeToFile, openInBrowser, getPathTo, deleteFile, doesFileExist, readFileInAppDir, readFile } from '../utils/system.js'
   import { startServer, buildNewSite } from '../utils/hugo.js'
-  import { titleToFileName, fileNameToTitle, siteToFolderName } from '../utils/utils.js'
-  
- 
-  import AccentButton from '../components/buttons/AccentButton.vue';
-  import FlatButton from '../components/buttons/FlatButton.vue';
-  import Dialog from "../components/Dialog.vue";
+  import { titleToFileName, fileNameToTitle, siteToFolderName, getTodaysDate } from '../utils/utils.js'
+  import { blockTypes, currentblockproperties, currentblockBarproperties } from '../utils/blockEditorData.js'
 
   // Blocks
   import ParagraphBlock from '../components/blocks/ParagraphBlock.vue';
@@ -30,6 +26,8 @@
   import IconX from '../components/icons/IconX.vue';
   import IconArrowLeft from '../components/icons/IconArrowLeft.vue';
 
+  import { Dialog } from "../utils/DialogService.js";
+
   const router = useRouter();
  
   // Var
@@ -42,7 +40,6 @@
   const websiteName = ref('');
   const isNotANewPost = ref(false);
   const isDraft = ref(true);
-  const dialogState = ref(false);
 
   let blocks = ref([
     {
@@ -51,14 +48,16 @@
       id: 60585449478,
       active: false,
       menu: false,
-      headingType: "h3"
+      focus: false,
+      headingType: "h3",
     },
     {
       type: "paragraph",
       content: "After hours of driving through Iowa, we came into Minnesota…just in time to wait. There we were with a low battery on our phone (which we were using for GPS), slowly creeping along the road with a long line of vehicles ahead of us. We had hit a construction standstill.",
       id: 73127606971,
       active: false,
-      menu: false
+      menu: false,
+      focus: false,
     },
     // {
     //   type: "image",
@@ -73,43 +72,16 @@
       content: "We live in a busy culture of work and pleasure. A “selfie” generation of people who only care about what they can get, how much they can get, how much people like them, and what would benefit them the most. As much as we would like to say that we are not one of those people, we are not perfect. Being self-less rather than self-ish is a difficult task.",
       id: 51951209688,
       active: false,
-      menu: false
+      menu: false,
+      focus: false,
     },
     {
       type: "paragraph",
       content: "After hours of driving through Iowa, we came into Minnesota…just in time to wait. There we were with a low battery on our phone (which we were using for GPS), slowly creeping along the road with a long line of vehicles ahead of us. We had hit a construction standstill.",
       id: 73127606971,
       active: false,
-      menu: false
-    },
-  ]);
-
-
-  const blockTypes = ref([
-    {
-      name: "heading",
-      icon: "_",
-      id: 1
-    },
-    {
-      name: "paragraph",
-      icon: "_",
-      id: 2
-    },
-    {
-      name: "image",
-      icon: "_",
-      id: 3
-    },  
-    {
-      name: "list",
-      icon: "_",
-      id: 4
-    },  
-    {
-      name: "other",
-      icon: "_",
-      id: 5
+      menu: false,
+      focus: false,
     },
   ]);
 
@@ -131,7 +103,6 @@
     // Check if they are opening a post or creating a new one
     const currentPost = localStorage.getItem("activeSiteData_currentPost");
     websiteName.value = siteToFolderName(localStorage.getItem("activeSiteData_currentSite"));
-
     isDraft.value = localStorage.getItem("activeSiteData_iscurrentPostADraft");
     // If there editing load it else don't
     console.log(currentPost)
@@ -150,33 +121,30 @@
     }
   })();
 
-
-
   function addNewBlock(array, value, name) {
     let idNum =  Math.random().toString().slice(2,9).concat( Math.random().toString().slice(5,7)).concat(Math.random().toString().slice(4,6));
     if(value != 0){
-    let index = array.indexOf(value);
-    switch(name) {
-      case "paragraph":
-        array.splice(index + 1, 0,  { type: "paragraph", content: "", id: idNum, active: false, menu: false });
-        break;
-      case "heading":
-        array.splice(index + 1, 0,  { type: "heading", content: "", id: idNum, active: false, menu: false, headingType: "h3" });
-        break;
-      case "list":
-            
-        break;
-      case "image":
-        array.splice(index + 1, 0,  { type: "image", caption: "", src: "", id: idNum, active: false, menu: false });
-        break;
-      default:
-            
-    } 
-    openBlockBox(array, value, 'out')
-  } else {
-    array.splice(0, 0, { type: "paragraph", content: "", id: idNum, active: false, menu: false });
-  }
-    //console.log(blocks)
+      let index = array.indexOf(value);
+      switch(name) {
+        case "paragraph":
+          array.splice(index + 1, 0,  { type: "paragraph", content: "", id: idNum, active: false, menu: false, focus: false, });
+          break;
+        case "heading":
+          array.splice(index + 1, 0,  { type: "heading", content: "", id: idNum, active: false, menu: false, focus: false, headingType: "h3" });
+          break;
+        case "list":
+              
+          break;
+        case "image":
+          array.splice(index + 1, 0,  { type: "image", caption: "", src: "", id: idNum, active: false, menu: false, focus: false, });
+          break;
+        default:
+              
+      } 
+      openBlockBox(array, value, 'out')
+    } else {
+      array.splice(0, 0, { type: "paragraph", content: "", id: idNum, active: false, menu: false, focus: false, });
+    }
   }
 
   // Delete block
@@ -283,64 +251,29 @@
   const filteredBlocks = computed( () => {
     let filter = filterText.value
     if (!filter.length) return blockTypes.value
-    return blockTypes.value.filter( poke => 
-        poke.name.toLowerCase().includes(filter.toLowerCase())
+    return blockTypes.value.filter( x => 
+        x.name.toLowerCase().includes(filter.toLowerCase())
     )
   });
 
-  // Properties to be passed in for main blocks
-  function currentblockproperties(_item) {
-    let blockProperties = {};
-
-    switch(_item.type) {
-      case "paragraph":
-        blockProperties = { item: _item };
-        break;
-      case "heading":
-        blockProperties = { item: _item };
-        break;
-      case "list":
-        blockProperties = { item: _item };
-        break;
-      case "image":
-        blockProperties = { item: _item };
-        break;
-      default:
-        blockProperties = { item: _item };
-    } 
-    return blockProperties;
-  }
-
-  // Properties to be passed in for blocks top bar
-  function currentblockBarproperties(_item) {
-    let blockProperties = {};
-    switch(_item.type) {
-      case "paragraph":
-        blockProperties = { item: _item };
-        break;
-      case "heading":
-        blockProperties = { item: _item };
-        break;
-      case "list":
-        blockProperties = { item: _item };
-        break;
-      case "image":
-        blockProperties = { item: _item };
-        break;
-      default:
-        blockProperties = { item: _item };
-    } 
-    return blockProperties;
-  }
-
   // On enter create new paragraph block if called on paragraph or header
   function addNewBlockOnEnter(array, value, name){
-    console.log("enter")
-    if(name == "paragraph" || name == "header"){
+    if(name == "paragraph" || name == "heading"){
+      //console.log("enter");
       addNewBlock(array, value, name);
+      let index;
+      if(value == 0){ // For the title
+        index = 0;
+      }else{
+        index = array.indexOf(value);
+      }
+      // Focus new block and blur old
+      array[index].focus = false;
+      array[index + 1].focus = true;
     }
   }
 
+  // When the uses trys to go back to dashboard
   function goToDashboard() {
     if(isNotANewPost.value){ // i.e Are they editing the post or is this a new one
       // TODO: If they are editing a published post ask if they want to publish their changes
@@ -350,20 +283,33 @@
         router.push({path: '/'});
       });
     }else{
-      // TODO: ...
+      // Dialog({
+      //   title: "Unpublished Changes!", 
+      //   message: "Would you like to publish your changes? All unpublished changes will be lost.", 
+      //   cancelText: 'Cancel', 
+      //   onCancel: console.log("closedx"),
+      //   acceptText: "Publish",
+      //   onAccept: console.log("savex"),
+      //   declineText: 'Discard',
+      //   onDecline: console.log("deletex")});
     }
-    }else{
-       // TODO: ask if they want to save their post first
-
-
-       router.push({path: '/'});
+    }else{ // If it's a new post
+    //   Dialog({
+    //     title: "Unsaved Changes!", 
+    //     message: "Would you like to save your post? All unsaved changes will be lost.", 
+    //     cancelText: 'Cancel', 
+    //     onCancel: () => { console.log("CLOSED")},
+    //     acceptText: "Save",
+    //     onAccept: () => {console.log("save")},
+    //     declineText: 'Delete',
+    //     onDecline: () => {console.log("delete")},
+    // });
+      router.push({path: '/'});
     }
   }
 
   function previewPost(){
-
-    console.log(websiteName.value)
-
+    //console.log(websiteName.value)
     if(titleToFileName(pageTitle.value).length > 2){
         // If they changed the title delete the old files with other title (not when editing a saved post)
         if(titleAtPerview.value != ""){
@@ -471,7 +417,6 @@
     let postDescription = getPostDescription(blocksData);
     let featuredImage = "/images/Pope-Edouard-de-Beaumont-1844.jpg";
     let postTages = '"scene", "fun", "time"';
-
   
     // TODO: Don't change date on update
     let pageHead = `---\r\ndate: ${getTodaysDate()} \r\ndescription: "${postDescription}"\r\nfeatured_image: "${featuredImage}"\r\ntags: [${postTages}]\r\ntitle: "${pageTitle.value}"\r\ndraft: ${buildTypeSettings.value.isDraft}\r\n_build:\r\n  render: ${buildTypeSettings.value.render}\r\n  list: ${buildTypeSettings.value.render}\r\n---\r\n`;
@@ -504,28 +449,6 @@
     await writeToFile(data, "sites/" + websiteName.value + "/content/post", titleToFileName(pageTitle.value) + ".markdown");
   }
 
-  function getTodaysDate() {
-    Date.prototype.yyyymmdd = function() {
-      let mm = this.getMonth() + 1; // getMonth() is zero-based
-      let dd = this.getDate();
-      return [this.getFullYear(),
-              (mm>9 ? '' : '0') + mm,
-              (dd>9 ? '' : '0') + dd
-            ].join('-');
-    };
-    Date.prototype.hhmmss = function() {
-      let hh = this.getHours();
-      let mm = this.getMinutes();
-      let ss = this.getSeconds();
-      return [(hh>9 ? '' : '0') + hh,
-              (mm>9 ? '' : '0') + mm,
-              (ss>9 ? '' : '0') + ss
-            ].join(':');
-    };
-    let date = new Date();
-    return date.yyyymmdd() + "T" + date.hhmmss();
-  }
-
 function publishSite(){
   dialogState.value = true;
 }
@@ -533,7 +456,6 @@ function publishSite(){
 </script>
 
 <template>
-  <Dialog :dialogState="dialogState" title="Publish You Site" content="This is a test dialog." button="Close" @close-dialog="dialogState = false"></Dialog>
   <div class="relative">
     <!-- Topbar -->
     <div class="flex flex-row max-w-7xl py-2 items-center justify-between mx-auto">
@@ -555,10 +477,10 @@ function publishSite(){
 
     <div class="flex flex-row mt-2">
       <!-- TODO: allow editing title -->
-      <textarea 
+      <textarea
         :disabled="isNotANewPost ? true : null"
         @keydown.enter.exact.prevent
-        @keydown.enter.exact="addNewBlockOnEnter(blocks, 0, 'header')"
+        @keydown.enter.exact="addNewBlockOnEnter(blocks, 0, 'heading')"
         type="text" 
         placeholder="Add title" 
         v-model="pageTitle" 
@@ -648,7 +570,7 @@ function publishSite(){
             <div class="flex flex-auto">
                 <component :is="mainBlockTypes[item.type]" 
                 v-bind="currentblockproperties(item)" 
-                :ref="'block_'+item.id" 
+                :ref="item.id" 
                 @on-press-enter="addNewBlockOnEnter(blocks, item, item.type)" />
             </div>
                 
@@ -676,6 +598,19 @@ Decide what bottons we want on toolbar
 
 # Other #
 Set Window size
-
+Add Word count
+Keyboard short cuts
 -->
 
+
+
+<!-- 
+
+
+
+Image, Video, 
+
+
+
+
+ -->

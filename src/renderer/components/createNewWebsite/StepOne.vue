@@ -19,6 +19,7 @@
     <div class="flex flex-col mt-8">
       <input type="text" 
         v-model="webName"
+        maxlength="40"
         @input="$emit('onChange', webName)"
         placeholder="Your website name"
         :class="{'border-red-500': !props.isvalid }"

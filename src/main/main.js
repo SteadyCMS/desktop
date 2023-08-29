@@ -262,3 +262,25 @@
   });
  
 }); // On ready
+
+
+
+// import { exec } from 'child_process';
+// function execute(command, callback){
+//     exec(command, function(error, stdout, stderr){ callback(stdout); });
+// };
+
+// module.exports.getGitUser = function(callback){
+//     execute("git config --global user.name", function(name){
+//         execute("git config --global user.email", function(email){
+//             callback({ name: name.replace("\n", ""), email: email.replace("\n", "") });
+//         });
+//     });
+// };
+
+
+// // File destination.txt will be created or overwritten by default.
+// fs.copyFile('source.txt', 'destination.txt', (err) => {
+//   if (err) throw err;
+//   console.log('source.txt was copied to destination.txt');
+// });

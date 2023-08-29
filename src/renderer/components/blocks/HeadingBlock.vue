@@ -2,6 +2,7 @@
  import { ref } from 'vue';
 
   const props = defineProps(['item']);
+  defineEmits(['onPressEnter']);
 
 // h1 is 2 em
 // h2 is 1.5 em
@@ -14,7 +15,10 @@
 
 <template>
   <input type="text" 
-    placeholder="Title..." 
+    placeholder="Text..." 
+    @keydown.enter.exact.prevent
+    @keydown.enter.exact="$emit('onPressEnter', props.item)"
+    v-focus="props.item.focus"
     v-model="props.item.content" 
     :class="{
      'text-[2em]': (props.item.headingType == 'h1'),

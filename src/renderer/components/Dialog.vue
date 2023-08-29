@@ -1,24 +1,56 @@
 <script setup>
-import { ref } from 'vue'
+import { ref, defineExpose } from 'vue'
 import { GDialog } from 'gitart-vue-dialog'
 import 'gitart-vue-dialog/dist/style.css'
 
-const props = defineProps(['dialogState', 'title', 'content', 'button']);
-defineEmits(['closeDialog']);
+const show = ref(false);
+const title = ref('');
+const message = ref('');
+
+const declineText = ref('');
+const acceptText = ref('');
+const cancelText = ref('');
+
+const onCancel = () => {};
+const onAccept = () => {};
+const onDecline = () => {};
+
+defineExpose({
+  title,
+  message,
+  show,
+  declineText,
+  acceptText,
+  cancelText,
+  onCancel,
+  onAccept,
+  onDecline
+});
 
 </script>
+
 <template>
-    <GDialog v-model="props.dialogState" max-width="500">
+    <GDialog v-model="show" max-width="500">
       <div class="wrapper">
         <div class="content">
-          <div class="title">{{ props.title }}</div>
-          <p>{{ props.content }}</p>
+          <div v-if="title" class="title">{{ title }}</div>
+          <p>{{ message }}</p>
         </div>
         <div class="actions">
           <button
-            class="btn btn--outline-gray"
-            @click="$emit('closeDialog')">
-            {{ props.button }}
+            class="m-2"
+            @click="show = false; onDecline()">
+            {{ declineText }}
+          </button>
+          <button
+            class="m-2"
+            @click="show = false; onAccept()">
+            {{ acceptText }}
+          </button>
+          <button
+            class="m-2"
+            @click="show = false; onCancel()">
+            {{ cancelText }}
           </button>
         </div>
       </div>
@@ -49,5 +81,4 @@ defineEmits(['closeDialog']);
 }
 
 </style>
-
 

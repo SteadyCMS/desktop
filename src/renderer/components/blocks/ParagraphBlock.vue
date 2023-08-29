@@ -1,5 +1,6 @@
 <script setup>
   import { ref } from 'vue';
+  //import SteadyEditor from '../components/steadyEditor/SteadyEditor.vue';
 
   const props =  defineProps(['item']);
   defineEmits(['onPressEnter']);
@@ -40,7 +41,6 @@
 //     }
 // });
 
-
 // focus editor when it is ready
 //quillEditor.value.getQuill().blur();
 //}
@@ -50,6 +50,11 @@
 </script>
 
 <template>
+
+<!-- <SteadyEditor /> -->
+
+
+
   <QuillEditor v-model:content="props.item.content" 
     :toolbar="toolbarStyle(props.item)"
     @keydown.enter.exact.prevent
