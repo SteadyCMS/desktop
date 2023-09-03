@@ -1,5 +1,5 @@
 <script setup>
-import { ref, defineExpose } from 'vue'
+import { ref } from 'vue'
 import { GDialog } from 'gitart-vue-dialog'
 import 'gitart-vue-dialog/dist/style.css'
 
@@ -24,7 +24,7 @@ defineExpose({
   cancelText,
   onCancel,
   onAccept,
-  onDecline
+  onDecline,
 });
 
 </script>
@@ -39,17 +39,17 @@ defineExpose({
         <div class="actions">
           <button
             class="m-2"
-            @click="show = false; onDecline()">
+            @click="() => {show = false; onDecline()}">
             {{ declineText }}
           </button>
           <button
             class="m-2"
-            @click="show = false; onAccept()">
+            @click="() => {show = false; onAccept()}">
             {{ acceptText }}
           </button>
           <button
             class="m-2"
-            @click="show = false; onCancel()">
+            @click="() => {show = false; onCancel()}">
             {{ cancelText }}
           </button>
         </div>

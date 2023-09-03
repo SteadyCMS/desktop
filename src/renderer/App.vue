@@ -1,7 +1,6 @@
 <script setup>
-import { RouterView } from 'vue-router';
-window.electronAPI.sendMessage('Hello from App.vue');
-
+  import { RouterView } from 'vue-router';
+  window.electronAPI.sendMessage('Hello from App.vue');
 </script>
 <template>
   <main> 

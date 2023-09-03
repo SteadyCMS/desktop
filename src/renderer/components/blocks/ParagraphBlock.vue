@@ -1,80 +1,92 @@
 <script setup>
-  import { ref } from 'vue';
-  //import SteadyEditor from '../components/steadyEditor/SteadyEditor.vue';
+  import { ref, watch } from 'vue';
+  import { Editor, EditorContent, BubbleMenu } from '@tiptap/vue-3';
+
+  import Gapcursor from '@tiptap/extension-gapcursor'
+  import Dropcursor from '@tiptap/extension-dropcursor'
+  import Document from '@tiptap/extension-document'
+  import History from '@tiptap/extension-history'
+  import Paragraph from '@tiptap/extension-paragraph'
+  import Text from '@tiptap/extension-text'
+  import Placeholder from '@tiptap/extension-placeholder'
+  import Strike from '@tiptap/extension-strike'
+  import Bold from '@tiptap/extension-bold'
+  import Italic from '@tiptap/extension-italic'
+  import Code from '@tiptap/extension-code'
 
   const props =  defineProps(['item']);
   defineEmits(['onPressEnter']);
 
-  function toolbarStyle(value){
-    let toolbarType = [];
+  const isEnter = ref(false);
 
-    switch(value.type) {
-      case "paragraph":
-        toolbarType = [
-          ['bold', 'italic', 'strike'],        // toggled buttons
-          ['blockquote', 'code-block'], 
-          ['clean'] 
-        ];
-        break;
-      case "list":
-        toolbarType = [{ 'list': 'ordered' }, { 'list': 'bullet'} ];
-        break;
-      default:
-        toolbarType = ['bold', 'italic', 'underline'];
-    } 
-    // console.log(value.type)
-    return toolbarType;
-  }
+  const editor = new Editor({
+    content: props.item.content,
+    extensions: [
+      Document,
+      Paragraph,
+      Text,
+      History,
+      Gapcursor,
+      Dropcursor,
+      Strike,
+      Bold,
+      Italic,
+      Code,
+      Placeholder.configure({
+        placeholder: 'Text here...',
+      }),
+    ],
+    autofocus: true,
+    onUpdate({ editor }) {  
+      props.item.content = editor.getHTML();
+      if (isEnter.value) {
+        editor.commands.joinBackward();
+        //editor.commands.blur();
+        isEnter.value = false;
+      }
+    },
+    editorProps: {
+      handleKeyDown(view, event) {
+          if (event.key == "Enter") {
+            //console.log('enter');
+            isEnter.value = true;
+          }else{
+            isEnter.value = false;
+          }
+      },
+      attributes: {
+        class: 'focus:outline-none w-full h-full break-normal',
+      },
+    }
+  });
 
-// const quillEditor = ref();
-// function onQuillReady() {
-
-//     quillEditor.keyboard.bindings[13].unshift({
-//     key: 13,
-//     handler: (range, context) => {
-//         console.log('jjjj')
-
-//         if (this.popupVisible) {
-//             return false;
-//         }
-//         return true;
-//     }
-// });
-
-// focus editor when it is ready
-//quillEditor.value.getQuill().blur();
-//}
+ 
 
 
 
 </script>
-
 <template>
 
-<!-- <SteadyEditor /> -->
+<bubble-menu
+  :editor="editor"
+  :tippy-options="{ duration: 100 }"
+  v-if="editor">
+    <div class="bg-[#444444] rounded-full text-white flex flex-row p-1">
+      <button @click="editor.chain().focus().toggleBold().run()" :class="{ 'is-active': editor.isActive('bold') }">
+        bold
+      </button>
+      <button @click="editor.chain().focus().toggleItalic().run()" :class="{ 'is-active': editor.isActive('italic') }">
+        italic
+      </button>
+      <button @click="editor.chain().focus().toggleStrike().run()" :class="{ 'is-active': editor.isActive('strike') }">
+        strike
+      </button>
+    </div>
+  </bubble-menu>
+
+<editor-content :editor="editor" @keydown.enter.exact="$emit('onPressEnter')" class="w-full"/>
 
 
-
-  <QuillEditor v-model:content="props.item.content" 
-    :toolbar="toolbarStyle(props.item)"
-    @keydown.enter.exact.prevent
-    @keydown.enter.exact="$emit('onPressEnter')"
-    ref="quillEditor"
-    theme="bubble" 
-    placeholder="Write Here..." 
-    contentType="html"/>
 </template>
 
 
-
-<!--  'toolbar': [
-[{ 'font': [] }, { 'size': [] }],
-[ 'bold', 'italic', 'underline', 'strike' ],
-[{ 'color': [] }, { 'background': [] }],
-[{ 'script': 'super' }, { 'script': 'sub' }],
-[{ 'header': '1' }, { 'header': '2' }, 'blockquote', 'code-block' ],
-[{ 'list': 'ordered' }, { 'list': 'bullet'}, { 'indent': '-1' }, { 'indent': '+1' }],
-[ 'direction', { 'align': [] }],
-[ 'link', 'image', 'video', 'formula' ],
-[ 'clean' ]
-]-->

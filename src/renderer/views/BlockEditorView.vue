@@ -54,7 +54,7 @@
     {
       type: "paragraph",
       content: "After hours of driving through Iowa, we came into Minnesota…just in time to wait. There we were with a low battery on our phone (which we were using for GPS), slowly creeping along the road with a long line of vehicles ahead of us. We had hit a construction standstill.",
-      id: 73127606971,
+      id: 73127606972,
       active: false,
       menu: false,
       focus: false,
@@ -78,7 +78,7 @@
     {
       type: "paragraph",
       content: "After hours of driving through Iowa, we came into Minnesota…just in time to wait. There we were with a low battery on our phone (which we were using for GPS), slowly creeping along the road with a long line of vehicles ahead of us. We had hit a construction standstill.",
-      id: 73127606971,
+      id: 73127606973,
       active: false,
       menu: false,
       focus: false,
@@ -105,8 +105,8 @@
     websiteName.value = siteToFolderName(localStorage.getItem("activeSiteData_currentSite"));
     isDraft.value = localStorage.getItem("activeSiteData_iscurrentPostADraft");
     // If there editing load it else don't
-    console.log(currentPost)
-    if (currentPost == "newsteadycmspost"){}else{
+    console.log(currentPost);
+    if (currentPost != "newsteadycmspost") {
       isNotANewPost.value = true;
       pageTitle.value = fileNameToTitle(currentPost.replace('.markdown', ''));
       //Load in blocks and data to post from json on start if they exist
@@ -123,7 +123,7 @@
 
   function addNewBlock(array, value, name) {
     let idNum =  Math.random().toString().slice(2,9).concat( Math.random().toString().slice(5,7)).concat(Math.random().toString().slice(4,6));
-    if(value != 0){
+    if (value != 0) {
       let index = array.indexOf(value);
       switch(name) {
         case "paragraph":
@@ -141,10 +141,11 @@
         default:
               
       } 
-      openBlockBox(array, value, 'out')
+      openBlockBox(array, value, 'out');
     } else {
       array.splice(0, 0, { type: "paragraph", content: "", id: idNum, active: false, menu: false, focus: false, });
     }
+    console.log(blocks.value)
   }
 
   // Delete block
@@ -154,13 +155,16 @@
     overTopbar = false;
   }
 
-  function insert1(event) {
-    blocks.splice(event.index, 0, event.data);
-  }
+  // function insert1(event) {
+  //   console.log(event.index)
+  //   console.log(event.data)
+  //   blocks.splice(event.index, 0, event.data);
+  // }
 
   function remove(array, value) {
     let index = array.indexOf(value);
     array.splice(index, 1);
+    
   }
 
   // Cancel the close event when mouse is over the top bar
@@ -226,7 +230,7 @@
         document.addEventListener("mouseup", doClick);
       }
     } else {
-      console.log("closed 1")
+      //console.log("closed 1")
       for (let i = 0; i < array.length; i++) {
         array[i].menu = false;
       } 
@@ -270,6 +274,7 @@
       // Focus new block and blur old
       array[index].focus = false;
       array[index + 1].focus = true;
+     // focusEditor(array, value, 'click');
     }
   }
 
@@ -293,24 +298,24 @@
       //   declineText: 'Discard',
       //   onDecline: console.log("deletex")});
     }
-    }else{ // If it's a new post
+    } else { // If it's a new post
     //   Dialog({
     //     title: "Unsaved Changes!", 
     //     message: "Would you like to save your post? All unsaved changes will be lost.", 
     //     cancelText: 'Cancel', 
-    //     onCancel: () => { console.log("CLOSED")},
     //     acceptText: "Save",
-    //     onAccept: () => {console.log("save")},
     //     declineText: 'Delete',
+    //     onCancel: () => {console.log("goodbye there")},
+    //     onAccept: () => {console.log("save")},  
     //     onDecline: () => {console.log("delete")},
     // });
       router.push({path: '/'});
     }
   }
 
-  function previewPost(){
+  function previewPost() {
     //console.log(websiteName.value)
-    if(titleToFileName(pageTitle.value).length > 2){
+    if (titleToFileName(pageTitle.value).length > 2) {
         // If they changed the title delete the old files with other title (not when editing a saved post)
         if(titleAtPerview.value != ""){
           if (titleAtPerview.value != pageTitle.value) {
@@ -321,7 +326,7 @@
         }
         // TODO: IF they are updating a post skip this step (doesFileExist)
         // Make sure they don't already have a post with this name
-      doesFileExist("sites/" + websiteName.value + "/content/post/" + titleToFileName(pageTitle.value) + ".json").then(fileExsits => {
+        doesFileExist("sites/" + websiteName.value + "/content/post/" + titleToFileName(pageTitle.value) + ".json").then(fileExsits => {
 
         // TODO: Improve this
         const runbuild = ref(true);
@@ -340,7 +345,7 @@
         }
 
         if(runbuild.value){ // If this is the first time pervining they can't use a name of a post
-          buildAndSavePostAs("perview-draft").then(x => { 
+          buildAndSavePostAs("preview-draft").then(x => { 
             getPathTo('documents').then(path => { 
              // buildNewSite(path + "/steadyCMS/sites/" + websiteName.value);
 
@@ -388,12 +393,12 @@
 
     switch (buildType) {
       case 'published': // Build as pubished post (render = "always" & draft = "false")
-      buildTypeSettings.value = {
-      'isDraft': false,
-      'render': 'always',
-      }
+        buildTypeSettings.value = {
+          'isDraft': false,
+          'render': 'always',
+        }
         break;
-      case 'perview-draft': // Build as a draft for previewing (render = "always" & draft = "false")
+      case 'preview-draft': // Build as a draft for previewing (render = "always" & draft = "false")
       buildTypeSettings.value = {
       'isDraft': false,
       'render': 'always',
@@ -449,10 +454,9 @@
     await writeToFile(data, "sites/" + websiteName.value + "/content/post", titleToFileName(pageTitle.value) + ".markdown");
   }
 
-function publishSite(){
-  dialogState.value = true;
-}
-
+  function publishSite() {
+    dialogState.value = true;
+  }
 </script>
 
 <template>
@@ -497,16 +501,17 @@ function publishSite(){
       </textarea>
     </div>
 
-    <div class="flex flex-row mt-5">
-      <drop-list class="w-1/2 mx-auto" :items="blocks" @reorder="$event.apply(blocks)" @insert="insert1" mode="cut">
+    <div class="flex flex-row  pt-5">
+      <drop-list class="w-1/2 mx-auto" :items="blocks" @reorder="$event.apply(blocks)" mode="cut">
         <template v-slot:item="{item}">
           <drag @click="focusEditor(blocks, item, 'click')" 
             @focusout="focusEditor(blocks, item, 'out')" 
-            @dragstart="focusEditor(blocks, item, 'out')" 
+            @dragstart="focusEditor(blocks, item, 'out')"
+            @cut="remove(blocks, item)" 
             :class="{ 'border-opacity-100': item.active }" 
             class="group relative flex flex-row border-b-2 border-x-2 m-2 border-slate-100 rounded-b border-opacity-0 px-2 pb-2" 
-            :key="item.id" :data="item" 
-            @cut="remove(items1, item)" 
+            :key="item.id" 
+            :data="item" 
             handle=".drag-handle">
             
             <!-- Block Top Bar -->
@@ -573,10 +578,10 @@ function publishSite(){
                 :ref="item.id" 
                 @on-press-enter="addNewBlockOnEnter(blocks, item, item.type)" />
             </div>
-                
           </drag>
+        
         </template>
-        <template v-slot:feedback="{data}"></template>
+        <template v-slot:feedback="{item}"></template>
       </drop-list>
     </div>
   </div>

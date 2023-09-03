@@ -12,7 +12,8 @@
   import AccentButton from '../components/buttons/AccentButton.vue';
   import SecondaryButton from '../components/buttons/SecondaryButton.vue';
 
-  import { downloadFile, extractFile, deleteFile, deleteDir, writeToFile, getPathTo, doesFileExistInAppDir, readFileInAppDir, writeToFileInAppDir } from '../utils/system.js'
+  import { downloadFile, extractFile, deleteFile, deleteDir, writeToFile, 
+           getPathTo, doesFileExistInAppDir, readFileInAppDir, writeToFileInAppDir } from '../utils/system.js'
   import { createNewSite } from '../utils/hugo.js'
 
   import LogoLight from '../components/logos/LogoLight.vue';
@@ -21,12 +22,7 @@
 
   const router = useRouter();
 
-
-// TODO: On start up remove the x and cancel buttons
-
-  function backToDashboard() {
-    router.go(-1); 
-  }
+  // TODO: On start up remove the x and cancel buttons
 
   // For Component Step Switching
   const num = ref("1");
@@ -54,6 +50,10 @@
       return StepFour;
     }
   });
+
+  function backToDashboard() {
+    router.go(-1); 
+  }
   
   function changeCurrentStep(type) {
     if (type == "next") {
@@ -122,7 +122,7 @@
       if (!format.test(websiteName.value)) {
         return true;
       } else {
-        nameInputError.value = 'Name can not contain any special characters except "." and "_"';
+        nameInputError.value = 'Name cannot contain any special characters except "." and "_"';
         return false;
       }
     }
@@ -143,7 +143,7 @@
   }
 
   function buildWebsite() { 
-      if(isOnline()){
+    if (isOnline()) {
       showLoadingScreen.value = true;
       const name = websiteName.value.replaceAll(' ', '_').toLowerCase();
       
@@ -193,15 +193,22 @@
         });
       });
     });
-    }else{
+    } else {
       // They are offline
-      showWaringToast({ title: 'Internet Connection Needed', description: 'Please check your internet connection and try again.'})
+      changeWarningToast({ title: 'Internet Connection Needed', description: 'Please check your internet connection and try again.'});
     }
   }
 
-  const showWaringToast = (message) => {
-          createToast(message, {type: 'warning', /* toastBackgroundColor: 'color',*/ showCloseButton: true, swipeClose: true, transition: 'slide', showIcon: false, position: 'top-right'})
-      }
+  const changeWarningToast = (message) => {
+    createToast(message, {
+      type: 'warning', /* toastBackgroundColor: 'color',*/ 
+      showCloseButton: true, 
+      swipeClose: true, 
+      transition: 'slide', 
+      showIcon: false, 
+      position: 'top-right'
+    });
+  }
 
   // Check if uses is connected to the internet
   function isOnline() {
@@ -210,11 +217,11 @@
   
   // If they user gose offline when the app is using it cancel can clean up
   window.addEventListener("offline", (e) => {
-    if(isUsingInternet.value){
-        if(isCancelAndCleanUp.value == false){
+    if (isUsingInternet.value) {
+      if (isCancelAndCleanUp.value == false) {
         isCancelAndCleanUp.value = true;
         //console.log('called');
-        showWaringToast({ title: 'Internet Connection Was Lost', description: 'Please check your internet connection and try again.'});
+        changeWarningToast({ title: 'Internet Connection Was Lost', description: 'Please check your internet connection and try again.'});
         cancelAndCleanUp(); // TODO: Doesn't work sometimes because the downloading progress is not stopped
       }
     }

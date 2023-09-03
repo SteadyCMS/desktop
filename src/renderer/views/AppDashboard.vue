@@ -3,7 +3,8 @@
   import { RouterLink, RouterView, useRouter} from 'vue-router';
   import { storeToRefs } from 'pinia'
   import { useGeneralStore } from '../stores/general.js'
-  import { getDirsIn, doesFileExistInAppDir, readFileInAppDir, getPathTo, doesFileExist, writeToFileInAppDir, deleteFileInAppDir } from '../utils/system.js'
+  import { getDirsIn, doesFileExistInAppDir, readFileInAppDir, getPathTo, 
+           doesFileExist, writeToFileInAppDir, deleteFileInAppDir } from '../utils/system.js'
   import { fileNameToTitle } from '../utils/utils.js'
 
   import LogoLight from '../components/logos/LogoLight.vue';
@@ -44,7 +45,7 @@
           getPathTo('documents').then(path => {
             getDirsIn(path + "/SteadyCMS/sites/").then( dirs => {
              // console.log(dirs)
-              if(dirs != "error" && dirs.length != 0){
+              if (dirs != "error" && dirs.length != 0) {
 
                 for (let i = 0; i < dirs.length; i++) {
                   doesFileExist("/sites/" + dirs[i] + '/hugo.toml').then(fileExsits => {
@@ -53,7 +54,7 @@
                     }
                   });
                 }
-              }else{
+              } else {
                   // Delete steady.config.json
                   deleteFileInAppDir("steady.config.json").then(x => {
                   // They have no websites (have them make one)
@@ -70,7 +71,7 @@
     });
   }
 
-  function changeCurrentWebsite(websiteName){ // TODO: when changing site the server must be stop before changed
+  function changeCurrentWebsite(websiteName) { // TODO: when changing site the server must be stop before changed
     console.log(websiteName);
      const obj = {"currentWebsite": websiteName};
       writeToFileInAppDir(JSON.stringify(obj), "/", "steady.config.json").then(x => {
