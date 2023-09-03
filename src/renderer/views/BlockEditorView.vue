@@ -145,14 +145,19 @@
     } else {
       array.splice(0, 0, { type: "paragraph", content: "", id: idNum, active: false, menu: false, focus: false, });
     }
-    console.log(blocks.value)
+    console.log(blocks.value);
+    focusEditor(array, value, 'click');
   }
 
   // Delete block
-  function removeBlock(array, value) {
+  function removeBlock(array, value, focusPreBlock) {
     let index = array.indexOf(value);
     array.splice(index, 1);
     overTopbar = false;
+
+    // if(focusPreBlock){
+    //   focusEditor(array, index - 1, 'click'); 
+    // }
   }
 
   // function insert1(event) {
@@ -176,19 +181,25 @@
     blockButton = block;
   }
 
+
   function focusEditor(array, value, activeType) {
-    if (!overTopbar) {
-      if (activeType == "click") {
-       // console.log("ON CLICK")
-        for (let i = 0; i < array.length; i++) {
+    if (!overTopbar) { // Only if the corser is not over the top bar
+      if (activeType == "click") { // Focus the block they clicked on 
+        for (let i = 0; i < array.length; i++) { // First blur them all (so we don't end up with two focused blocks)
           array[i].active = false;
         } 
-        let index = array.indexOf(value);
-        if(index >= 0){
-          array[index].active = true;
-        }
-      } else if (activeType == "out") {
-        //console.log("ON OUT")
+        // if(typeof(value) == 'number'){ // This is to focus block in special circumstances (i.e it uses a number instead of a array value)
+        //   array[value].active = true;
+
+        //  // array[value + 1].focus = false;
+        //   array[value].focus = true;
+        // }else{ // Otherwise if the type is not a number this is a normal focus 
+          let index = array.indexOf(value);
+          if(index >= 0){ // Focus block
+            array[index].active = true;
+          }
+        //}
+      } else if (activeType == "out") { // Blur all blocks
         for (let i = 0; i < array.length; i++) {
           array[i].active = false;
         } 
@@ -274,7 +285,6 @@
       // Focus new block and blur old
       array[index].focus = false;
       array[index + 1].focus = true;
-     // focusEditor(array, value, 'click');
     }
   }
 
@@ -531,7 +541,7 @@
                 </div>
                 <!-- Delete (Right Side)-->
                 <div class="flex items-center"> 
-                  <button @click="removeBlock(blocks, item)" class="hover:bg-slate-100 px-1.5 py-1 rounded-md duration-300">
+                  <button @click="removeBlock(blocks, item, false)" class="hover:bg-slate-100 px-1.5 py-1 rounded-md duration-300">
                     <IconX class="fill-slate-600 w-5 h-5" />     
                   </button> 
                 </div>
@@ -576,7 +586,8 @@
                 <component :is="mainBlockTypes[item.type]" 
                 v-bind="currentblockproperties(item)" 
                 :ref="item.id" 
-                @on-press-enter="addNewBlockOnEnter(blocks, item, item.type)" />
+                @on-press-enter="addNewBlockOnEnter(blocks, item, item.type)"
+                @on-backspace-when-empty="removeBlock(blocks, item, true)"/>
             </div>
           </drag>
         

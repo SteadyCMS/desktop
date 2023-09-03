@@ -2,7 +2,7 @@
  import { ref } from 'vue';
 
   const props = defineProps(['item']);
-  defineEmits(['onPressEnter']);
+  const emit = defineEmits(['onPressEnter', 'onBackspaceWhenEmpty']);
 
 // h1 is 2 em
 // h2 is 1.5 em
@@ -11,6 +11,13 @@
 // h5 is 0.8 em
 // h6 is 0.7 em
 
+  function checkContent(){
+    console.log(props.item.content)
+    if(props.item.content == ''){
+      emit('onBackspaceWhenEmpty');
+    }
+  }
+
 </script>
 
 <template>
@@ -18,6 +25,7 @@
     placeholder="Text..." 
     @keydown.enter.exact.prevent
     @keydown.enter.exact="$emit('onPressEnter', props.item)"
+    @keydown.backspace.exact="checkContent()"
     v-focus="props.item.focus"
     v-model="props.item.content" 
     :class="{

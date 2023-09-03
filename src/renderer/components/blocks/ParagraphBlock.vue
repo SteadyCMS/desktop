@@ -15,7 +15,7 @@
   import Code from '@tiptap/extension-code'
 
   const props =  defineProps(['item']);
-  defineEmits(['onPressEnter']);
+  const emit = defineEmits(['onPressEnter', 'onBackspaceWhenEmpty']);
 
   const isEnter = ref(false);
 
@@ -41,15 +41,20 @@
       props.item.content = editor.getHTML();
       if (isEnter.value) {
         editor.commands.joinBackward();
-        //editor.commands.blur();
         isEnter.value = false;
       }
     },
     editorProps: {
       handleKeyDown(view, event) {
-          if (event.key == "Enter") {
+          if (event.key == "Enter") { // On enter create a new block
             //console.log('enter');
             isEnter.value = true;
+          }else if(event.key == "Backspace"){ // If the block is empty on backspace delete it
+            //console.log('Backspace');
+            if(props.item.content == "" || props.item.content == "<p></p>"){
+              emit('onBackspaceWhenEmpty')
+            }
+            isEnter.value = false;
           }else{
             isEnter.value = false;
           }
@@ -59,10 +64,6 @@
       },
     }
   });
-
- 
-
-
 
 </script>
 <template>
