@@ -12,7 +12,7 @@
 // h6 is 0.7 em
 
   function checkContent(){
-    console.log(props.item.content)
+    //console.log(props.item.content)
     if(props.item.content == ''){
       emit('onBackspaceWhenEmpty');
     }

@@ -1,5 +1,5 @@
 <script setup>
-  import { ref, watch } from 'vue';
+  import { ref } from 'vue';
   import { Editor, EditorContent, BubbleMenu } from '@tiptap/vue-3';
 
   import Gapcursor from '@tiptap/extension-gapcursor'
@@ -34,6 +34,7 @@
       Code,
       Placeholder.configure({
         placeholder: 'Text here...',
+
       }),
     ],
     autofocus: true,
@@ -90,4 +91,13 @@
 
 </template>
 
-
+<style>
+/* Placeholder (at the top)  MUST HAVE! */
+.tiptap p.is-editor-empty:first-child::before {
+  content: attr(data-placeholder);
+  float: left;
+  color: #adb5bd;
+  pointer-events: none;
+  height: 0;
+}
+</style>
