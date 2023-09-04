@@ -33,13 +33,13 @@
 
   // Event
   generalStore.$onAction(
-  ({name}) => {
-    if (name === 'changeCurrentSite') {
-      website.value = [];
-      updatePostList();
+    ({name}) => {
+      if (name === 'changeCurrentSite') {
+        website.value = [];
+        updatePostList();
+      }
     }
-  }
-);
+  );
 
   function updatePostList() {
     doesFileExistInAppDir('steady.config.json').then(fileExsits => {
@@ -92,10 +92,9 @@
   }
 
   const formatDate = (dateString) => {
-    const options = { year: "numeric", month: "short", day: "numeric", hour: "numeric", minute: "numeric" }
-    return new Date(dateString).toLocaleDateString(undefined, options)
+    const options = { year: "numeric", month: "short", day: "numeric", hour: "numeric", minute: "numeric" };
+    return new Date(dateString).toLocaleDateString(undefined, options);
   }
-
 </script>
 
 <template>
@@ -104,9 +103,7 @@
       <h1 class="text-4xl text-tint-10 font-bold">Posts</h1>
       <AccentButton text="Add Post" @click="goToBlockEditor('newsteadycmspost')" />
     </div>
-
     <div class="flex flex-col mt-12 space-y-2">
-
       <div v-for="post in website" :key="post.name" @click="goToBlockEditor(post.name)" class="rounded-lg cursor-pointer py-5 px-6 bg-tint-0 hover:bg-tint-1 duration-500">
         <div class="flex flex-row justify-between items-center">
           <h4 class="flex items-center text-xl text-tint-10 font-bold">{{ post.title }}<span class="text-sm text-tint-7 ml-1 font-semibold">&mdash; Draft</span></h4>
@@ -114,13 +111,12 @@
         </div>
         <p class="text-tint-7 text-sm mt-1 max-w-2xl truncate">{{ post.text }}</p>
       </div>
-
-      <div v-if="!isPosts" class="rounded-lg cursor-pointer py-5 px-6 bg-slate-50 hover:bg-slate-100 duration-500">
-        <div class="flex flex-row justify-between items-center">
-          <h4 class="flex items-center text-xl text-dark font-bold">No Posts</h4>
+      <div v-if="!isPosts" class="flex h-full justify-center mt-12">
+        <div class="flex flex-col items-center text-center justify-center">
+          <h4 class="flex items-center text-2xl text-tint-10 font-bold"> {{ generalStore.currentSite }} doesn't have any posts yet.</h4>
+          <p class="text-tint-7 mt-1">Create one by clicking the Add Post button.</p>
         </div>
       </div>
-
     </div>
   </div>
 </template>
