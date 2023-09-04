@@ -549,9 +549,10 @@
     
             <!-- Block Icons -->
             <div class="flex flex-row" :class="{ 'visible':item.active, 'invisible':!item.active, 'group-hover:visible':!item.active }">
-              <span @click="openBlockBox(blocks, item, 'click')" class="add-button cursor-pointer">
-                <IconPlus class="w-6 fill-tint-7"/>
-    
+              <span @click="openBlockBox(blocks, item, 'click')" class="add-button">
+                <span class="cursor-pointer">
+                  <IconPlus class="w-6 fill-tint-7"/>
+                </span>
                 <!-- Add blocks menu -->
                 <div class="relative flex">
                   <div class="absolute w-44 max-h-44 bg-white z-30 -bottom-62 left-0 
@@ -563,7 +564,7 @@
                       class="text-tint-10 m-2 text-base outline-1 outline-tint-2 border border-tint-2 px-2 py-1 rounded-md bg-tint-0 placeholder:text-tint-6" />
                     <div class="relative flex flex-col m-2 overflow-y-scroll">
                       <div v-for="(blockItems, i) in filteredBlocks" :key="i">
-                        <span class="w-full flex flex-row py-1 px-2 hover:bg-tint-1 duration-500 rounded-md" @click="addNewBlock(blocks, item, blockItems.name)">
+                        <span class="w-full flex flex-row py-1 px-2 cursor-pointer hover:bg-tint-1 duration-500 rounded-md" @click="addNewBlock(blocks, item, blockItems.name)">
                             
                           <span class="text-base text-tint-10 capitalize">
                             {{ blockItems.name }}

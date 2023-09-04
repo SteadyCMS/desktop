@@ -2,17 +2,21 @@
   import { ref } from 'vue';
   import { Editor, EditorContent, BubbleMenu } from '@tiptap/vue-3';
 
-  import Gapcursor from '@tiptap/extension-gapcursor'
-  import Dropcursor from '@tiptap/extension-dropcursor'
-  import Document from '@tiptap/extension-document'
-  import History from '@tiptap/extension-history'
-  import Paragraph from '@tiptap/extension-paragraph'
-  import Text from '@tiptap/extension-text'
-  import Placeholder from '@tiptap/extension-placeholder'
-  import Strike from '@tiptap/extension-strike'
-  import Bold from '@tiptap/extension-bold'
-  import Italic from '@tiptap/extension-italic'
-  import Code from '@tiptap/extension-code'
+  import Gapcursor from '@tiptap/extension-gapcursor';
+  import Dropcursor from '@tiptap/extension-dropcursor';
+  import Document from '@tiptap/extension-document';
+  import History from '@tiptap/extension-history';
+  import Paragraph from '@tiptap/extension-paragraph';
+  import Text from '@tiptap/extension-text';
+  import Placeholder from '@tiptap/extension-placeholder';
+  import Strike from '@tiptap/extension-strike';
+  import Bold from '@tiptap/extension-bold';
+  import Italic from '@tiptap/extension-italic';
+  import Code from '@tiptap/extension-code';
+
+  import BoldStyleIcon from '../icons/BoldStyleIcon.vue';
+  import ItalicStyleIcon from '../icons/ItalicStyleIcon.vue';
+  import StrikethroughStyleIcon from '../icons/StrikethroughStyleIcon.vue';
 
   const props =  defineProps(['item']);
   const emit = defineEmits(['onPressEnter', 'onBackspaceWhenEmpty']);
@@ -71,15 +75,15 @@
     :editor="editor"
     :tippy-options="{ duration: 100 }"
     v-if="editor">
-      <div class="bg-tint-4 rounded-full text-white flex flex-row p-1">
-        <button @click="editor.chain().focus().toggleBold().run()" :class="{ 'is-active': editor.isActive('bold') }">
-          bold
+      <div class="bg-white shadow-lg rounded-full text-white flex flex-row p-1">
+        <button class="p-1 rounded-full" @click="editor.chain().focus().toggleBold().run()" :class="{ 'is-active bg-tint-1': editor.isActive('bold') }">
+          <BoldStyleIcon class="w-5 h-5 fill-tint-7"/>
         </button>
-        <button @click="editor.chain().focus().toggleItalic().run()" :class="{ 'is-active': editor.isActive('italic') }">
-          italic
+        <button class="p-1 rounded-full" @click="editor.chain().focus().toggleItalic().run()" :class="{ 'is-active bg-tint-1': editor.isActive('italic') }">
+          <ItalicStyleIcon class="w-5 h-5 fill-tint-7"/>
         </button>
-        <button @click="editor.chain().focus().toggleStrike().run()" :class="{ 'is-active': editor.isActive('strike') }">
-          strike
+        <button class="p-1 rounded-full" @click="editor.chain().focus().toggleStrike().run()" :class="{ 'is-active bg-tint-1': editor.isActive('strike') }">
+          <StrikethroughStyleIcon class="w-5 h-5 fill-tint-7"/>
         </button>
       </div>
   </bubble-menu>
