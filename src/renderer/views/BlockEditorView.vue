@@ -524,16 +524,15 @@
             :data="item" 
             handle=".drag-handle">
             
-            <!-- Block Top Bar -->
+            <!-- Block Topbar -->
             <div @mouseover="cancelCloseEvent(true)" 
               @mouseleave="cancelCloseEvent(false)" 
-              class="flex flex-row bg-white -top-10 -left-2.5 -right-2.5 
-              h-10 rounded-lg px-1 shadow-md" 
+              class="flex flex-row bg-white -top-10 left-0 right-0 rounded-lg px-1 shadow-md" 
               :class="{ 'absolute': item.active, 'hidden':!item.active }">
               <div class="ml-1.5 flex grow justify-between">
-                <!-- Top Bar Buttons -->
+                <!-- Topbar Buttons -->
                 <div class="flex space-x-1 items-center w-full">
-                  <span class="text-sm font-medium text-tint-9 mr-4 capitalize">{{ item.type }}</span> 
+                  <span class="text-sm font-medium text-tint-9 mr-3 py-2 capitalize">{{ item.type }}</span> 
                   <component :is="blockBarTypes[item.type]" 
                     v-bind="currentblockBarproperties(item)" 
                     @size-changed="changeHeaderSize" 
@@ -553,18 +552,18 @@
               <span @click="openBlockBox(blocks, item, 'click')" class="add-button cursor-pointer">
                 <IconPlus class="w-6 fill-tint-7"/>
     
-                <!-- Add Blocks Box -->
+                <!-- Add blocks menu -->
                 <div class="relative flex">
-                  <div class="absolute w-44 max-h-60 bg-white z-30 -bottom-62 -left-4 
+                  <div class="absolute w-44 max-h-44 bg-white z-30 -bottom-62 left-0 
                     flex flex-col visible rounded-lg shadow-lg" 
                     @mouseover="cancelCloseEvent(true), blockAddButton(true)" 
                     @mouseleave="cancelCloseEvent(false), blockAddButton(false)"
                     :class="{'hidden':!item.menu }">
-                    <input v-model="filterText" type="text" placeholder="Filter" 
-                      class="text-tint-10 m-2 text-base outline-1 outline-tint-2 border border-tint-2 px-2 py-1 rounded-md bg-tint-0" />
+                    <input v-model="filterText" type="text" placeholder="Filter blocks" 
+                      class="text-tint-10 m-2 text-base outline-1 outline-tint-2 border border-tint-2 px-2 py-1 rounded-md bg-tint-0 placeholder:text-tint-6" />
                     <div class="relative flex flex-col m-2 overflow-y-scroll">
                       <div v-for="(blockItems, i) in filteredBlocks" :key="i">
-                        <span class="w-full flex flex-row py-0.5" @click="addNewBlock(blocks, item, blockItems.name)">
+                        <span class="w-full flex flex-row py-1 px-2 hover:bg-tint-1 duration-500 rounded-md" @click="addNewBlock(blocks, item, blockItems.name)">
                             
                           <span class="text-base text-tint-10 capitalize">
                             {{ blockItems.name }}
