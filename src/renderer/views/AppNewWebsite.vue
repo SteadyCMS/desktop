@@ -243,9 +243,9 @@
               <LogoDark class="h-9 w-auto" />
             </div>
             <div class="flex flex-row space-x-2 mt-4 mb-2">
-              <div v-for="item in stepCount" :key="item" class="flex rounded-md h-2 w-8" :class="{'bg-accent': item.done, 'bg-light-gray': !item.done }"></div>
+              <div v-for="item in stepCount" :key="item" class="flex rounded-md h-2 w-8" :class="{'bg-accent': item.done, 'bg-tint-2': !item.done }"></div>
             </div>
-            <h6 class="text-xs font-medium text-slate-600">Step {{ num }} of 4</h6>
+            <h6 class="text-xs font-medium text-tint-7">Step {{ num }} of 4</h6>
           </div>
           <!-- Views -->
           <div>
@@ -270,8 +270,8 @@
       </div>
       <div class="w-1/6 md:w-1/3 flex flex-row justify-end mt-4">
         <div>
-          <button class="py-3 px-6 bg-white text-dark" @click="backToDashboard">
-            <IconX class="fill-gray-400 w-8 h-8" />
+          <button class="py-3 px-6 bg-white" @click="backToDashboard">
+            <IconX class="fill-tint-6 w-8 h-8" />
           </button>
         </div>
       </div>
