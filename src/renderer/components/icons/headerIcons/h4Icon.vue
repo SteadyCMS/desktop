@@ -1,5 +1,8 @@
 <template>
-    <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" class="bi bi-type-h1" viewBox="0 0 16 16">
-        <path d="M8.637 13V3.669H7.379V7.62H2.758V3.67H1.5V13h1.258V8.728h4.62V13h1.259zm5.329 0V3.669h-1.244L10.5 5.316v1.265l2.16-1.565h.062V13h1.244z"/>
-    </svg>
+  <svg fill="currentColor" viewBox="0 0 16 16" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns="http://www.w3.org/2000/svg">
+    <g id="H4">
+      <path d="M0 0L16 0L16 16L0 16L0 0Z" id="Rectangle-Copy-2" fill="none" fill-rule="evenodd" stroke="none" />
+      <path d="M7.79102 10.8438L6.80664 10.8438L6.80664 8.32031L4.26367 8.32031L4.26367 10.8438L3.27539 10.8438L3.27539 5.15625L4.26367 5.15625L4.26367 7.52344L6.80664 7.52344L6.80664 5.15625L7.79102 5.15625L7.79102 10.8438ZM12.0176 8.81641L12.7246 8.81641L12.7246 9.57813L12.0176 9.57813L12.0176 10.8438L11.0684 10.8438L11.0684 9.57813L8.61133 9.57813L8.58398 9L11.0371 5.15625L12.0176 5.15625L12.0176 8.81641ZM9.58008 8.81641L11.0684 8.81641L11.0684 6.44141L10.998 6.56641L9.58008 8.81641Z" id="Path" stroke="none" />
+    </g>
+  </svg>
 </template>
