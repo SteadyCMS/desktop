@@ -148,7 +148,7 @@
       const name = websiteName.value.replaceAll(' ', '_').toLowerCase();
       
       // Create New Hugo Site
-      loadingScreenText.value = "Seting up site...";
+      loadingScreenText.value = "Setting up...";
       getPathTo('documents').then(path => {
         createNewSite(path + "/SteadyCMS/sites/"  + name + "/").then(x => {
 
@@ -156,13 +156,13 @@
         isUsingInternet.value = true;
         loadingScreenText.value = "Downloading template..."; 
         downloadFile('https://github.com/nanxiaobei/hugo-paper/archive/refs/heads/main.zip', '/sites/' + name + '/themes/').then(x => {
-          loadingScreenText.value = "Processing Template...";
+          loadingScreenText.value = "Processing template...";
           isUsingInternet.value = false;
           extractFile('sites/' + name + '/themes/hugo-paper-main.zip', 'sites/' + name + "/themes/").then(x => {
             deleteFile('sites/' + name + '/themes/hugo-paper-main.zip').then(x => {
 
               // Set up hugo.toml
-              loadingScreenText.value = "Configuring site..."; // TODO: SET theme name in .toml
+              loadingScreenText.value = "Configuring your site..."; // TODO: SET theme name in .toml
 
               let hugoToml = "baseURL = 'http://example.org/'\r\nlanguageCode = 'en-us'\r\ntitle = '" + name.replaceAll("_", " ") +"'\r\ntheme='hugo-paper-main'";
               writeToFile(hugoToml, "/sites/" + name, "hugo.toml").then(x => {
@@ -231,7 +231,7 @@
 
 <template>
   <Transition name="fade" mode="out-in">
-    <LoadingScreen class="h-full w-full" v-if="showLoadingScreen" :title="'Building website:'" :text="loadingScreenText"></LoadingScreen>
+    <LoadingScreen class="h-full w-full" v-if="showLoadingScreen" :title="'Creating website'" :text="loadingScreenText"></LoadingScreen>
   </Transition>
   <div class="relative max-w-6xl mx-auto px-8">
     <div class="flex flex-row w-full h-screen py-8">
