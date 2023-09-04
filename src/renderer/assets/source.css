@@ -2,49 +2,12 @@
 @tailwind components;
 @tailwind utilities;
 
-@font-face {
-  font-family: "Inter";
-  src: url("../assets/inter/Inter-Regular.otf") format("opentype");
-  font-weight: normal;
-  font-style: normal;
-}
-
-@font-face {
-  font-family: "Inter";
-  src: url("../assets/inter/Inter-Medium.otf") format("opentype");
-  font-weight: 500;
-  font-style: 500;
-}
-
-@font-face {
-  font-family: "Inter";
-  src: url("../assets/inter/Inter-Semibold.otf") format("opentype");
-  font-weight: 600;
-  font-style: 600;
-}
-
-@font-face {
-  font-family: "Inter";
-  src: url("../assets/inter/Inter-Bold.otf") format("opentype");
-  font-weight: bold;
-  font-style: bold;
-}
-
-body {
-    font-family: "Inter";
-}
-
-.ql-container {
-    font-size: 1.2rem !important; 
-    @apply text-slate-800;
-}
-
 .active-rl {
-    --tw-bg-opacity: 1;
-    background-color: rgb(10 46 54 / var(--tw-bg-opacity));
+  --tw-bg-opacity: 1;
+  background-color: rgb(10 46 54 / var(--tw-bg-opacity));
 
-    --tw-text-opacity: 1;
-    color: rgb(41 194 225 / var(--tw-text-opacity));
-    
-    fill: #29C2E1;
+  --tw-text-opacity: 1;
+  color: rgb(41 194 225 / var(--tw-text-opacity));
+  
+  fill: #29C2E1;
 }

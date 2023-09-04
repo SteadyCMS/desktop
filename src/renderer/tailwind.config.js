@@ -6,7 +6,8 @@ export default {
   ],
   theme: {
     fontFamily:{
-      sans: ["Inter", "sans-serif"],
+      sans: ["system-ui", "-apple-system", "Segoe UI", "Roboto", "Ubuntu", "Cantarell", 
+             "Noto Sans", "sans-serif", "BlinkMacSystemFont", "Oxygen", "Open Sans", "Helvetica Neue"],
     },
     extend: {
       colors: {

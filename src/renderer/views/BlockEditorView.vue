@@ -369,18 +369,18 @@
           });
         }else{
           // The title is not unique
-          showWaringToast({ title: 'Post title must be unique', description: 'You already have a post with this title.'});
+          showWarningToast({ title: 'Post title must be unique', description: 'You already have a post with this title.'});
         }
       });
     }else{
       // The title is too short
-      showWaringToast({ title: 'Problem with title', description: 'Title must have more than 2 letters.'});
+      showWarningToast({ title: 'Problem with title', description: 'Title must have more than 2 letters.'});
     }
   }
 
-  const showWaringToast = (message) => {
-          createToast(message, {type: 'warning', /* toastBackgroundColor: 'color',*/ showCloseButton: true, swipeClose: true, transition: 'slide', showIcon: false, position: 'top-right'})
-      }
+  const showWarningToast = (message) => {
+    createToast(message, {type: 'warning', /* toastBackgroundColor: 'color',*/ showCloseButton: true, swipeClose: true, transition: 'slide', showIcon: false, position: 'top-right'})
+  }
 
   // Get 150 characters of the first paragraph for a post description
   function getPostDescription(blocksData) {
@@ -513,7 +513,7 @@
       </textarea>
     </div>
 
-    <div class="flex flex-row  pt-5">
+    <div class="flex flex-row mt-5">
       <drop-list class="w-1/2 mx-auto" :items="blocks" @reorder="$event.apply(blocks)" mode="cut">
         <template v-slot:item="{item}">
           <drag @click="focusEditor(blocks, item, 'click')" 
@@ -521,21 +521,20 @@
             @dragstart="focusEditor(blocks, item, 'out')"
             @cut="remove(blocks, item)" 
             :class="{ 'border-opacity-100': item.active }" 
-            class="group relative flex flex-row border-b-2 border-x-2 m-2 border-slate-100 rounded-b border-opacity-0 px-2 pb-2" 
+            class="group relative flex flex-row border-slate-100 px-2 pb-6" 
             :key="item.id" 
             :data="item" 
             handle=".drag-handle">
             
-            <!-- Block Top Bar -->
+            <!-- Block Topbar -->
             <div @mouseover="cancelCloseEvent(true)" 
               @mouseleave="cancelCloseEvent(false)" 
-              class="flex flex-row bg-white -top-12 -left-2.5 -right-2.5 
-              h-10 border-t-2 border-x-2 mt-2 mx-2 border-slate-100 rounded-t px-2 pt-2" 
+              class="flex flex-row bg-white -top-10 left-0 right-0 rounded-lg px-1 shadow-md" 
               :class="{ 'absolute': item.active, 'hidden':!item.active }">
               <div class="ml-1.5 flex grow justify-between">
-                <!-- Top Bar Buttons -->
+                <!-- Topbar Buttons -->
                 <div class="flex space-x-1 items-center w-full">
-                  <span class="tracking-tight text-sm font-medium text-slate-700 uppercase mr-4">{{ item.type }}</span> 
+                  <span class="text-sm font-medium text-tint-9 mr-3 py-2 capitalize">{{ item.type }}</span> 
                   <component :is="blockBarTypes[item.type]" 
                     v-bind="currentblockBarproperties(item)" 
                     @size-changed="changeHeaderSize"
@@ -544,35 +543,33 @@
                 </div>
                 <!-- Delete (Right Side)-->
                 <div class="flex items-center"> 
-                  <button @click="removeBlock(blocks, item, false)" class="hover:bg-slate-100 px-1.5 py-1 rounded-md duration-300">
-                    <IconX class="fill-slate-600 w-5 h-5" />     
+                  <button @click="removeBlock(blocks, item, false)" class="hover:bg-tint-1 px-1 py-1 rounded-md duration-300">
+                    <IconX class="fill-tint-8 w-5 h-5" />     
                   </button> 
                 </div>
               </div>
             </div> 
     
             <!-- Block Icons -->
-            <div class="flex flex-col mt-4 " :class="{ 'visible':item.active, 'invisible':!item.active, 'group-hover:visible':!item.active }">
-              <span class="drag-handle mb-1 hover:cursor-grab">
-                <IconDragHandle class="w-8"/>
-              </span>
+            <div class="flex flex-row" :class="{ 'visible':item.active, 'invisible':!item.active, 'group-hover:visible':!item.active }">
               <span @click="openBlockBox(blocks, item, 'click')" class="add-button">
-                <IconPlus class="w-8"/>
-    
-                <!-- Added Blocks Box -->
+                <span class="cursor-pointer">
+                  <IconPlus class="w-6 fill-tint-7"/>
+                </span>
+                <!-- Add blocks menu -->
                 <div class="relative flex">
-                  <div class="absolute w-50 max-h-60 bg-white z-30 -bottom-62 -left-4 
-                    flex flex-col visible rounded-lg shadow-[0_5px_30px_-12px_rgba(0,0,0,0.45)]" 
+                  <div class="absolute w-44 max-h-44 bg-white z-30 -bottom-62 left-0 
+                    flex flex-col visible rounded-lg shadow-lg" 
                     @mouseover="cancelCloseEvent(true), blockAddButton(true)" 
                     @mouseleave="cancelCloseEvent(false), blockAddButton(false)"
                     :class="{'hidden':!item.menu }">
-                    <input v-model="filterText" type="text" placeholder="Search Blocks..." 
-                      class="m-3 outline-1 outline-slate-300 border-1 border-slate-400 p-2 rounded-sm" />
-                    <div class="w-full h-full flex flex-col m-2 overflow-scroll">
+                    <input v-model="filterText" type="text" placeholder="Filter blocks" 
+                      class="text-tint-10 m-2 text-base outline-1 outline-tint-2 border border-tint-2 px-2 py-1 rounded-md bg-tint-0 placeholder:text-tint-6" />
+                    <div class="relative flex flex-col m-2 overflow-y-scroll">
                       <div v-for="(blockItems, i) in filteredBlocks" :key="i">
-                        <span class="w-full flex flex-row" @click="addNewBlock(blocks, item, blockItems.name)">
-                            {{ blockItems.icon }}
-                          <span  class="text-base text-slate-600">
+                        <span class="w-full flex flex-row py-1 px-2 cursor-pointer hover:bg-tint-1 duration-500 rounded-md" @click="addNewBlock(blocks, item, blockItems.name)">
+                            
+                          <span class="text-base text-tint-10 capitalize">
                             {{ blockItems.name }}
                           </span>
                         </span> 
@@ -582,15 +579,18 @@
                   </div>
                 </div>
               </span>
+              <span class="drag-handle mr-1 hover:cursor-grab">
+                <IconDragHandle class="w-6 fill-tint-7"/>
+              </span>
             </div>
           
             <!-- Main Block getBlockType(item.type) -->
             <div class="flex flex-auto">
-                <component :is="mainBlockTypes[item.type]" 
-                v-bind="currentblockproperties(item)" 
-                :ref="item.id" 
-                @on-press-enter="addNewBlockOnEnter(blocks, item, item.type)"
-                @on-backspace-when-empty="removeBlock(blocks, item, true)"/>
+              <component :is="mainBlockTypes[item.type]" 
+              v-bind="currentblockproperties(item)" 
+              :ref="item.id" 
+              @on-press-enter="addNewBlockOnEnter(blocks, item, item.type)"
+              @on-backspace-when-empty="removeBlock(blocks, item, true)"/>
             </div>
           </drag>
         

@@ -148,7 +148,7 @@
       const name = websiteName.value.replaceAll(' ', '_').toLowerCase();
       
       // Create New Hugo Site
-      loadingScreenText.value = "Seting up site...";
+      loadingScreenText.value = "Setting up...";
       getPathTo('documents').then(path => {
         createNewSite(path + "/SteadyCMS/sites/"  + name + "/").then(x => {
 
@@ -156,13 +156,13 @@
         isUsingInternet.value = true;
         loadingScreenText.value = "Downloading template..."; 
         downloadFile('https://github.com/nanxiaobei/hugo-paper/archive/refs/heads/main.zip', '/sites/' + name + '/themes/').then(x => {
-          loadingScreenText.value = "Processing Template...";
+          loadingScreenText.value = "Processing template...";
           isUsingInternet.value = false;
           extractFile('sites/' + name + '/themes/hugo-paper-main.zip', 'sites/' + name + "/themes/").then(x => {
             deleteFile('sites/' + name + '/themes/hugo-paper-main.zip').then(x => {
 
               // Set up hugo.toml
-              loadingScreenText.value = "Configuring site..."; // TODO: SET theme name in .toml
+              loadingScreenText.value = "Configuring your site..."; // TODO: SET theme name in .toml
 
               let hugoToml = "baseURL = 'http://example.org/'\r\nlanguageCode = 'en-us'\r\ntitle = '" + name.replaceAll("_", " ") +"'\r\ntheme='hugo-paper-main'";
               writeToFile(hugoToml, "/sites/" + name, "hugo.toml").then(x => {
@@ -231,7 +231,7 @@
 
 <template>
   <Transition name="fade" mode="out-in">
-    <LoadingScreen class="h-full w-full" v-if="showLoadingScreen" :title="'Building website:'" :text="loadingScreenText"></LoadingScreen>
+    <LoadingScreen class="h-full w-full" v-if="showLoadingScreen" :title="'Creating website'" :text="loadingScreenText"></LoadingScreen>
   </Transition>
   <div class="relative max-w-6xl mx-auto px-8">
     <div class="flex flex-row w-full h-screen py-8">
@@ -243,9 +243,9 @@
               <LogoDark class="h-9 w-auto" />
             </div>
             <div class="flex flex-row space-x-2 mt-4 mb-2">
-              <div v-for="item in stepCount" :key="item" class="flex rounded-md h-2 w-8" :class="{'bg-accent': item.done, 'bg-light-gray': !item.done }"></div>
+              <div v-for="item in stepCount" :key="item" class="flex rounded-md h-2 w-8" :class="{'bg-accent': item.done, 'bg-tint-2': !item.done }"></div>
             </div>
-            <h6 class="text-xs font-medium text-slate-600">Step {{ num }} of 4</h6>
+            <h6 class="text-xs font-medium text-tint-7">Step {{ num }} of 4</h6>
           </div>
           <!-- Views -->
           <div>
@@ -270,8 +270,8 @@
       </div>
       <div class="w-1/6 md:w-1/3 flex flex-row justify-end mt-4">
         <div>
-          <button class="py-3 px-6 bg-white text-dark" @click="backToDashboard">
-            <IconX class="fill-gray-400 w-8 h-8" />
+          <button class="py-3 px-6 bg-white" @click="backToDashboard">
+            <IconX class="fill-tint-6 w-8 h-8" />
           </button>
         </div>
       </div>
