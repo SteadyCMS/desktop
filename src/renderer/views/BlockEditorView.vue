@@ -1,7 +1,7 @@
 <script setup> 
   import { useRouter } from 'vue-router';
   import {Drag, DropList} from 'vue-easy-dnd';
-  import { ref, computed, watch } from 'vue';
+  import { ref, computed } from 'vue';
   import TurndownService from 'turndown';
   import { createToast } from 'mosha-vue-toastify';
   //import Showdown from 'showdown';
@@ -15,10 +15,13 @@
   import ParagraphBlock from '../components/blocks/ParagraphBlock.vue';
   import HeadingBlock from '../components/blocks/HeadingBlock.vue';
   import ImageBlock from '../components/blocks/ImageBlock.vue';
+  import ListBlock from '../components/blocks/ListBlock.vue';
+  
 
   import header from '../components/blockTopbar/HeaderBlockTopbar.vue';
   import paragraph from '../components/blockTopbar/ParagraphBlockTopbar.vue';
   import image from '../components/blockTopbar/ImageBlockTopbar.vue';
+  import list from '../components/blockTopbar/ListBlockTopbar.vue';
 
   // Icons
   import IconDragHandle from '../components/icons/IconDragHandle.vue';
@@ -74,6 +77,7 @@
       active: false,
       menu: false,
       focus: false,
+      listType: "UL"
     },
     {
       type: "paragraph",
@@ -88,14 +92,14 @@
   const mainBlockTypes = {
     "paragraph": ParagraphBlock,
     "heading": HeadingBlock,
-    "list": ParagraphBlock,
+    "list": ListBlock,
     "image": ImageBlock,
   };
 
   const blockBarTypes = {
     "paragraph": paragraph,
     "heading": header,
-    "list": header,
+    "list": list,
     "image": image,
   };
     
@@ -133,13 +137,13 @@
           array.splice(index + 1, 0,  { type: "heading", content: "", id: idNum, active: false, menu: false, focus: false, headingType: "h3" });
           break;
         case "list":
-              
+          array.splice(index + 1, 0,  { type: "list", content: "", id: idNum, active: false, menu: false, focus: false, listType: "UL" });
           break;
         case "image":
           array.splice(index + 1, 0,  { type: "image", caption: "", src: "", id: idNum, active: false, menu: false, focus: false, });
           break;
         default:
-              
+          
       } 
       openBlockBox(array, value, 'out');
     } else {
@@ -154,17 +158,10 @@
     let index = array.indexOf(value);
     array.splice(index, 1);
     overTopbar = false;
-
     // if(focusPreBlock){
     //   focusEditor(array, index - 1, 'click'); 
     // }
   }
-
-  // function insert1(event) {
-  //   console.log(event.index)
-  //   console.log(event.data)
-  //   blocks.splice(event.index, 0, event.data);
-  // }
 
   function remove(array, value) {
     let index = array.indexOf(value);
@@ -190,7 +187,6 @@
         } 
         // if(typeof(value) == 'number'){ // This is to focus block in special circumstances (i.e it uses a number instead of a array value)
         //   array[value].active = true;
-
         //  // array[value + 1].focus = false;
         //   array[value].focus = true;
         // }else{ // Otherwise if the type is not a number this is a normal focus 
@@ -225,9 +221,16 @@
   //   return html;
   // }
 
+  // For Block Topbars (Header)
   function changeHeaderSize(size, value) {
     value.headingType = size;
   }
+
+  // For Block Topbars (List)
+  function changeListStyle(type, value) {
+    value.listType = type;
+  }
+
 
   // Open/Close the add new block box
   function openBlockBox(array, value, activeType) {
@@ -273,8 +276,7 @@
 
   // On enter create new paragraph block if called on paragraph or header
   function addNewBlockOnEnter(array, value, name){
-    if(name == "paragraph" || name == "heading"){
-      //console.log("enter");
+    if(name == "paragraph" || name == "heading" || name == "list"){
       addNewBlock(array, value, name);
       let index;
       if(value == 0){ // For the title
@@ -536,7 +538,8 @@
                   <span class="tracking-tight text-sm font-medium text-slate-700 uppercase mr-4">{{ item.type }}</span> 
                   <component :is="blockBarTypes[item.type]" 
                     v-bind="currentblockBarproperties(item)" 
-                    @size-changed="changeHeaderSize" 
+                    @size-changed="changeHeaderSize"
+                    @list-style-changed="changeListStyle"
                     :ref="'block_'+item.id" />
                 </div>
                 <!-- Delete (Right Side)-->

@@ -48,10 +48,8 @@
     editorProps: {
       handleKeyDown(view, event) {
           if (event.key == "Enter") { // On enter create a new block
-            //console.log('enter');
             isEnter.value = true;
           }else if(event.key == "Backspace"){ // If the block is empty on backspace delete it
-            //console.log('Backspace');
             if(props.item.content == "" || props.item.content == "<p></p>"){
               emit('onBackspaceWhenEmpty')
             }
