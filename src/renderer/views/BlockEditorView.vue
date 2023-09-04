@@ -367,16 +367,16 @@
           });
         }else{
           // The title is not unique
-          showWaringToast({ title: 'Post title must be unique', description: 'You already have a post with this title.'});
+          showWarningToast({ title: 'Post title must be unique', description: 'You already have a post with this title.'});
         }
       });
     }else{
       // The title is too short
-      showWaringToast({ title: 'Problem with title', description: 'Title must have more than 2 letters.'});
+      showWarningToast({ title: 'Problem with title', description: 'Title must have more than 2 letters.'});
     }
   }
 
-  const showWaringToast = (message) => {
+  const showWarningToast = (message) => {
           createToast(message, {type: 'warning', /* toastBackgroundColor: 'color',*/ showCloseButton: true, swipeClose: true, transition: 'slide', showIcon: false, position: 'top-right'})
       }
 
