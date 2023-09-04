@@ -377,8 +377,8 @@
   }
 
   const showWarningToast = (message) => {
-          createToast(message, {type: 'warning', /* toastBackgroundColor: 'color',*/ showCloseButton: true, swipeClose: true, transition: 'slide', showIcon: false, position: 'top-right'})
-      }
+    createToast(message, {type: 'warning', /* toastBackgroundColor: 'color',*/ showCloseButton: true, swipeClose: true, transition: 'slide', showIcon: false, position: 'top-right'})
+  }
 
   // Get 150 characters of the first paragraph for a post description
   function getPostDescription(blocksData) {
@@ -550,23 +550,23 @@
     
             <!-- Block Icons -->
             <div class="flex flex-row" :class="{ 'visible':item.active, 'invisible':!item.active, 'group-hover:visible':!item.active }">
-              <span @click="openBlockBox(blocks, item, 'click')" class="add-button">
+              <span @click="openBlockBox(blocks, item, 'click')" class="add-button cursor-pointer">
                 <IconPlus class="w-6 fill-tint-7"/>
     
-                <!-- Added Blocks Box -->
+                <!-- Add Blocks Box -->
                 <div class="relative flex">
-                  <div class="absolute w-50 max-h-60 bg-white z-30 -bottom-62 -left-4 
-                    flex flex-col visible rounded-lg" 
+                  <div class="absolute w-44 max-h-60 bg-white z-30 -bottom-62 -left-4 
+                    flex flex-col visible rounded-lg shadow-lg" 
                     @mouseover="cancelCloseEvent(true), blockAddButton(true)" 
                     @mouseleave="cancelCloseEvent(false), blockAddButton(false)"
                     :class="{'hidden':!item.menu }">
-                    <input v-model="filterText" type="text" placeholder="Search Blocks..." 
-                      class="m-3 outline-1 outline-slate-300 border-1 border-slate-400 p-2 rounded-sm" />
-                    <div class="w-full h-full flex flex-col m-2 overflow-scroll">
+                    <input v-model="filterText" type="text" placeholder="Filter" 
+                      class="text-tint-10 m-2 text-base outline-1 outline-tint-2 border border-tint-2 px-2 py-1 rounded-md bg-tint-0" />
+                    <div class="relative flex flex-col m-2 overflow-y-scroll">
                       <div v-for="(blockItems, i) in filteredBlocks" :key="i">
-                        <span class="w-full flex flex-row" @click="addNewBlock(blocks, item, blockItems.name)">
-                            {{ blockItems.icon }}
-                          <span  class="text-base text-slate-600">
+                        <span class="w-full flex flex-row py-0.5" @click="addNewBlock(blocks, item, blockItems.name)">
+                            
+                          <span class="text-base text-tint-10 capitalize">
                             {{ blockItems.name }}
                           </span>
                         </span> 
@@ -583,11 +583,11 @@
           
             <!-- Main Block getBlockType(item.type) -->
             <div class="flex flex-auto">
-                <component :is="mainBlockTypes[item.type]" 
-                v-bind="currentblockproperties(item)" 
-                :ref="item.id" 
-                @on-press-enter="addNewBlockOnEnter(blocks, item, item.type)"
-                @on-backspace-when-empty="removeBlock(blocks, item, true)"/>
+              <component :is="mainBlockTypes[item.type]" 
+              v-bind="currentblockproperties(item)" 
+              :ref="item.id" 
+              @on-press-enter="addNewBlockOnEnter(blocks, item, item.type)"
+              @on-backspace-when-empty="removeBlock(blocks, item, true)"/>
             </div>
           </drag>
         
