@@ -511,7 +511,7 @@
       </textarea>
     </div>
 
-    <div class="flex flex-row  pt-5">
+    <div class="flex flex-row mt-5">
       <drop-list class="w-1/2 mx-auto" :items="blocks" @reorder="$event.apply(blocks)" mode="cut">
         <template v-slot:item="{item}">
           <drag @click="focusEditor(blocks, item, 'click')" 
@@ -519,7 +519,7 @@
             @dragstart="focusEditor(blocks, item, 'out')"
             @cut="remove(blocks, item)" 
             :class="{ 'border-opacity-100': item.active }" 
-            class="group relative flex flex-row border-b-2 border-x-2 m-2 border-slate-100 rounded-b border-opacity-0 px-2 pb-2" 
+            class="group relative flex flex-row border-slate-100 px-2 pb-6" 
             :key="item.id" 
             :data="item" 
             handle=".drag-handle">
@@ -527,13 +527,13 @@
             <!-- Block Top Bar -->
             <div @mouseover="cancelCloseEvent(true)" 
               @mouseleave="cancelCloseEvent(false)" 
-              class="flex flex-row bg-white -top-12 -left-2.5 -right-2.5 
-              h-10 border-t-2 border-x-2 mt-2 mx-2 border-slate-100 rounded-t px-2 pt-2" 
+              class="flex flex-row bg-white -top-10 -left-2.5 -right-2.5 
+              h-10 rounded-lg px-1 shadow-md" 
               :class="{ 'absolute': item.active, 'hidden':!item.active }">
               <div class="ml-1.5 flex grow justify-between">
                 <!-- Top Bar Buttons -->
                 <div class="flex space-x-1 items-center w-full">
-                  <span class="tracking-tight text-sm font-medium text-slate-700 uppercase mr-4">{{ item.type }}</span> 
+                  <span class="text-sm font-medium text-tint-9 mr-4 capitalize">{{ item.type }}</span> 
                   <component :is="blockBarTypes[item.type]" 
                     v-bind="currentblockBarproperties(item)" 
                     @size-changed="changeHeaderSize" 
@@ -541,25 +541,22 @@
                 </div>
                 <!-- Delete (Right Side)-->
                 <div class="flex items-center"> 
-                  <button @click="removeBlock(blocks, item, false)" class="hover:bg-slate-100 px-1.5 py-1 rounded-md duration-300">
-                    <IconX class="fill-slate-600 w-5 h-5" />     
+                  <button @click="removeBlock(blocks, item, false)" class="hover:bg-tint-1 px-1 py-1 rounded-md duration-300">
+                    <IconX class="fill-tint-8 w-5 h-5" />     
                   </button> 
                 </div>
               </div>
             </div> 
     
             <!-- Block Icons -->
-            <div class="flex flex-col mt-4 " :class="{ 'visible':item.active, 'invisible':!item.active, 'group-hover:visible':!item.active }">
-              <span class="drag-handle mb-1 hover:cursor-grab">
-                <IconDragHandle class="w-8"/>
-              </span>
+            <div class="flex flex-row" :class="{ 'visible':item.active, 'invisible':!item.active, 'group-hover:visible':!item.active }">
               <span @click="openBlockBox(blocks, item, 'click')" class="add-button">
-                <IconPlus class="w-8"/>
+                <IconPlus class="w-6 fill-tint-7"/>
     
                 <!-- Added Blocks Box -->
                 <div class="relative flex">
                   <div class="absolute w-50 max-h-60 bg-white z-30 -bottom-62 -left-4 
-                    flex flex-col visible rounded-lg shadow-[0_5px_30px_-12px_rgba(0,0,0,0.45)]" 
+                    flex flex-col visible rounded-lg" 
                     @mouseover="cancelCloseEvent(true), blockAddButton(true)" 
                     @mouseleave="cancelCloseEvent(false), blockAddButton(false)"
                     :class="{'hidden':!item.menu }">
@@ -578,6 +575,9 @@
                     </div>
                   </div>
                 </div>
+              </span>
+              <span class="drag-handle mr-1 hover:cursor-grab">
+                <IconDragHandle class="w-6 fill-tint-7"/>
               </span>
             </div>
           
