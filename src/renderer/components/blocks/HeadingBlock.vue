@@ -31,7 +31,7 @@
     ref="inputField"
     placeholder="Type heading..." 
     @keydown.enter.exact.prevent
-    @keydown.enter.exact="$emit('onPressEnter', props.item)"
+    @keydown.enter.exact="$emit('onPressEnter', '')"
     @keydown.backspace.exact="checkContent()"
     v-focus="props.item.focus"
     v-model="props.item.content" 

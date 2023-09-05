@@ -282,7 +282,7 @@
   });
 
   // On enter create new paragraph block if called on paragraph or header
-  function addNewBlockOnEnter(array, value, name){
+  function addNewBlockOnEnter(array, value, name, content){
     if(name == "paragraph" || name == "heading" || name == "list"){
       addNewBlock(array, value, name);
       let index;
@@ -290,6 +290,10 @@
         index = 0;
       }else{
         index = array.indexOf(value);
+      }
+      // If there is content to be passed in pass it
+      if (content != "") {
+        array[index + 1].content = content;
       }
       // Focus new block and blur old 
       if(index > 0){
@@ -409,15 +413,14 @@
   // Convert blocks to markdown and json
   async function buildAndSavePostAs(buildType){
     const blocksData = blocks['_rawValue'];
-
     const buildTypeSettings = ref({})
 
     switch (buildType) {
       case 'published': // Build as pubished post (render = "always" & draft = "false")
-        buildTypeSettings.value = {
-          'isDraft': false,
-          'render': 'always',
-        }
+      buildTypeSettings.value = {
+      'isDraft': false,
+      'render': 'always',
+      }
         break;
       case 'preview-draft': // Build as a draft for previewing (render = "always" & draft = "false")
       buildTypeSettings.value = {
@@ -476,7 +479,7 @@
   }
 
   function publishSite() {
-    dialogState.value = true;
+    
   }
 </script>
 
@@ -505,7 +508,7 @@
       <textarea
         :disabled="isNotANewPost ? true : null"
         @keydown.enter.exact.prevent
-        @keydown.enter.exact="addNewBlockOnEnter(blocks, 0, 'heading')"
+        @keydown.enter.exact="addNewBlockOnEnter(blocks, 0, 'heading', '')"
         type="text" 
         placeholder="Add title" 
         v-model="pageTitle" 
@@ -598,7 +601,7 @@
               <component :is="mainBlockTypes[item.type]" 
               v-bind="currentblockproperties(item)" 
               :ref="item.id" 
-              @on-press-enter="addNewBlockOnEnter(blocks, item, item.type)"
+              @on-press-enter="(content) => {addNewBlockOnEnter(blocks, item, item.type, content)}"
               @on-backspace-when-empty="removeBlock(blocks, item, true)"/>
             </div>
           </drag>
@@ -614,9 +617,7 @@
 <!-- 
   TODO:
 WITH BLOCKS:
-- Fix on down space create new block (list)
-- Backspace delete, deletes two blocks
-- On delete block should focus the one above it
+- On downspace in middle of block splite text
 
 With Block Editor:
 Fix dialog

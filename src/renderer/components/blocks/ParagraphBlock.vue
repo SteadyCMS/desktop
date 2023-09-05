@@ -22,6 +22,7 @@
   const emit = defineEmits(['onPressEnter', 'onBackspaceWhenEmpty']);
 
   const isEnter = ref(false);
+  const cursorPosition = ref(null)
 
   const editor = new Editor({
     content: props.item.content,
@@ -64,6 +65,16 @@
       attributes: {
         class: 'focus:outline-none w-full h-full break-normal',
       },
+      createSelectionBetween(view, anchor, head){
+      //console.log(props.item.content);
+       if (props.item.content.match(/<p>/gi) != null) {
+        cursorPosition.value = props.item.content.match(/<p>/gi).length + props.item.content.match(/<p>/gi).length + anchor.pos;
+       }else{
+        cursorPosition.value = anchor.pos;
+       }
+       //console.log(anchor.pos);
+       //console.log(cursorPosition.value);
+      },
     }
   });
 
@@ -78,6 +89,17 @@
       }
     }
   );
+
+  function getContent() {
+    let content = props.item.content.slice(cursorPosition.value);
+    if(content != "/p>"){
+      editor.commands.setContent(props.item.content.slice(0, cursorPosition.value), false)
+      return content.replace("</p>", "");
+    }else{
+      // there is nothing to pass 
+      return "";
+    }
+  }
 
 </script>
 
@@ -99,7 +121,7 @@
       </div>
   </bubble-menu>
 
-  <editor-content :editor="editor" @keydown.enter.exact="$emit('onPressEnter')" class="w-full text-tint-10"/>
+  <editor-content :editor="editor" @keydown.enter.exact="$emit('onPressEnter', getContent())" class="w-full text-tint-10"/>
 </template>
 
 <style>

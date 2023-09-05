@@ -18,6 +18,7 @@
 
   const onEnterOnce = ref(false);
   const isEndSelected = ref(false);
+  const anchorPos = ref(10)
 
   const editor = new Editor({
     content: props.item.content,
@@ -51,17 +52,19 @@
             if(onEnterOnce.value){ // Have they pressed enter once already (if so this is the second time)
               console.log(isEndSelected.value)
               if(isEndSelected.value){
-                emit('onPressEnter');
+                editor.chain().focus().redo().run()
+                emit('onPressEnter', "");
               }
               onEnterOnce.value = false;
             }else{
               onEnterOnce.value = true;
             }
-            
           }else if(event.key == "Backspace"){ // If the block is empty on backspace delete it
-            //console.log(props.item.content)
+
             if(props.item.content == "<ul><li><p></p></li></ul>" || props.item.content == "<ol><li><p></p></li></ol>" || props.item.content == '<p></p>'){
               emit('onBackspaceWhenEmpty')
+            }else if(anchorPos.value == 3){
+              editor.chain().focus().undo().run();
             }
             onEnterOnce.value = false;
           }else{
@@ -69,12 +72,13 @@
           }
       },
       createSelectionBetween(view, anchor, head){
-
+        // Checks if the corser is at the end of the block (Needs some work)
+        anchorPos.value = anchor.pos;
         // console.log("-----------")
-        // console.log("size: " + (view.state.doc.content.size - 2))
-        // console.log("pod: " + (anchor.pos - 1))
-
-        if((anchor.pos - 1) == (view.state.doc.content.size - 2)){
+        // console.log("pod: " + (anchor.pos ))
+        //console.log(props.item.content.replaceAll("<ul>", "").replaceAll("</ul>", "").replaceAll("<li>", "..").replaceAll("</li>", "").replaceAll("<p>", "..").replaceAll("</p>", "").length)
+        let textLength = props.item.content.replaceAll("<ul>", "").replaceAll("</ul>", "").replaceAll("<li>", "..").replaceAll("</li>", "").replaceAll("<p>", "..").replaceAll("</p>", "").length;
+        if(anchor.pos == textLength){
           isEndSelected.value = true;
         }else{
           isEndSelected.value = false;
