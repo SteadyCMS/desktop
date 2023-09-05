@@ -21,10 +21,8 @@ app.use(router);
 app.directive('focus', {  // When the bound element is inserted into the DOM...
     mounted(el, binding, vnode) {
         if(binding.value){ // Focus the element if the value is true
-            //console.log("focus");
             el.focus();
         }else{
-            //console.log("blur");
             el.blur();
         }
     }

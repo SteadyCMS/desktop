@@ -1,5 +1,5 @@
 <script setup>
-  import { ref } from 'vue';
+  import { ref, watch } from 'vue';
   import { Editor, EditorContent, BubbleMenu } from '@tiptap/vue-3';
 
   import Gapcursor from '@tiptap/extension-gapcursor';
@@ -50,21 +50,9 @@
     },
     editorProps: {
       handleKeyDown(view, event) {
-          if (event.key == "Enter") { // On enter create a new block
-            isEnter.value = true;
-          }else if(event.key == "Backspace"){ // If the block is empty on backspace delete it
-            if(props.item.content == "" || props.item.content == "<p></p>"){
-              emit('onBackspaceWhenEmpty')
-            }
-            isEnter.value = false;
-          }else{
-            isEnter.value = false;
-          }
         if (event.key == "Enter") { // On enter create a new block
-          //console.log('enter');
           isEnter.value = true;
         } else if(event.key == "Backspace") { // If the block is empty on backspace delete it
-          //console.log('Backspace');
           if (props.item.content == "" || props.item.content == "<p></p>") {
             emit('onBackspaceWhenEmpty')
           }
@@ -78,6 +66,19 @@
       },
     }
   });
+
+  // Update focus
+  watch(
+    () => props.item.focus,
+    (focus) => {
+      if(focus){
+        editor.commands.focus('end');
+      }else{
+        editor.commands.blur();
+      }
+    }
+  );
+
 </script>
 
 <template>

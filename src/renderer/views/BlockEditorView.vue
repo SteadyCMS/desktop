@@ -158,15 +158,14 @@
     let index = array.indexOf(value);
     array.splice(index, 1);
     overTopbar = false;
-    // if(focusPreBlock){
-    //   focusEditor(array, index - 1, 'click'); 
-    // }
+    if(focusPreBlock){
+      setInputFocus(array, index - 1);
+    }
   }
 
   function remove(array, value) {
     let index = array.indexOf(value);
     array.splice(index, 1);
-    
   }
 
   // Cancel the close event when mouse is over the top bar
@@ -178,7 +177,7 @@
     blockButton = block;
   }
 
-
+  // FOR ACTIVE NOT FOCUS
   function focusEditor(array, value, activeType) {
     if (!overTopbar) { // Only if the corser is not over the top bar
       if (activeType == "click") { // Focus the block they clicked on 
@@ -201,6 +200,16 @@
         } 
       }
     }
+  }
+
+  function setInputFocus(array, index){
+    for (let i = 0; i < array.length; i++) { 
+      array[i].active = false;
+    } 
+    if(index >= 0){ // Focus block
+        array[index].focus = true;
+    }
+    
   }
 
   function htmlToMarkdown(html) {
@@ -231,12 +240,10 @@
     value.listType = type;
   }
 
-
   // Open/Close the add new block box
   function openBlockBox(array, value, activeType) {
     if (activeType == "click") {
       if (!blockButton) {
-        console.log("open")
         let index = array.indexOf(value);
         array[index].menu = true;
         // An event to tell if they click outside the dialog so we can close it
@@ -284,9 +291,11 @@
       }else{
         index = array.indexOf(value);
       }
-      // Focus new block and blur old
-      array[index].focus = false;
-      array[index + 1].focus = true;
+      // Focus new block and blur old 
+      if(index > 0){
+        array[index].focus = false;
+        array[index + 1].focus = true;
+      }
     }
   }
 
@@ -602,34 +611,23 @@
 </template>
 
 
-<!--
-// TODO:
-On down space create new block
-Resize header on change 1/2
+<!-- 
+  TODO:
+WITH BLOCKS:
+- Fix on down space create new block (list)
+- Backspace delete, deletes two blocks
+- On delete block should focus the one above it
 
-Make Image block
-Fix List block
+With Block Editor:
+Fix dialog
+Make Image block + Media library
 
-Fix block (Other than paragraph) width *
-Add style to add block box
-Genral style fix >*
-Decide what bottons we want on toolbar
+Other:
+Add template chooser
+Fix downloder
+Add Site publishing
 
-# Other #
-Set Window size
-Add Word count
-Keyboard short cuts
 -->
 
 
 
-<!-- 
-
-
-
-Image, Video, 
-
-
-
-
- -->

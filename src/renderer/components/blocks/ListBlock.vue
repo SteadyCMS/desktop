@@ -101,6 +101,18 @@
     }
   );
 
+  // Update focus
+  watch(
+    () => props.item.focus,
+    (focus) => {
+      if(focus){
+        editor.commands.focus('end');
+      }else{
+        editor.commands.blur();
+      }
+    }
+  );
+
 </script>
 <template>
   <editor-content :editor="editor" class="w-full"/>
