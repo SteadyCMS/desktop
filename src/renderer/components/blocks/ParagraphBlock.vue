@@ -18,11 +18,11 @@
   import ItalicStyleIcon from '../icons/ItalicStyleIcon.vue';
   import StrikethroughStyleIcon from '../icons/StrikethroughStyleIcon.vue';
 
-  const props =  defineProps(['item']);
-  const emit = defineEmits(['onPressEnter', 'onBackspaceWhenEmpty']);
+  const props = defineProps(['item', 'blocks']);
+  const emit = defineEmits(['onPressEnter', 'onBackspaceWhenEmpty', 'onBackspaceJoin']);
 
   const isEnter = ref(false);
-  const cursorPosition = ref(null)
+  const cursorPosition = ref(3);
 
   const editor = new Editor({
     content: props.item.content,
@@ -53,9 +53,16 @@
       handleKeyDown(view, event) {
         if (event.key == "Enter") { // On enter create a new block
           isEnter.value = true;
-        } else if(event.key == "Backspace") { // If the block is empty on backspace delete it
-          if (props.item.content == "" || props.item.content == "<p></p>") {
-            emit('onBackspaceWhenEmpty')
+        } else if(event.key == "Backspace") {
+          if (props.item.content == "" || props.item.content == "<p></p>") { // If the block is empty on backspace delete it
+            emit('onBackspaceWhenEmpty');
+          }else if(cursorPosition.value == 3){ // If they are at the start of the input...
+            let index = props.blocks.indexOf(props.item);
+            if(index > 0){ // & It's not the first block...
+              if(props.blocks[index - 1].type == "paragraph"){ // & the above block is a paragraph, join the blocks
+                emit('onBackspaceJoin', index);
+              }
+            }
           }
           isEnter.value = false;
         } else {
@@ -65,15 +72,12 @@
       attributes: {
         class: 'focus:outline-none w-full h-full break-normal',
       },
-      createSelectionBetween(view, anchor, head){
-      //console.log(props.item.content);
+      createSelectionBetween(view, anchor, head){  //TODO: Fix this
        if (props.item.content.match(/<p>/gi) != null) {
         cursorPosition.value = props.item.content.match(/<p>/gi).length + props.item.content.match(/<p>/gi).length + anchor.pos;
        }else{
         cursorPosition.value = anchor.pos;
        }
-       //console.log(anchor.pos);
-       //console.log(cursorPosition.value);
       },
     }
   });
@@ -84,6 +88,7 @@
     (focus) => {
       if(focus){
         editor.commands.focus('end');
+        updateContent(); // And focus
       }else{
         editor.commands.blur();
       }
@@ -93,16 +98,29 @@
   function getContent() {
     let content = props.item.content.slice(cursorPosition.value);
     if(content != "/p>"){
-      editor.commands.setContent(props.item.content.slice(0, cursorPosition.value), false)
-      return content.replace("</p>", "");
+      editor.commands.splitBlock();
+      let content = props.item.content.split("</p>");
+      editor.commands.setContent(content[0], false);
+      return content[1];
     }else{
       // there is nothing to pass 
       return "";
     }
   }
 
-</script>
+    function updateContent() {
+      if (props.item.content.match(/<p>/gi).length == 2) {
+        let x = editor.getHTML().length - 6;
+        editor.commands.setContent(props.item.content.replace('</p><p>', ''), false);
+        editor.commands.focus(x);
+      }else{
+        editor.commands.setContent(props.item.content, false);
+        editor.commands.focus('end');
+      }
+    }
 
+
+</script>
 <template>
   <bubble-menu
     :editor="editor"

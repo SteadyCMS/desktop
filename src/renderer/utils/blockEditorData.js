@@ -31,24 +31,23 @@ import { ref } from 'vue';
   ]);
 
   // Properties to be passed in for main blocks
-  export function currentblockproperties(_item) {
+  export function currentblockproperties(_item, _blocks) {
     let blockProperties = {};
-
     switch(_item.type) {
       case "paragraph":
-        blockProperties = { item: _item };
+        blockProperties = { item: _item, blocks: _blocks };
         break;
       case "heading":
-        blockProperties = { item: _item };
+        blockProperties = { item: _item, blocks: _blocks };
         break;
       case "list":
-        blockProperties = { item: _item };
+        blockProperties = { item: _item, blocks: _blocks };
         break;
       case "image":
-        blockProperties = { item: _item };
+        blockProperties = { item: _item, blocks: _blocks };
         break;
       default:
-        blockProperties = { item: _item };
+        blockProperties = { item: _item, blocks: _blocks };
     } 
     return blockProperties;
   }

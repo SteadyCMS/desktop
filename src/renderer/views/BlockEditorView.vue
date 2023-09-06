@@ -45,47 +45,55 @@
   const isDraft = ref(true);
 
   let blocks = ref([
-    {
-      type: "heading",
-      content: "Putting Yahweh first",
-      id: 60585449478,
-      active: false,
-      menu: false,
-      focus: false,
-      headingType: "h3",
+  {
+        "type": "heading",
+        "content": "All about our work",
+        "id": "32369332045",
+        "active": false,
+        "menu": false,
+        "focus": false,
+        "headingType": "h3"
     },
     {
-      type: "paragraph",
-      content: "After hours of driving through Iowa, we came into Minnesota…just in time to wait. There we were with a low battery on our phone (which we were using for GPS), slowly creeping along the road with a long line of vehicles ahead of us. We had hit a construction standstill.",
-      id: 73127606972,
-      active: false,
-      menu: false,
-      focus: false,
-    },
-    // {
-    //   type: "image",
-    //   caption: "A image of something",
-    //   src: "",
-    //   id: 51951226658,
-    //   active: false,
-    //   menu: false
-    // },
-    {
-      type: "list",
-      content: "We live in a busy culture of work and pleasure. A “selfie” generation of people who only care about what they can get, how much they can get, how much people like them, and what would benefit them the most. As much as we would like to say that we are not one of those people, we are not perfect. Being self-less rather than self-ish is a difficult task.",
-      id: 51951209688,
-      active: false,
-      menu: false,
-      focus: false,
-      listType: "UL"
+        "type": "paragraph",
+        "content": "<p>This is test text. So much testing is needed to make this... Days and weeks of work... It is a big job.</p>",
+        "id": "91466924419",
+        "active": false,
+        "menu": false,
+        "focus": false
     },
     {
-      type: "paragraph",
-      content: "After hours of driving through Iowa, we came into Minnesota…just in time to wait. There we were with a low battery on our phone (which we were using for GPS), slowly creeping along the road with a long line of vehicles ahead of us. We had hit a construction standstill.",
-      id: 73127606973,
-      active: false,
-      menu: false,
-      focus: false,
+        "type": "list",
+        "content": "<ul><li><p>There is the setup</p></li><li><p>All the learning</p></li><li><p>building each thing</p></li><li><p>Fixing bugs (and there are always bugs)</p></li></ul><p></p>",
+        "id": "08249939654",
+        "active": false,
+        "menu": false,
+        "focus": false,
+        "listType": "UL"
+    },
+    {
+        "type": "paragraph",
+        "content": "<p>But over all it's really cool what you can do!</p>",
+        "id": "98016553865",
+        "active": false,
+        "menu": false,
+        "focus": false
+    },
+    {
+        "type": "paragraph",
+        "content": "<p>I would say to leave comments bellow, but we are still working  on that:)</p>",
+        "id": "33169299101",
+        "active": false,
+        "menu": false,
+        "focus": true
+    },
+    {
+        "type": "paragraph",
+        "content": "<p>After hours of driving through Iowa, we came into Minnesota…just in time to wait. There we were with a low battery on our phone (which we were using for GPS), slowly creeping along the road with a long line of vehicles ahead of us. We had hit a construction standstill.</p>",
+        "id": "70610341484",
+        "active": false,
+        "menu": false,
+        "focus": false
     },
   ]);
 
@@ -125,44 +133,6 @@
     }
   })();
 
-  function addNewBlock(array, value, name) {
-    let idNum =  Math.random().toString().slice(2,9).concat( Math.random().toString().slice(5,7)).concat(Math.random().toString().slice(4,6));
-    if (value != 0) {
-      let index = array.indexOf(value);
-      switch(name) {
-        case "paragraph":
-          array.splice(index + 1, 0,  { type: "paragraph", content: "", id: idNum, active: false, menu: false, focus: false, });
-          break;
-        case "heading":
-          array.splice(index + 1, 0,  { type: "heading", content: "", id: idNum, active: false, menu: false, focus: false, headingType: "h3" });
-          break;
-        case "list":
-          array.splice(index + 1, 0,  { type: "list", content: "", id: idNum, active: false, menu: false, focus: false, listType: "UL" });
-          break;
-        case "image":
-          array.splice(index + 1, 0,  { type: "image", caption: "", src: "", id: idNum, active: false, menu: false, focus: false, });
-          break;
-        default:
-          
-      } 
-      openBlockBox(array, value, 'out');
-    } else {
-      array.splice(0, 0, { type: "paragraph", content: "", id: idNum, active: false, menu: false, focus: false, });
-    }
-    console.log(blocks.value);
-    focusEditor(array, value, 'click');
-  }
-
-  // Delete block
-  function removeBlock(array, value, focusPreBlock) {
-    let index = array.indexOf(value);
-    array.splice(index, 1);
-    overTopbar = false;
-    if(focusPreBlock){
-      setInputFocus(array, index - 1);
-    }
-  }
-
   function remove(array, value) {
     let index = array.indexOf(value);
     array.splice(index, 1);
@@ -184,32 +154,16 @@
         for (let i = 0; i < array.length; i++) { // First blur them all (so we don't end up with two focused blocks)
           array[i].active = false;
         } 
-        // if(typeof(value) == 'number'){ // This is to focus block in special circumstances (i.e it uses a number instead of a array value)
-        //   array[value].active = true;
-        //  // array[value + 1].focus = false;
-        //   array[value].focus = true;
-        // }else{ // Otherwise if the type is not a number this is a normal focus 
           let index = array.indexOf(value);
           if(index >= 0){ // Focus block
             array[index].active = true;
           }
-        //}
       } else if (activeType == "out") { // Blur all blocks
         for (let i = 0; i < array.length; i++) {
           array[i].active = false;
         } 
       }
     }
-  }
-
-  function setInputFocus(array, index){
-    for (let i = 0; i < array.length; i++) { 
-      array[i].active = false;
-    } 
-    if(index >= 0){ // Focus block
-        array[index].focus = true;
-    }
-    
   }
 
   function htmlToMarkdown(html) {
@@ -251,7 +205,6 @@
         document.addEventListener("mouseup", doClick);
       }
     } else {
-      //console.log("closed 1")
       for (let i = 0; i < array.length; i++) {
         array[i].menu = false;
       } 
@@ -280,28 +233,6 @@
         x.name.toLowerCase().includes(filter.toLowerCase())
     )
   });
-
-  // On enter create new paragraph block if called on paragraph or header
-  function addNewBlockOnEnter(array, value, name, content){
-    if(name == "paragraph" || name == "heading" || name == "list"){
-      addNewBlock(array, value, name);
-      let index;
-      if(value == 0){ // For the title
-        index = 0;
-      }else{
-        index = array.indexOf(value);
-      }
-      // If there is content to be passed in pass it
-      if (content != "") {
-        array[index + 1].content = content;
-      }
-      // Focus new block and blur old 
-      if(index > 0){
-        array[index].focus = false;
-        array[index + 1].focus = true;
-      }
-    }
-  }
 
   // When the uses trys to go back to dashboard
   function goToDashboard() {
@@ -481,6 +412,91 @@
   function publishSite() {
     
   }
+
+  function addNewBlock(array, value, name) {
+    let idNum =  Math.random().toString().slice(2,9).concat( Math.random().toString().slice(5,7)).concat(Math.random().toString().slice(4,6));
+    if (value != 0) {
+      let index = array.indexOf(value);
+      switch(name) {
+        case "paragraph":
+          array.splice(index + 1, 0,  { type: "paragraph", content: "", id: idNum, active: false, menu: false, focus: false, });
+          break;
+        case "heading":
+          array.splice(index + 1, 0,  { type: "heading", content: "", id: idNum, active: false, menu: false, focus: false, headingType: "h3" });
+          break;
+        case "list":
+          array.splice(index + 1, 0,  { type: "list", content: "", id: idNum, active: false, menu: false, focus: false, listType: "UL" });
+          break;
+        case "image":
+          array.splice(index + 1, 0,  { type: "image", caption: "", src: "", id: idNum, active: false, menu: false, focus: false, });
+          break;
+        default:
+          
+      } 
+      openBlockBox(array, value, 'out');
+    } else {
+      array.splice(0, 0, { type: "paragraph", content: "", id: idNum, active: false, menu: false, focus: false, });
+    }
+    //console.log(blocks.value);
+    focusEditor(array, value, 'click');
+  }
+
+  // Delete a block By it's item
+  function deleteBlockByItem(blocksArray, blockItem, focusPerviousBlock) {
+    let index = blocksArray.indexOf(blockItem);
+    blocksArray.splice(index, 1);
+    overTopbar = false;
+    if(focusPerviousBlock){
+      setBlockFocus(blocksArray, index - 1);
+    }
+  }
+
+  // Delete a block By it's index
+  function deleteBlockByIndex(blocksArray, blockIndex, focusPerviousBlock) {
+    blocksArray.splice(blockIndex, 1);
+    overTopbar = false;
+    if(focusPerviousBlock){
+      setBlockFocus(blocksArray, blockIndex - 1);
+    }
+  }
+
+  function setBlockFocus(blocksArray, BlockIndex){
+    for (let i = 0; i < blocksArray.length; i++) { // Clear all focus
+      blocksArray[i].active = false;
+    } 
+    if(BlockIndex >= 0){ // Focus the block
+      blocksArray[BlockIndex].focus = true;
+    }
+  }
+
+  // function joinBlockWithPervious(blocksArray, content, blockIndex){
+  //   console.log( blocksArray[blockIndex - 1].content)
+  //   deleteBlockByIndex(blocksArray, blockIndex, true);
+  // }
+
+  // On enter create new block with setup config
+  function addNewBlockWithSetup(blocksArray, blockItem, blockType, passedContent){
+    if(blockType == "paragraph" || blockType == "heading" || blockType == "list"){
+      addNewBlock(blocksArray, blockItem, blockType);
+      let index;
+      if(blockItem == 0){ // For the title
+        index = 0;
+      }else{
+        index = blocksArray.indexOf(blockItem);
+      }
+      // If there is content to be passed in pass it
+      if (passedContent != "") {
+        blocksArray[index + 1].content = passedContent;
+      }
+      // Focus new block and blur old 
+      if(index > 0){
+        blocksArray[index].focus = false;
+        blocksArray[index + 1].focus = true;
+      }
+    }
+  }
+
+
 </script>
 
 <template>
@@ -508,7 +524,7 @@
       <textarea
         :disabled="isNotANewPost ? true : null"
         @keydown.enter.exact.prevent
-        @keydown.enter.exact="addNewBlockOnEnter(blocks, 0, 'heading', '')"
+        @keydown.enter.exact="addNewBlockWithSetup(blocks, 0, 'heading', '')"
         type="text" 
         placeholder="Add title" 
         v-model="pageTitle" 
@@ -555,7 +571,7 @@
                 </div>
                 <!-- Delete (Right Side)-->
                 <div class="flex items-center"> 
-                  <button @click="removeBlock(blocks, item, false)" class="hover:bg-tint-1 px-1 py-1 rounded-md duration-300">
+                  <button @click="deleteBlockByItem(blocks, item, false)" class="hover:bg-tint-1 px-1 py-1 rounded-md duration-300">
                     <IconX class="fill-tint-8 w-5 h-5" />     
                   </button> 
                 </div>
@@ -580,7 +596,6 @@
                     <div class="relative flex flex-col m-2 overflow-y-scroll">
                       <div v-for="(blockItems, i) in filteredBlocks" :key="i">
                         <span class="w-full flex flex-row py-1 px-2 cursor-pointer hover:bg-tint-1 duration-500 rounded-md" @click="addNewBlock(blocks, item, blockItems.name)">
-                            
                           <span class="text-base text-tint-10 capitalize">
                             {{ blockItems.name }}
                           </span>
@@ -599,13 +614,13 @@
             <!-- Main Block getBlockType(item.type) -->
             <div class="flex flex-auto">
               <component :is="mainBlockTypes[item.type]" 
-              v-bind="currentblockproperties(item)" 
+              v-bind="currentblockproperties(item, blocks)" 
               :ref="item.id" 
-              @on-press-enter="(content) => {addNewBlockOnEnter(blocks, item, item.type, content)}"
-              @on-backspace-when-empty="removeBlock(blocks, item, true)"/>
+              @on-press-enter="(content) => {addNewBlockWithSetup(blocks, item, item.type, content)}"
+              @on-backspace-when-empty="deleteBlockByItem(blocks, item, true)"
+              @on-backspace-join="(blockIndex) => {deleteBlockByIndex(blocks, blockIndex, true);}"/>
             </div>
           </drag>
-        
         </template>
         <template v-slot:feedback="{item}"></template>
       </drop-list>
@@ -617,7 +632,8 @@
 <!-- 
   TODO:
 WITH BLOCKS:
-- On downspace in middle of block splite text
+- Style doesn't show on reloading of post
+- On list . doesn't show always
 
 With Block Editor:
 Fix dialog
@@ -627,7 +643,7 @@ Other:
 Add template chooser
 Fix downloder
 Add Site publishing
-
+If website is deleted and is the current don't show it
 -->
 
 
