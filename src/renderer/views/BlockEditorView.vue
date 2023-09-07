@@ -100,7 +100,7 @@
         "type": "quote",
         "content": "After hours of driving through Iowa, we came into Minnesota…just in time to wait. There we were with a low battery on our phone (which we were using for GPS), slowly creeping along the road with a long line of vehicles ahead of us. We had hit a construction standstill.",
         "author": "- El de Lasovain",
-        "id": "70610341484",
+        "id": "70610341414",
         "active": false,
         "menu": false,
         "focus": false
@@ -121,7 +121,6 @@
     "heading": header,
     "list": list,
     "image": image,
-    //"quote": quote,
   };
     
   (async () => {
@@ -656,7 +655,7 @@
 <!-- 
   TODO:
 WITH BLOCKS:
-- On list . doesn't show always
+- On list . doesn't show always (has <p> instead of list)
 
 With Block Editor:
 Fix dialog

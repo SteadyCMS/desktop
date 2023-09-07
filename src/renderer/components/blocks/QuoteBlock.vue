@@ -15,12 +15,12 @@
   }
 
   function OnPressEnter(isAuther) {
-    if(isAuther){
+   // if(isAuther){
       emit('onPressEnter', '');
-    }else{
-      inputField.value.blur();
-      authorInput.value.focus();
-    }
+    // }else{
+    //   inputField.value.blur();
+    //   authorInput.value.focus();
+    // }
   }
 
   function updateOnChange() {
@@ -37,8 +37,6 @@
       ref="inputField"
       v-focus="props.item.focus"
       contenteditable="true"
-      @keydown.enter.exact.prevent
-      @keydown.enter.exact="OnPressEnter(false)"
       @keydown.backspace.exact="checkContentOnBackspace()"
       @input="updateOnChange()"
       placeholder="Type Quote..."

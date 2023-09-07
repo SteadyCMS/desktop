@@ -50,9 +50,9 @@
       handleKeyDown(view, event) {
           if (event.key == "Enter") { // If they hit enter twice create new block
             if(onEnterOnce.value){ // Have they pressed enter once already (if so this is the second time)
-              console.log(isEndSelected.value)
+              //console.log(isEndSelected.value);
               if(isEndSelected.value){
-                editor.chain().focus().redo().run()
+                editor.chain().focus().redo().run();
                 emit('onPressEnter', "");
               }
               onEnterOnce.value = false;
