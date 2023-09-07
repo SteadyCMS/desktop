@@ -60,7 +60,6 @@
               onEnterOnce.value = true;
             }
           }else if(event.key == "Backspace"){ // If the block is empty on backspace delete it
-
             if(props.item.content == "<ul><li><p></p></li></ul>" || props.item.content == "<ol><li><p></p></li></ol>" || props.item.content == '<p></p>'){
               emit('onBackspaceWhenEmpty')
             }else if(anchorPos.value == 3){
@@ -91,7 +90,16 @@
   });
 
   // Setup list when block is first made (UL)
-  (() => {editor.chain().focus().toggleBulletList().run()})();
+  (() => {
+    editor.chain().focus().toggleBulletList().run(); 
+    // Fix a list bug
+    if(props.item.content.startsWith("<p>")){
+      let firstItem = props.item.content.match(/<p>[^<>]*<\/p>/g)[0];
+      let html = '<li>' + firstItem + '</li>';
+      let inner = props.item.content.replace(firstItem, '');
+      editor.commands.setContent(inner.slice(0, 4) + html + inner.slice(4).replace("<p></p>", ""));
+    }
+  })();
 
   // Watch for when they change the list type (and change it)
   watch(
@@ -135,3 +143,10 @@
     padding: 0 1.5rem;
   }
 </style>
+
+
+<!-- 
+
+
+  <ol><li><p>There is the setup</p></li></ol><ul><li><p>All the learning</p></li><li><p>building each thing</p></li><li><p>Fixing bugs (and there are always bugs)</p></li></ul><p></p>
+ -->
