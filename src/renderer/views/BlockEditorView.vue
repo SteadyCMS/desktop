@@ -16,6 +16,7 @@
   import HeadingBlock from '../components/blocks/HeadingBlock.vue';
   import ImageBlock from '../components/blocks/ImageBlock.vue';
   import ListBlock from '../components/blocks/ListBlock.vue';
+  import QuoteBlock from '../components/blocks/QuoteBlock.vue';
   
 
   import header from '../components/blockTopbar/HeaderBlockTopbar.vue';
@@ -56,7 +57,7 @@
     },
     {
         "type": "paragraph",
-        "content": "<p>This is test text. So much testing is needed to make this... Days and weeks of work... It is a big job.</p>",
+        "content": "<p>This is test text. <strong>So much testing is needed to make this...</strong> Days and weeks of work... It is a big job.</p>",
         "id": "91466924419",
         "active": false,
         "menu": false,
@@ -95,6 +96,16 @@
         "menu": false,
         "focus": false
     },
+    {
+        "type": "quote",
+        "content": "After hours of driving through Iowa, we came into Minnesota…just in time to wait. There we were with a low battery on our phone (which we were using for GPS), slowly creeping along the road with a long line of vehicles ahead of us. We had hit a construction standstill.",
+        "author": "- El de Lasovain",
+        "id": "70610341484",
+        "active": false,
+        "menu": false,
+        "focus": false
+    },
+    
   ]);
 
   const mainBlockTypes = {
@@ -102,6 +113,7 @@
     "heading": HeadingBlock,
     "list": ListBlock,
     "image": ImageBlock,
+    "quote": QuoteBlock,
   };
 
   const blockBarTypes = {
@@ -109,6 +121,7 @@
     "heading": header,
     "list": list,
     "image": image,
+    //"quote": quote,
   };
     
   (async () => {
@@ -330,6 +343,7 @@
   function getPostDescription(blocksData) {
     let found;
     let i = 0;
+    if(blocksData.length > 0){
     do {
       if(blocksData[i].type == "paragraph"){
         found = true;
@@ -339,6 +353,9 @@
       }
       i++;
     } while (found == false);  
+  }else{
+    return '';
+  }
   }
 
   // Convert blocks to markdown and json
@@ -394,13 +411,16 @@
           break;
         case "heading":
           let ht =  blocksData[i].headingType + ">";
-          data = data + "\n\n" + htmlToMarkdown( "<" + ht + blocksData[i].content + "</" + ht);
+          data = data + "\n\n" + htmlToMarkdown( `<${ht}${blocksData[i].content}</${ht}`);
           break;
         case "list":
           data = data + "\n\n" + htmlToMarkdown(blocksData[i].content);
           break;
         case "image":
           
+          break;
+        case "quote":
+          data = data + "\n\n" + htmlToMarkdown(`<blockquote>${blocksData[i].content}</br>${blocksData[i].author}</blockquote>`);
           break;
         default:
           data = data + "\n\n" + htmlToMarkdown(blocksData[i].content);
@@ -419,7 +439,7 @@
       let index = array.indexOf(value);
       switch(name) {
         case "paragraph":
-          array.splice(index + 1, 0,  { type: "paragraph", content: "", id: idNum, active: false, menu: false, focus: false, });
+          array.splice(index + 1, 0,  { type: "paragraph", content: "", id: idNum, active: false, menu: false, focus: false });
           break;
         case "heading":
           array.splice(index + 1, 0,  { type: "heading", content: "", id: idNum, active: false, menu: false, focus: false, headingType: "h3" });
@@ -428,17 +448,23 @@
           array.splice(index + 1, 0,  { type: "list", content: "", id: idNum, active: false, menu: false, focus: false, listType: "UL" });
           break;
         case "image":
-          array.splice(index + 1, 0,  { type: "image", caption: "", src: "", id: idNum, active: false, menu: false, focus: false, });
+          array.splice(index + 1, 0,  { type: "image", caption: "", src: "", id: idNum, active: false, menu: false, focus: false });
           break;
+        case "quote":
+          array.splice(index + 1, 0,  { type: "quote", content: "", author: "", id: idNum, active: false, menu: false, focus: false });
+          break;
+          
         default:
           
       } 
       openBlockBox(array, value, 'out');
+      setBlockFocus(array, index + 1);
     } else {
       array.splice(0, 0, { type: "paragraph", content: "", id: idNum, active: false, menu: false, focus: false, });
     }
-    //console.log(blocks.value);
+    console.log(blocks.value);
     focusEditor(array, value, 'click');
+   
   }
 
   // Delete a block By it's item
@@ -462,7 +488,7 @@
 
   function setBlockFocus(blocksArray, BlockIndex){
     for (let i = 0; i < blocksArray.length; i++) { // Clear all focus
-      blocksArray[i].active = false;
+      blocksArray[i].focus = false;
     } 
     if(BlockIndex >= 0){ // Focus the block
       blocksArray[BlockIndex].focus = true;
@@ -476,8 +502,8 @@
 
   // On enter create new block with setup config
   function addNewBlockWithSetup(blocksArray, blockItem, blockType, passedContent){
-    if(blockType == "paragraph" || blockType == "heading" || blockType == "list"){
-      addNewBlock(blocksArray, blockItem, blockType);
+    if(blockType == "paragraph" || blockType == "heading" || blockType == "list" || blockType == "quote"){
+      addNewBlock(blocksArray, blockItem, "paragraph");
       let index;
       if(blockItem == 0){ // For the title
         index = 0;
@@ -495,8 +521,6 @@
       }
     }
   }
-
-
 </script>
 
 <template>
@@ -616,7 +640,7 @@
               <component :is="mainBlockTypes[item.type]" 
               v-bind="currentblockproperties(item, blocks)" 
               :ref="item.id" 
-              @on-press-enter="(content) => {addNewBlockWithSetup(blocks, item, item.type, content)}"
+              @on-press-enter="(content) => {addNewBlockWithSetup(blocks, item, item.type, content);}"
               @on-backspace-when-empty="deleteBlockByItem(blocks, item, true)"
               @on-backspace-join="(blockIndex) => {deleteBlockByIndex(blocks, blockIndex, true);}"/>
             </div>
@@ -632,7 +656,6 @@
 <!-- 
   TODO:
 WITH BLOCKS:
-- Style doesn't show on reloading of post
 - On list . doesn't show always
 
 With Block Editor:

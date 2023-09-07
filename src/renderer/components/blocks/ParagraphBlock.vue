@@ -12,7 +12,6 @@
   import Strike from '@tiptap/extension-strike';
   import Bold from '@tiptap/extension-bold';
   import Italic from '@tiptap/extension-italic';
-  import Code from '@tiptap/extension-code';
 
   import BoldStyleIcon from '../icons/BoldStyleIcon.vue';
   import ItalicStyleIcon from '../icons/ItalicStyleIcon.vue';
@@ -23,6 +22,7 @@
 
   const isEnter = ref(false);
   const cursorPosition = ref(3);
+
 
   const editor = new Editor({
     content: props.item.content,
@@ -36,7 +36,6 @@
       Strike,
       Bold,
       Italic,
-      Code,
       Placeholder.configure({
         placeholder: 'Type paragraph...',
       }),
@@ -87,7 +86,7 @@
     () => props.item.focus,
     (focus) => {
       if(focus){
-        editor.commands.focus('end');
+        //editor.commands.focus('end');
         updateContent(); // And focus
       }else{
         editor.commands.blur();
@@ -109,16 +108,17 @@
   }
 
     function updateContent() {
-      if (props.item.content.match(/<p>/gi).length == 2) {
-        let x = editor.getHTML().length - 6;
-        editor.commands.setContent(props.item.content.replace('</p><p>', ''), false);
-        editor.commands.focus(x);
-      }else{
-        editor.commands.setContent(props.item.content, false);
-        editor.commands.focus('end');
+      if(props.item.content.match(/<p>/gi) != null){
+        if (props.item.content.match(/<p>/gi).length == 2) {
+          let x = editor.getHTML().length - 6;
+          editor.commands.setContent(props.item.content.replace('</p><p>', ''), false);
+          editor.commands.focus(x);
+        }else{
+          editor.commands.setContent(props.item.content, false);
+          editor.commands.focus('end');
+        }
       }
     }
-
 
 </script>
 <template>
@@ -151,4 +151,7 @@
   pointer-events: none;
   height: 0;
 }
+  strong {
+    font-weight: bold;
+  }
 </style>

@@ -14,19 +14,24 @@ import { ref } from 'vue';
       id: 2
     },
     {
-      name: "image",
+      name: "quote",
       icon: "_",
       id: 3
-    },  
+    }, 
     {
-      name: "list",
+      name: "image",
       icon: "_",
       id: 4
     },  
     {
-      name: "other",
+      name: "list",
       icon: "_",
       id: 5
+    },  
+    {
+      name: "other",
+      icon: "_",
+      id: 6
     },
   ]);
 
@@ -44,6 +49,9 @@ import { ref } from 'vue';
         blockProperties = { item: _item, blocks: _blocks };
         break;
       case "image":
+        blockProperties = { item: _item, blocks: _blocks };
+        break;
+      case "quote":
         blockProperties = { item: _item, blocks: _blocks };
         break;
       default:
@@ -68,6 +76,9 @@ import { ref } from 'vue';
       case "image":
         blockProperties = { item: _item };
         break;
+     case "quote":
+       blockProperties = { item: _item };
+       break;
       default:
         blockProperties = { item: _item };
     } 

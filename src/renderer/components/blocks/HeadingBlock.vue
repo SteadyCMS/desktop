@@ -1,34 +1,19 @@
 <script setup>
-  import { ref, watch } from 'vue';
+  import { ref } from 'vue';
 
   const props = defineProps(['item']);
   const emit = defineEmits(['onPressEnter', 'onBackspaceWhenEmpty']);
-  const inputField = ref();
 
   function checkContent(){
-    //console.log(props.item.content)
     if (props.item.content == '') {
       emit('onBackspaceWhenEmpty');
     }
   }
 
-  // Update focus
-  watch(
-    () => props.item.focus,
-    (focus) => {
-      if(focus){
-        inputField.value.focus();
-      }else{
-        inputField.value.blur();
-      }
-    }
-  );
-
 </script>
 
 <template>
-  <input type="text" 
-    ref="inputField"
+  <input type="text"
     placeholder="Type heading..." 
     @keydown.enter.exact.prevent
     @keydown.enter.exact="$emit('onPressEnter', '')"
