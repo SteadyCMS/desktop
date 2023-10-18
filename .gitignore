@@ -1,3 +1,4 @@
 node_modules
 build/main
 src/renderer/assets/main.css
+src/renderer
