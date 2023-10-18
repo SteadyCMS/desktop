@@ -4,6 +4,7 @@
   import { ref, computed } from 'vue';
   import TurndownService from 'turndown';
   import { createToast } from 'mosha-vue-toastify';
+  import { useGeneralStore } from '../stores/general.js'
   //import Showdown from 'showdown';
 
   import { writeToFile, openInBrowser, getPathTo, deleteFile, doesFileExist, readFileInAppDir, readFile } from '../utils/system.js'
@@ -29,10 +30,15 @@
   import IconPlus from '../components/icons/IconPlus.vue';
   import IconX from '../components/icons/IconX.vue';
   import IconArrowLeft from '../components/icons/IconArrowLeft.vue';
-
+  import { storeToRefs } from "pinia";
   import { Dialog } from "../utils/DialogService.js";
 
   const router = useRouter();
+
+  const generalStore = useGeneralStore();
+  const { isCurrentPostDraft } = storeToRefs(generalStore);
+  const { updateCurrentDaftStatus } = generalStore; 
+
  
   // Var
   let overTopbar = false;
@@ -129,7 +135,7 @@
     websiteName.value = siteToFolderName(localStorage.getItem("activeSiteData_currentSite"));
     isDraft.value = localStorage.getItem("activeSiteData_iscurrentPostADraft");
     // If there editing load it else don't
-    console.log(currentPost);
+   // console.log(currentPost);
     if (currentPost != "newsteadycmspost") {
       isNotANewPost.value = true;
       pageTitle.value = fileNameToTitle(currentPost.replace('.markdown', ''));
@@ -265,6 +271,7 @@
       //   onAccept: console.log("savex"),
       //   declineText: 'Discard',
       //   onDecline: console.log("deletex")});
+      router.push({path: '/'});
     }
     } else { // If it's a new post
     //   Dialog({
@@ -278,6 +285,60 @@
     //     onDecline: () => {console.log("delete")},
     // });
       router.push({path: '/'});
+    }
+  }
+
+  function publishSite() {
+        //console.log(websiteName.value)
+        if (titleToFileName(pageTitle.value).length > 2) {
+        // If they changed the title delete the old files with other title (not when editing a saved post)
+        if(titleAtPerview.value != ""){
+          if (titleAtPerview.value != pageTitle.value) {
+            deleteFile("sites/" + websiteName.value + "/content/post/" + titleToFileName(titleAtPerview.value) + ".json");
+            deleteFile("sites/" + websiteName.value + "/content/post/" + titleToFileName(titleAtPerview.value) + ".markdown");
+            titleAtPerview.value = pageTitle.value;
+          }
+        }
+        // TODO: IF they are updating a post skip this step (doesFileExist)
+        // Make sure they don't already have a post with this name
+        doesFileExist("sites/" + websiteName.value + "/content/post/" + titleToFileName(pageTitle.value) + ".json").then(fileExsits => {
+
+        // TODO: Improve this
+        const runbuild = ref(true);
+        if (fileExsits) { // If there is a file with the same name
+          if (isFirstTime.value == true) { // if this is the first time runinng perview 
+            if(isNotANewPost.value){ // i.e Are editing a post or creating a new one
+              runbuild.value = true;
+            }else{
+              runbuild.value = false;
+            }
+          }else{ // if this is NOT the first time runinng perview 
+            runbuild.value = true;
+          }
+        }else{ // If there is NOT a file with the same name
+          runbuild.value = true;
+        }
+
+        if(runbuild.value){ // If this is the first time pervining they can't use a name of a post
+          buildAndSavePostAs("published").then(x => { 
+            getPathTo('documents').then(path => { 
+              buildNewSite(path + "/steadyCMS/sites/" + websiteName.value);
+              isDraft.value = false;
+              console.log("done");
+              //startServer('8080', path + "/steadyCMS/sites/" + websiteName.value);
+              //openInBrowser('http://localhost:8080/post/' + titleToFileName(pageTitle.value) + '/');
+              titleAtPerview.value = pageTitle.value;
+              isFirstTime.value = false;
+            });
+          });
+        }else{
+          // The title is not unique
+          showWarningToast({ title: 'Post title must be unique', description: 'You already have a post with this title.'});
+        }
+      });
+    }else{
+      // The title is too short
+      showWarningToast({ title: 'Problem with title', description: 'Title must have more than 2 letters.'});
     }
   }
 
@@ -426,10 +487,6 @@
       }
     } 
     await writeToFile(data, "sites/" + websiteName.value + "/content/post", titleToFileName(pageTitle.value) + ".markdown");
-  }
-
-  function publishSite() {
-    
   }
 
   function addNewBlock(array, value, name) {

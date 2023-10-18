@@ -32,6 +32,7 @@ const router = createRouter({
     {
       path: '/new-website',
       name: 'newwebsite',
+      props: true,
       component: () => import('../views/AppNewWebsite.vue'),
     },
     {

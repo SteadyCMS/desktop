@@ -262,14 +262,16 @@
           </div>
         </div>
         <div class="space-x-1 mb-2">
-          <SecondaryButton text="Cancel" v-if="(num == '1')" @click="backToDashboard" />
+          <div v-if="(this.$route.query.hasProjects == true)"> 
+            <SecondaryButton text="Cancel" v-if="(num == '1')" @click="backToDashboard" />
+          </div>
           <SecondaryButton text="Back" v-if="!(num == '1')" @click="changeCurrentStep('previous')" />
           <AccentButton text="Continue" v-if="!(num == '4')" @click="changeCurrentStep('next')" />
           <AccentButton text="Create website" v-if="(num == '4')" @click="buildWebsite" />
         </div>
       </div>
       <div class="w-1/6 md:w-1/3 flex flex-row justify-end mt-4">
-        <div>
+        <div v-if="this.$route.query.hasProjects">
           <button class="py-3 px-6 bg-white" @click="backToDashboard">
             <IconX class="fill-tint-6 w-8 h-8" />
           </button>

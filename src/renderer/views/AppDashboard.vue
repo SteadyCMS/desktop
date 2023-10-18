@@ -58,7 +58,7 @@
                   // Delete steady.config.json
                   deleteFileInAppDir("steady.config.json").then(x => {
                   // They have no websites (have them make one)
-                  createNewWebsite();
+                  createNewWebsite(false);
                 });
               }
             });
@@ -66,7 +66,7 @@
         });
       } else { 
         // They have no websites (have them make one)
-        createNewWebsite();
+        createNewWebsite(false);
       }
     });
   }
@@ -83,8 +83,12 @@
     });
   }
 
-  function createNewWebsite() {
-    router.push({path: '/new-website'});
+  function createNewWebsite(projects) {
+    router.push({path: '/new-website', 
+      query: {
+        hasProjects: projects
+      }
+    });
   }
 
 </script>
@@ -126,7 +130,7 @@
             </div>
           </div>
           <!-- New website button -->
-          <button @click="createNewWebsite" class="p-1.5 border border-tint-10 rounded-lg hover:bg-accent-glow duration-300">
+          <button @click="createNewWebsite(true)" class="p-1.5 border border-tint-10 rounded-lg hover:bg-accent-glow duration-300">
             <IconPlus class="fill-tint-4 w-5 h-5" />
           </button>
         </div>

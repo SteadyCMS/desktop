@@ -3,12 +3,17 @@
 
   export const useGeneralStore = defineStore('general', () => {
     const currentSite = ref('');
+    const isCurrentPostDraft = ref('');
 
       function changeCurrentSite(name) {
         currentSite.value = name;
       }
+      
+      function updateCurrentDaftStatus(isDraft) {
+        isCurrentPostDraft.value = isDraft;
+      }
 
-    return { currentSite, changeCurrentSite }
+    return { currentSite, changeCurrentSite, isCurrentPostDraft, updateCurrentDaftStatus };
   });
 
 
