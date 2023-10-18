@@ -1,17 +1,6 @@
 # SteadyCMS desktop
 
-The desktop app for SteadyCMS — a block-based, Hugo static site CMS for desktop and web.
-
-This repository contains the source for the desktop application built with Vue 3, Electron, and Tailwindcss. 
-
-Status: **Highly work in progress. Not yet ready for use.**
-
-
-## Roadmap
-
-For now the desktop application is our primary focus, then the web version. 
-
-The immediate goal is to create a simple frontend for creating a site and editing posts in a block-based editor.
+This repository contains the desktop-specific Electron source for the SteadyCMS desktop application built with Vue 3, Electron, and Tailwindcss. 
 
 
 ## Development
@@ -22,13 +11,21 @@ The immediate goal is to create a simple frontend for creating a site and editin
 npm install
 ```
 
-### Start developing
+### Sync the main Vue.js application code
 
 ```bash
-npm run dev
+cd src/renderer
 ```
 
-### Rebuilding tailwindcss
+```bash
+git clone https://github.com/SteadyCMS/SteadyCMS.git
+```
+
+```bash
+cd ../..
+```
+
+#### Rebuilding tailwindcss
 
 ```bash
 cd src/renderer
@@ -38,6 +35,11 @@ cd src/renderer
 npx tailwindcss -i ./assets/source.css -o ./assets/main.css --watch
 ```
 
+### Start developing
+
+```bash
+npm run dev
+```
 
 ## Additional Commands
 
@@ -61,7 +63,7 @@ Optional configuration options can be found in the [Electron Builder CLI docs](h
 - scripts/ # all the scripts used to build or serve your application, change as you like.
 - src/
   - main/ # Main thread (Electron application source)
-  - renderer/ # Renderer thread (VueJS application source)
+  - renderer/ # Renderer thread (VueJS application source goes here)
 ```
 
 
