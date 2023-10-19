@@ -27,18 +27,7 @@
     "vite": "^4.1.1"
   },
   "dependencies": {
-    "@vueup/vue-quill": "^1.2.0",
-    "decompress": "^4.2.1",
-    "electron-dl": "^3.5.0",
-    "gitart-vue-dialog": "^3.1.0",
-    "mosha-vue-toastify": "^1.0.23",
-    "open": "^9.1.0",
-    "pinia": "^2.1.6",
-    "showdown": "^2.1.0",
-    "turndown": "^7.1.2",
-    "vue": "^3.2.47",
-    "vue-easy-dnd": "^2.1.3",
-    "vue-router": "^4.2.4",
+    "@kolirt/vue-modal": "^0.0.14",
     "@tiptap/extension-blockquote": "^2.1.7",
     "@tiptap/extension-bold": "^2.1.7",
     "@tiptap/extension-bubble-menu": "^2.1.7",
@@ -59,6 +48,17 @@
     "@tiptap/extension-strike": "^2.1.7",
     "@tiptap/extension-text": "^2.1.7",
     "@tiptap/pm": "^2.1.7",
-    "@tiptap/vue-3": "^2.1.7"
+    "@tiptap/vue-3": "^2.1.7",
+    "@vueup/vue-quill": "^1.2.0",
+    "decompress": "^4.2.1",
+    "electron-dl": "^3.5.0",
+    "mosha-vue-toastify": "^1.0.23",
+    "open": "^9.1.0",
+    "pinia": "^2.1.6",
+    "showdown": "^2.1.0",
+    "turndown": "^7.1.2",
+    "vue": "^3.2.47",
+    "vue-easy-dnd": "^2.1.3",
+    "vue-router": "^4.2.4"
   }
 }
