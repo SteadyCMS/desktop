@@ -1,4 +1,4 @@
-  import {app, BrowserWindow, ipcMain, session} from 'electron';
+  import {app, BrowserWindow, ipcMain, session, protocol, net} from 'electron';
   import {join} from 'path';
 
   import {readFileSync, mkdir, rmdirSync, writeFile, existsSync, rmSync, readdirSync, lstatSync, unlinkSync} from 'fs';
@@ -6,7 +6,6 @@
   import {download} from "electron-dl";
   import decompress from "decompress";
 
-  //process.env['ELECTRON_DISABLE_SECURITY_WARNINGS'] = 'true';
   
   function createWindow () {
     const mainWindow = new BrowserWindow({
@@ -19,9 +18,11 @@
         preload: join(__dirname, 'preload.js'),
         nodeIntegration: false,
         contextIsolation: true,
+        webSecurity: app.isPackaged
       // devTools: false,
       }
     });
+    console.log(`${__dirname}`)
     mainWindow.maximize();
 
     if (process.env.NODE_ENV === 'development') {
@@ -52,18 +53,20 @@
       }
     });
 
-  app.on('window-all-closed', function () {
-    if (process.platform !== 'darwin') app.quit()
-  });
+   app.on('window-all-closed', function () {
+     if (process.platform !== 'darwin') app.quit()
+   });
 
-  ipcMain.on('message', (event, message) => {
-    console.log(message);
-  });
+   ipcMain.on('message', (event, message) => {
+    if (!validateSender(event.senderFrame)) return null
+     console.log(message);
+   });
 
-// MY Fun
+// MY Stuff
 
   // Read From File (IN DOCUMENTS)
   ipcMain.handle('readFromFile',  async (event, path) => {
+    if (!validateSender(event.senderFrame)) return null
     const filePath = app.getPath('documents') + "/SteadyCMS/" + path;
     const data = readFileSync(filePath);
     return data.toString();
@@ -71,6 +74,7 @@
 
   // Read From File (IN APP DIR)
   ipcMain.handle('readFileInAppDir',  async (event, path) => {
+    if (!validateSender(event.senderFrame)) return null
     const filePath = app.getAppPath()+  "/SteadyCMS/" + path;
     const data = readFileSync(filePath);
     return data.toString();
@@ -78,6 +82,7 @@
 
   // Write To File (IN DOCUMENTS)
   ipcMain.on('writeToFile', (event, rawData, filePath, fileName) => {
+    if (!validateSender(event.senderFrame)) return null
     mkdir(app.getPath('documents') + "/SteadyCMS/" + filePath, { recursive: true }, (err) => {
       if (err){
         throw err;
@@ -86,11 +91,12 @@
             if (err) throw err;
           }); 
       }
-    });
+    }); 
   });
 
     // Write To File (IN APP DIR)
     ipcMain.on('writeToFileInAppDir', (event, rawData, filePath, fileName) => {
+      if (!validateSender(event.senderFrame)) return null
       mkdir(app.getAppPath() + "/SteadyCMS/" + filePath, { recursive: true }, (err) => {
         if (err){
           throw err;
@@ -104,16 +110,19 @@
 
   // Check if File Exists (IN DOCUMENTS)
   ipcMain.handle('doesFileExist',  async (event, path) => {
+    if (!validateSender(event.senderFrame)) return null
     return existsSync(app.getPath('documents') + "/SteadyCMS/" + path);
   });
 
   // Check if File Exists (IN APP DIR)
   ipcMain.handle('doesFileExistInAppDir',  async (event, path) => {
+    if (!validateSender(event.senderFrame)) return null
     return existsSync(app.getAppPath() + "/SteadyCMS/" + path);
   });
 
   // Run Hugo.exe
   ipcMain.on('runHugo', (event, commands) => {
+    if (!validateSender(event.senderFrame)) return null
     console.log("RUN hugo Command(s): " + commands);
      execFile(app.getAppPath() + '/static/hugo.exe', commands, function(err, data) {
           console.log(err);
@@ -123,11 +132,13 @@
 
   // Open url In Browser
   ipcMain.on('openInBrowser', (event, url) => {
+    if (!validateSender(event.senderFrame)) return null
     require('electron').shell.openExternal(url);
   });
 
   // Download File (TO DOCUMENTS)
   ipcMain.handle("downloadFile", async (event, url, info) => {
+    if (!validateSender(event.senderFrame)) return null
     info.properties.directory = app.getPath('documents') + '/SteadyCMS/' + info.properties.directory;
     await download(BrowserWindow.getFocusedWindow(), url, info.properties);
     return "done"; // TODO?: must return file name
@@ -135,6 +146,7 @@
 
   // Extract Zip File (FROM DOCUMENTS)
   ipcMain.handle("extractFile", async (event, source, target) => {
+    if (!validateSender(event.senderFrame)) return null
      try {
       let pathSource = app.getPath('documents') + '/SteadyCMS/' + source;
       let pathTarget = app.getPath('documents') + '/SteadyCMS/' + target;
@@ -148,6 +160,7 @@
 
   // Delete file (IN APP DIR)
   ipcMain.on('deleteFileInAppDir', (event, path) => {
+    if (!validateSender(event.senderFrame)) return null
     let pathSource = app.getAppPath() + "/SteadyCMS/" + path;
     try {
       rmSync(pathSource, {
@@ -160,6 +173,7 @@
 
   // Delete file (IN DOCUMENTS)
   ipcMain.on('deleteFile', (event, path) => {
+    if (!validateSender(event.senderFrame)) return null
     let pathSource = app.getPath('documents') + '/SteadyCMS/' + path;
     try {
       rmSync(pathSource, {
@@ -172,6 +186,7 @@
 
     // Delete Dir (IN DOCUMENTS)
     ipcMain.on('deleteDir', (event, path) => {
+      if (!validateSender(event.senderFrame)) return null
       let pathSource = app.getPath('documents') + '/SteadyCMS/' + path;
       try {
         const deleteFolderRecursive = function (directoryPath) {
@@ -197,7 +212,8 @@
 
   // Get Paths
   ipcMain.handle('getPathTo', (event, place) => {
- 
+    if (!validateSender(event.senderFrame)) return null
+
     switch (place) {
       case "documents": //  Directory for a user's "My Documents".
         return app.getPath('documents');
@@ -240,6 +256,7 @@
 
   // Gets a list of dir in dir
   ipcMain.handle('getDirsIn', (event, rootDir) => {
+    if (!validateSender(event.senderFrame)) return null
     try {
       return readdirSync(rootDir, { withFileTypes: true })
       .filter(dirent => dirent.isDirectory())
@@ -249,18 +266,27 @@
     }
   });
 
-  // Gets a list of files in dir (Only .markdown)
-  ipcMain.handle('getFilesIn', (event, dir) => {
+  // Gets a list of files in dir by file type
+  ipcMain.handle('getFilesIn', (event, dir, fileType) => {
+    if (!validateSender(event.senderFrame)) return null
     try {
       return readdirSync(dir, { withFileTypes: true })
-      .filter(dirent => dirent.name.endsWith(".markdown"))
+      .filter(dirent => dirent.name.endsWith(fileType))
       .map(dirent => dirent.name);
     } catch (error) {
       return "error";
     }
 
   });
- 
+
+  function validateSender (frame) {
+    //console.log((new URL(frame.url)).host)
+    // Value the host of the URL using an actual URL parser and an allowlist
+    if ((new URL(frame.url)).host === 'electronjs.org' || (new URL(frame.url)).host === 'localhost:8080') return true
+    return false
+
+  }
+
 }); // On ready
 
 
@@ -284,3 +310,49 @@
 //   if (err) throw err;
 //   console.log('source.txt was copied to destination.txt');
 // });
+
+  // protocol.handle('steady', () => {
+
+  //   console.log("cjcj")
+  //   //const pathname = decodeURI(request.url.replace('file:///', ''));
+  //   return net.fetch();
+
+  // });
+
+
+
+// const protocolName = 'your-app-name'
+
+// protocol.registerFileProtocol(protocolName, (request, callback) => {
+//   const url = request.url.replace(`${protocolName}://`, '')
+//   try {
+//     return callback(decodeURIComponent(url))
+//   }
+//   catch (error) {
+//     // Handle the error as needed
+//     console.error(error)
+//   }
+
+
+  // protocol.registerFileProtocol('file', (request, callback) => {
+  //   const pathname = decodeURI(request.url.replace('file:///', ''));
+  //   callback(pathname);
+  // });
+
+  // protocol.registerFileProtocol('some-protocol', () => {
+  //   callback({ filePath: '/path/to/my/file' })
+  // })
+
+  // protocol.handle('some-protocol', () => {
+  //   return net.fetch('file:///path/to/my/file')
+  // })
+  // protocol.registerSchemesAsPrivileged([
+  //   {
+  //     scheme: 'steady',
+  //     privileges: {
+  //       standard: true,
+  //       secure: true,
+  //       supportFetchAPI: true
+  //     }
+  //   }
+  // ]);

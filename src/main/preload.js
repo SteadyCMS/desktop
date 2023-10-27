@@ -39,8 +39,8 @@
     const dirs =  ipcRenderer.invoke('getDirsIn', rootDir);
     return dirs;
   },
-  getFilesIn: (dir) =>  {
-    const files =  ipcRenderer.invoke('getFilesIn', dir);
+  getFilesIn: (dir, fileType) =>  {
+    const files =  ipcRenderer.invoke('getFilesIn', dir, fileType);
     return files;
   },
 
