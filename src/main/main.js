@@ -172,9 +172,14 @@
   });
 
   // Delete file (IN DOCUMENTS)
-  ipcMain.on('deleteFile', (event, path) => {
+  ipcMain.on('deleteFile', (event, path, scoped) => {
     if (!validateSender(event.senderFrame)) return null
-    let pathSource = app.getPath('documents') + '/SteadyCMS/' + path;
+    let pathSource;
+    if (scoped == undefined || scoped == true) {
+      pathSource = app.getPath('documents') + '/SteadyCMS/' + path;
+    } else {
+      pathSource = path;
+    }
     try {
       rmSync(pathSource, {
         force: false,
