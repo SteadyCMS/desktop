@@ -1,10 +1,11 @@
   import {app, BrowserWindow, ipcMain, session, protocol, net} from 'electron';
   import {join} from 'path';
 
-  import {readFileSync, mkdir, rmdirSync, writeFile, existsSync, rmSync, readdirSync, lstatSync, unlinkSync} from 'fs';
+  import {readFileSync, mkdir, rmdirSync, writeFile, existsSync, rmSync, readdirSync, lstatSync, unlinkSync, copyFile, constants, copyFileSync} from 'fs';
   import {execFile} from 'child_process';
   import {download} from "electron-dl";
   import decompress from "decompress";
+  // import { copyFile, constants } from 'node:fs';
 
   
   function createWindow () {
@@ -276,8 +277,29 @@
     } catch (error) {
       return "error";
     }
-
   });
+
+  ipcMain.handle('copyFile', async (event, src, des) => {
+    if (!validateSender(event.senderFrame)) return null;
+    try {
+      copyFileSync(src, app.getPath('documents') + "/SteadyCMS/" + des, constants.COPYFILE_EXCL); 
+    } catch (error) {
+      return false;
+    }
+    return true;
+  });
+
+    // let callback = (err) =>{
+    //   if (err){
+    //     console.log(err);
+    //     return "false";
+    //   } else {
+    //     console.log('File was copied');
+    //     return "true";
+    //   }
+    // }
+    //  copyFile(src, app.getPath('documents') + "/SteadyCMS/" + des, constants.COPYFILE_EXCL, callback);
+
 
   function validateSender (frame) {
     //console.log((new URL(frame.url)).host)
@@ -288,71 +310,3 @@
   }
 
 }); // On ready
-
-
-
-// import { exec } from 'child_process';
-// function execute(command, callback){
-//     exec(command, function(error, stdout, stderr){ callback(stdout); });
-// };
-
-// module.exports.getGitUser = function(callback){
-//     execute("git config --global user.name", function(name){
-//         execute("git config --global user.email", function(email){
-//             callback({ name: name.replace("\n", ""), email: email.replace("\n", "") });
-//         });
-//     });
-// };
-
-
-// // File destination.txt will be created or overwritten by default.
-// fs.copyFile('source.txt', 'destination.txt', (err) => {
-//   if (err) throw err;
-//   console.log('source.txt was copied to destination.txt');
-// });
-
-  // protocol.handle('steady', () => {
-
-  //   console.log("cjcj")
-  //   //const pathname = decodeURI(request.url.replace('file:///', ''));
-  //   return net.fetch();
-
-  // });
-
-
-
-// const protocolName = 'your-app-name'
-
-// protocol.registerFileProtocol(protocolName, (request, callback) => {
-//   const url = request.url.replace(`${protocolName}://`, '')
-//   try {
-//     return callback(decodeURIComponent(url))
-//   }
-//   catch (error) {
-//     // Handle the error as needed
-//     console.error(error)
-//   }
-
-
-  // protocol.registerFileProtocol('file', (request, callback) => {
-  //   const pathname = decodeURI(request.url.replace('file:///', ''));
-  //   callback(pathname);
-  // });
-
-  // protocol.registerFileProtocol('some-protocol', () => {
-  //   callback({ filePath: '/path/to/my/file' })
-  // })
-
-  // protocol.handle('some-protocol', () => {
-  //   return net.fetch('file:///path/to/my/file')
-  // })
-  // protocol.registerSchemesAsPrivileged([
-  //   {
-  //     scheme: 'steady',
-  //     privileges: {
-  //       standard: true,
-  //       secure: true,
-  //       supportFetchAPI: true
-  //     }
-  //   }
-  // ]);

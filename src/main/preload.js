@@ -43,7 +43,16 @@
     const files =  ipcRenderer.invoke('getFilesIn', dir, fileType);
     return files;
   },
+  copyFile: async (src, des) =>  {
+    const data = await ipcRenderer.invoke('copyFile', src, des);
+    console.log(data);
+    return data;
+  },
+  
 
   
+
+
+
   });
   
