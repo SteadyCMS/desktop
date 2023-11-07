@@ -251,8 +251,11 @@
       case "videos": // Directory for a user's videos.
         return app.getPath('videos');
 
-      case "steady": // To Steady CMS's main directory
-        return app.getPath('documents') + '/steadyCMS/';
+      case "SteadyCMS": // To Steady CMS's main directory
+        return app.getPath('documents') + '/SteadyCMS/';
+
+      case "steadyCMS": // To Steady CMS's main directory // FIX THIS
+        return app.getPath('documents') + '/SteadyCMS/';
 
       default: // default : Our app directory path
         console.log(place + "! Not Found. Returning default path [getPathTo:main.js]")
