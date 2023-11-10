@@ -5,9 +5,8 @@
   import {execFile} from 'child_process';
   import {download} from "electron-dl";
   import decompress from "decompress";
-  // import { copyFile, constants } from 'node:fs';
 
-  
+
   function createWindow () {
     const mainWindow = new BrowserWindow({
       width: 1000,
@@ -29,8 +28,7 @@
     if (process.env.NODE_ENV === 'development') {
       const rendererPort = process.argv[2];
       mainWindow.loadURL(`http://localhost:${rendererPort}`);
-    }
-    else {
+    } else {
       mainWindow.loadFile(join(app.getAppPath(), 'renderer', 'index.html'));
     }
   }
@@ -55,7 +53,7 @@
     });
 
    app.on('window-all-closed', function () {
-     if (process.platform !== 'darwin') app.quit()
+     if (process.platform !== 'darwin') app.quit();
    });
 
    ipcMain.on('message', (event, message) => {
@@ -63,65 +61,96 @@
      console.log(message);
    });
 
-// MY Stuff
+// API
 
-  // Read From File (IN DOCUMENTS)
+  /** 
+   * Reads the full contents of a file 
+   * @param {String} path - The full path to the file
+   * @returns {String} The full contents of file
+   */ 
   ipcMain.handle('readFromFile',  async (event, path) => {
-    if (!validateSender(event.senderFrame)) return null
-    const filePath = app.getPath('documents') + "/SteadyCMS/" + path;
-    const data = readFileSync(filePath);
+    if (!validateSender(event.senderFrame)) return null;
+    const data = readFileSync(path);
     return data.toString();
   });
 
-  // Read From File (IN APP DIR)
+   /** 
+   * Reads the full contents of a file in the app directory
+   * @param {String} path - The path to the file in the app directory
+   * @returns {String} The full contents of the file
+   */ 
   ipcMain.handle('readFileInAppDir',  async (event, path) => {
-    if (!validateSender(event.senderFrame)) return null
-    const filePath = app.getAppPath()+  "/SteadyCMS/" + path;
-    const data = readFileSync(filePath);
+    if (!validateSender(event.senderFrame)) return null;
+    const data = readFileSync(path);
     return data.toString();
   });
 
-  // Write To File (IN DOCUMENTS)
+   /** 
+   * Writes given String to given file. Overwrites all existing content!
+   * @param {String} rawData - The string to be written to file
+   * @param {String} filePath - The path to the directory where the file is
+   * @param {String} fileName - The name of the file to be written to
+   */ 
   ipcMain.on('writeToFile', (event, rawData, filePath, fileName) => {
-    if (!validateSender(event.senderFrame)) return null
-    mkdir(app.getPath('documents') + "/SteadyCMS/" + filePath, { recursive: true }, (err) => {
+    if (!validateSender(event.senderFrame)) return null;
+    mkdir(filePath, { recursive: true }, (err) => {
       if (err){
         throw err;
       } else {
-        writeFile(app.getPath('documents') + "/SteadyCMS/" + filePath + "/" + fileName, rawData, (err) => {
-            if (err) throw err;
-          }); 
+        writeFile(filePath + "/" + fileName, rawData, (err) => {
+          if (err) throw err;
+        }); 
       }
     }); 
   });
 
-    // Write To File (IN APP DIR)
+   /** 
+   * Writes given String to given file in app directory. Overwrites all existing content!
+   * @param {String} rawData - The string to be written to file
+   * @param {String} filePath - The path to the directory where the file is starting from the app's directory
+   * @param {String} fileName - The name of the file to be written to
+   */ 
     ipcMain.on('writeToFileInAppDir', (event, rawData, filePath, fileName) => {
-      if (!validateSender(event.senderFrame)) return null
-      mkdir(app.getAppPath() + "/SteadyCMS/" + filePath, { recursive: true }, (err) => {
+      if (!validateSender(event.senderFrame)) return null;
+      mkdir(filePath, { recursive: true }, (err) => {
         if (err){
           throw err;
         } else {
-          writeFile(app.getAppPath() + "/SteadyCMS/" + filePath + "/" + fileName, rawData, (err) => {
+          writeFile(filePath + "/" + fileName, rawData, (err) => {
               if (err) throw err;
             }); 
         }
       });
     });
 
-  // Check if File Exists (IN DOCUMENTS)
+  /**
+   * Check if file exist at given path
+   * @param {String} path - The full path to file
+   */
   ipcMain.handle('doesFileExist',  async (event, path) => {
-    if (!validateSender(event.senderFrame)) return null
-    return existsSync(app.getPath('documents') + "/SteadyCMS/" + path);
+    if (!validateSender(event.senderFrame)) return null;
+    return existsSync(path);
   });
 
-  // Check if File Exists (IN APP DIR)
+  /**
+   * Check if file exist at given path in app directory
+   * @param {String} path - Path to file starting from the app directory
+   */
   ipcMain.handle('doesFileExistInAppDir',  async (event, path) => {
-    if (!validateSender(event.senderFrame)) return null
-    return existsSync(app.getAppPath() + "/SteadyCMS/" + path);
+    if (!validateSender(event.senderFrame)) return null;
+    return existsSync(path);
   });
 
-  // Run Hugo.exe
+  /**
+   * Run terminal commands on the hugo.exe (Only Hugo commands are accepted and "hugo" already prefixs commands)
+   * @param {Array} commands - The command to be executed (Each word of the command must be broken up into the array)
+   * @example Example of an array to create an new website in Hugo
+   * ['new', 'site', FILE-PATH]
+   * @example Example of an array to start a hugo sever to perview a website
+   * ['server', '--source', PATH-TO-WEBSITE, '-b', 'http://localhost/', '--port', THE-PORT-NUMBER]
+   * @example Example of an array to build a hugo website
+   * ['--source', pathToWebsite]
+   */
   ipcMain.on('runHugo', (event, commands) => {
     if (!validateSender(event.senderFrame)) return null
     console.log("RUN hugo Command(s): " + commands);
@@ -131,13 +160,25 @@
       });
   });
 
-  // Open url In Browser
+
+  /**
+   * Openings giving URL in the defult browser, in a new tab
+   * @param {String} url - The url to be opened
+   */
   ipcMain.on('openInBrowser', (event, url) => {
-    if (!validateSender(event.senderFrame)) return null
+    if (!validateSender(event.senderFrame)) return null;
     require('electron').shell.openExternal(url);
   });
 
-  // Download File (TO DOCUMENTS)
+  /**
+   * Downloads a file from a given URL to the users storage (Path is scoped to the 'SteadyCMS' directory)
+   * Note: PATH is the path to the directory the file is to downloaded to (Scoped to '/documents/SteadyCMS/').
+   * See docs for more info ("decompress" library)
+   * @param {String} url - The URL of the file that is to be downloaded
+   * @param {Object} info - Object with download settings
+   * @example { properties: {directory: PATH, showBadge: false, showProgressBar: true} }
+   * @returns Unknown (To be added)
+   */
   ipcMain.handle("downloadFile", async (event, url, info) => {
     if (!validateSender(event.senderFrame)) return null
     info.properties.directory = app.getPath('documents') + '/SteadyCMS/' + info.properties.directory;
@@ -145,13 +186,16 @@
     return "done"; // TODO?: must return file name
   });
 
-  // Extract Zip File (FROM DOCUMENTS)
+  /**
+   * Extract a zip file to given directory
+   * @param {String} source - Full path to the zip file to be extracted
+   * @param {String} target - Full path to the directory the file is to be extracted to
+   * @returns true if successfull, otherwise false
+   */
   ipcMain.handle("extractFile", async (event, source, target) => {
     if (!validateSender(event.senderFrame)) return null
      try {
-      let pathSource = app.getPath('documents') + '/SteadyCMS/' + source;
-      let pathTarget = app.getPath('documents') + '/SteadyCMS/' + target;
-     await decompress(pathSource, pathTarget);
+     await decompress(source, target);
       return true;
     } catch (err) {
       console.log(err.message);
@@ -159,7 +203,10 @@
     }
   });
 
-  // Delete file (IN APP DIR)
+  /**
+   * Deletes a file from the app directory
+   * @param {String} path - Path to file to be deleted. (Path is scoped to the 'SteadyCMS' directory)
+   */
   ipcMain.on('deleteFileInAppDir', (event, path) => {
     if (!validateSender(event.senderFrame)) return null
     let pathSource = app.getAppPath() + "/SteadyCMS/" + path;
@@ -172,7 +219,11 @@
     }
   });
 
-  // Delete file (IN DOCUMENTS)
+  /**
+   * Deletes given file at given path  (Path is scoped to the'/documents/SteadyCMS/' directory by defult)
+   * @param {String} path - Path to file to be deleted. (Scoped to '/documents/SteadyCMS/' unless scoped is false).
+   * @param {Boolean} scoped - If the path should be scoped to '/documents/SteadyCMS/'
+   */
   ipcMain.on('deleteFile', (event, path, scoped) => {
     if (!validateSender(event.senderFrame)) return null
     let pathSource;
@@ -190,7 +241,11 @@
     }
   });
 
-    // Delete Dir (IN DOCUMENTS)
+  /**
+   * Deletes given file directory at given path (Path is scoped to the'/documents/SteadyCMS/') 
+   * @param {String} path - Path to the directory to be deleted. (Scoped to '/documents/SteadyCMS/').
+   * @warning Use with care!
+   */
     ipcMain.on('deleteDir', (event, path) => {
       if (!validateSender(event.senderFrame)) return null
       let pathSource = app.getPath('documents') + '/SteadyCMS/' + path;
@@ -216,56 +271,72 @@
       }
     });
 
-  // Get Paths
+  /**
+   * Request the path to given place
+   * @param {String} place - The requested place
+   * Availble places:
+   * "documents": Directory for a user's "My Documents" ("/documents/").
+   * "appdir": Apps directory 
+   * "home": User's home directory.
+   * "temp": Temporary directory.
+   * "userdata": The directory for storing your app's configuration files, which by default is the appData directory appended with your app's name. By convention files storing user data should be written to this directory, and it is not recommended to write large files here because some environments may backup this directory to cloud storage.
+   * "desktop": The current user's Desktop directory.
+   * "downloads": Directory for a user's downloads.
+   * "music": Directory for a user's music.
+   * "pictures": Directory for a user's pictures.
+   * "videos": Directory for a user's videos.
+   * "SteadyCMS": To Steady CMS's main directory ("/documents/SteadyCMS/").
+   */
   ipcMain.handle('getPathTo', (event, place) => {
     if (!validateSender(event.senderFrame)) return null
-
     switch (place) {
-      case "documents": //  Directory for a user's "My Documents".
+      case "documents":
         return app.getPath('documents');
 
-      case "appdir": // Our app directory path
+      case "appdir": 
         return app.getAppPath();
 
-      case "home": //  User's home directory.
+      case "home": 
         return app.getPath('home');
 
-      case "temp": // Temporary directory.
+      case "temp": 
         return app.getPath('temp');
 
-      case "userdata": //  The directory for storing your app's configuration files, which by default is the appData directory appended with your app's name. By convention files storing user data should be written to this directory, and it is not recommended to write large files here because some environments may backup this directory to cloud storage.
+      case "userdata": 
         return app.getPath('userData');
 
-      case "desktop": // The current user's Desktop directory.
+      case "desktop": 
         return app.getPath('desktop');
         
-      case "downloads": //  Directory for a user's downloads.
+      case "downloads": 
         return app.getPath('downloads');
 
-      case "music": // Directory for a user's music.
+      case "music":
         return app.getPath('music');
 
-      case "pictures": // Directory for a user's pictures.
+      case "pictures": 
         return app.getPath('pictures');
 
-      case "videos": // Directory for a user's videos.
+      case "videos": 
         return app.getPath('videos');
 
-      case "SteadyCMS": // To Steady CMS's main directory
+      case "SteadyCMS": 
+      case "steadyCMS": 
         return app.getPath('documents') + '/SteadyCMS/';
 
-      case "steadyCMS": // To Steady CMS's main directory // FIX THIS
-        return app.getPath('documents') + '/SteadyCMS/';
-
-      default: // default : Our app directory path
+      default: 
         console.log(place + "! Not Found. Returning default path [getPathTo:main.js]")
-        return app.getAppPath();
+        return app.getPath('documents');
     }
   });
 
-  // Gets a list of dir in dir
+  /**
+   * Gets a list of directories in given directory
+   * @param {String} rootDir - The full path to the directory to be searched
+   * @returns {Array} List of directory
+   */
   ipcMain.handle('getDirsIn', (event, rootDir) => {
-    if (!validateSender(event.senderFrame)) return null
+    if (!validateSender(event.senderFrame)) return null;
     try {
       return readdirSync(rootDir, { withFileTypes: true })
       .filter(dirent => dirent.isDirectory())
@@ -275,11 +346,16 @@
     }
   });
 
-  // Gets a list of files in dir by file type
-  ipcMain.handle('getFilesIn', (event, dir, fileType) => {
-    if (!validateSender(event.senderFrame)) return null
+  /**
+   * Gets a list of files in given directory by file type
+   * @param {String} directory - The full path to the directory to be searched for files
+   * @param {String} fileType - The type of file to be searched for (i.e ".png", ".txt", ".markdown")
+   * @returns {Array} List of files
+   */
+  ipcMain.handle('getFilesIn', (event, directory, fileType) => {
+    if (!validateSender(event.senderFrame)) return null;
     try {
-      return readdirSync(dir, { withFileTypes: true })
+      return readdirSync(directory, { withFileTypes: true })
       .filter(dirent => dirent.name.endsWith(fileType))
       .map(dirent => dirent.name);
     } catch (error) {
@@ -287,27 +363,21 @@
     }
   });
 
-  ipcMain.handle('copyFile', async (event, src, des) => {
+  /**
+   * Copy a file from one given directory to another given directory
+   *  @param {String} source - Full path to the file to be copied
+   *  @param {String} destination - Full path to the directory the file will be copied to
+   * @returns {Boolean} true if successfull, otherwise false
+   */
+  ipcMain.handle('copyFile', async (event, source, destination) => {
     if (!validateSender(event.senderFrame)) return null;
     try {
-      copyFileSync(src, app.getPath('documents') + "/SteadyCMS/" + des, constants.COPYFILE_EXCL); 
+      copyFileSync(source, destination, constants.COPYFILE_EXCL); 
     } catch (error) {
       return false;
     }
     return true;
   });
-
-    // let callback = (err) =>{
-    //   if (err){
-    //     console.log(err);
-    //     return "false";
-    //   } else {
-    //     console.log('File was copied');
-    //     return "true";
-    //   }
-    // }
-    //  copyFile(src, app.getPath('documents') + "/SteadyCMS/" + des, constants.COPYFILE_EXCL, callback);
-
 
   function validateSender (frame) {
     //console.log((new URL(frame.url)).host)
