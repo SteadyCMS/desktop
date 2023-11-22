@@ -31,7 +31,26 @@
     } else {
       mainWindow.loadFile(join(app.getAppPath(), 'renderer', 'index.html'));
     }
-  }
+
+    mainWindow.on('close', (e) => { // On close save the website settings to file
+      mainWindow.webContents.executeJavaScript('localStorage.setItem("SteadyCMSInitialized", "false"); localStorage.getItem("currentSiteSettings");', true).then(result => {
+        console.log(">>>>>>>>>");
+        console.log(result);
+        const currentWebsite = JSON.parse(result).path.site;
+        mkdir(app.getPath('documents') + "/SteadyCMS/" + currentWebsite, { recursive: true }, (err) => {
+          if (err){
+            throw err;
+          } else {
+            writeFile(app.getPath('documents') + "/SteadyCMS/" + currentWebsite + "/site.settings.json", result, (err) => {
+                if (err) throw err;
+              }); 
+          }
+        }); 
+      });
+    });
+
+
+  } // createWindow
 
   app.whenReady().then(() => {
     createWindow();
@@ -61,7 +80,7 @@
      console.log(message);
    });
 
-// API
+// API 
 
   /** 
    * Reads the full contents of a file 
@@ -69,6 +88,7 @@
    * @returns {String} The full contents of file
    */ 
   ipcMain.handle('readFromFile',  async (event, path) => {
+    console.log("M 1")
     if (!validateSender(event.senderFrame)) return null;
     const data = readFileSync(path);
     return data.toString();
@@ -80,8 +100,9 @@
    * @returns {String} The full contents of the file
    */ 
   ipcMain.handle('readFileInAppDir',  async (event, path) => {
+    console.log("M 2")
     if (!validateSender(event.senderFrame)) return null;
-    const data = readFileSync(path);
+    const data = readFileSync(app.getAppPath() + "/SteadyCMS/" + path);
     return data.toString();
   });
 
@@ -92,6 +113,7 @@
    * @param {String} fileName - The name of the file to be written to
    */ 
   ipcMain.on('writeToFile', (event, rawData, filePath, fileName) => {
+    console.log("M 3")
     if (!validateSender(event.senderFrame)) return null;
     mkdir(filePath, { recursive: true }, (err) => {
       if (err){
@@ -111,12 +133,13 @@
    * @param {String} fileName - The name of the file to be written to
    */ 
     ipcMain.on('writeToFileInAppDir', (event, rawData, filePath, fileName) => {
+      console.log("M 4")
       if (!validateSender(event.senderFrame)) return null;
-      mkdir(filePath, { recursive: true }, (err) => {
+      mkdir(app.getAppPath() + "/SteadyCMS/" + filePath, { recursive: true }, (err) => {
         if (err){
           throw err;
         } else {
-          writeFile(filePath + "/" + fileName, rawData, (err) => {
+          writeFile(app.getAppPath() + "/SteadyCMS/" + filePath + "/" + fileName, rawData, (err) => {
               if (err) throw err;
             }); 
         }
@@ -128,6 +151,7 @@
    * @param {String} path - The full path to file
    */
   ipcMain.handle('doesFileExist',  async (event, path) => {
+    console.log("M 5")
     if (!validateSender(event.senderFrame)) return null;
     return existsSync(path);
   });
@@ -137,8 +161,9 @@
    * @param {String} path - Path to file starting from the app directory
    */
   ipcMain.handle('doesFileExistInAppDir',  async (event, path) => {
+    console.log("M 6")
     if (!validateSender(event.senderFrame)) return null;
-    return existsSync(path);
+    return existsSync(app.getAppPath() + "/SteadyCMS/" + path);
   });
 
   /**
@@ -152,6 +177,7 @@
    * ['--source', pathToWebsite]
    */
   ipcMain.on('runHugo', (event, commands) => {
+    console.log("M 7")
     if (!validateSender(event.senderFrame)) return null
     console.log("RUN hugo Command(s): " + commands);
      execFile(app.getAppPath() + '/static/hugo.exe', commands, function(err, data) {
@@ -180,6 +206,7 @@
    * @returns Unknown (To be added)
    */
   ipcMain.handle("downloadFile", async (event, url, info) => {
+    console.log("M 8")
     if (!validateSender(event.senderFrame)) return null
     info.properties.directory = app.getPath('documents') + '/SteadyCMS/' + info.properties.directory;
     await download(BrowserWindow.getFocusedWindow(), url, info.properties);
@@ -193,6 +220,7 @@
    * @returns true if successfull, otherwise false
    */
   ipcMain.handle("extractFile", async (event, source, target) => {
+    console.log("M 9")
     if (!validateSender(event.senderFrame)) return null
      try {
      await decompress(source, target);
@@ -208,6 +236,7 @@
    * @param {String} path - Path to file to be deleted. (Path is scoped to the 'SteadyCMS' directory)
    */
   ipcMain.on('deleteFileInAppDir', (event, path) => {
+    console.log("M 10")
     if (!validateSender(event.senderFrame)) return null
     let pathSource = app.getAppPath() + "/SteadyCMS/" + path;
     try {
@@ -225,6 +254,7 @@
    * @param {Boolean} scoped - If the path should be scoped to '/documents/SteadyCMS/'
    */
   ipcMain.on('deleteFile', (event, path, scoped) => {
+    console.log("M 11")
     if (!validateSender(event.senderFrame)) return null
     let pathSource;
     if (scoped == undefined || scoped == true) {
@@ -247,6 +277,7 @@
    * @warning Use with care!
    */
     ipcMain.on('deleteDir', (event, path) => {
+      console.log("M 12")
       if (!validateSender(event.senderFrame)) return null
       let pathSource = app.getPath('documents') + '/SteadyCMS/' + path;
       try {
@@ -288,6 +319,7 @@
    * "SteadyCMS": To Steady CMS's main directory ("/documents/SteadyCMS/").
    */
   ipcMain.handle('getPathTo', (event, place) => {
+    console.log("M 13")
     if (!validateSender(event.senderFrame)) return null
     switch (place) {
       case "documents":
@@ -336,6 +368,7 @@
    * @returns {Array} List of directory
    */
   ipcMain.handle('getDirsIn', (event, rootDir) => {
+    console.log("M 14")
     if (!validateSender(event.senderFrame)) return null;
     try {
       return readdirSync(rootDir, { withFileTypes: true })
@@ -353,6 +386,7 @@
    * @returns {Array} List of files
    */
   ipcMain.handle('getFilesIn', (event, directory, fileType) => {
+    console.log("M 15")
     if (!validateSender(event.senderFrame)) return null;
     try {
       return readdirSync(directory, { withFileTypes: true })
@@ -370,6 +404,7 @@
    * @returns {Boolean} true if successfull, otherwise false
    */
   ipcMain.handle('copyFile', async (event, source, destination) => {
+    console.log("M 16")
     if (!validateSender(event.senderFrame)) return null;
     try {
       copyFileSync(source, destination, constants.COPYFILE_EXCL); 
