@@ -34,8 +34,8 @@
 
     mainWindow.on('close', (e) => { // On close save the website settings to file
       mainWindow.webContents.executeJavaScript('localStorage.setItem("SteadyCMSInitialized", "false"); localStorage.getItem("currentSiteSettings");', true).then(result => {
-        console.log(">>>>>>>>>");
-        console.log(result);
+         console.log(">>>>>>>>>");
+         console.log(result);
         const currentWebsite = JSON.parse(result).path.site;
         mkdir(app.getPath('documents') + "/SteadyCMS/" + currentWebsite, { recursive: true }, (err) => {
           if (err){
@@ -409,6 +409,7 @@
     try {
       copyFileSync(source, destination, constants.COPYFILE_EXCL); 
     } catch (error) {
+      console.log(error.toString())
       return false;
     }
     return true;
