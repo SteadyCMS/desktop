@@ -5,7 +5,11 @@
 
   writeToFile: (data, filePath, fileName) => ipcRenderer.send('writeToFile', data, filePath, fileName),
   writeToFileInAppDir: (data, filePath, fileName) => ipcRenderer.send('writeToFileInAppDir', data, filePath, fileName),
-  runHugo: (commands) => ipcRenderer.send('runHugo', commands),
+  //runHugo: (commands) => ipcRenderer.send('runHugo', commands),
+  runHugo: async (commands) =>  {
+    const data = await ipcRenderer.invoke('runHugo', commands);
+    return data;
+  },
   readFile: async (path) =>  {
     const data = await ipcRenderer.invoke('readFromFile', path);
     return data;

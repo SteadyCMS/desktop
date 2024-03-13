@@ -176,16 +176,15 @@
    * @example Example of an array to build a hugo website
    * ['--source', pathToWebsite]
    */
-  ipcMain.on('runHugo', (event, commands) => {
+  ipcMain.handle('runHugo', async (event, commands) => {
     console.log("M 7")
     if (!validateSender(event.senderFrame)) return null
     console.log("RUN hugo Command(s): " + commands);
-     execFile(app.getAppPath() + '/static/hugo.exe', commands, function(err, data) {
-          console.log(err);
-          console.log(data.toString());
-      });
+      const util = require('util');
+      const execFile = util.promisify(require('child_process').execFile);
+      const { stdout } = await execFile(app.getAppPath() + '/static/hugo.exe', commands);
+      return stdout;
   });
-
 
   /**
    * Openings giving URL in the defult browser, in a new tab
@@ -394,7 +393,7 @@
       .map(dirent => dirent.name);
     } catch (error) {
       return "error";
-    }
+    } 
   });
 
   /**
@@ -409,6 +408,7 @@
     try {
       copyFileSync(source, destination, constants.COPYFILE_EXCL); 
     } catch (error) {
+      console.log("ERROR:")
       console.log(error.toString())
       return false;
     }
