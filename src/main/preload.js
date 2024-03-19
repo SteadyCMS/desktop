@@ -52,7 +52,7 @@
     console.log(data);
     return data;
   },
-  
+  openTerminal: (path) => ipcRenderer.send('openTerminal', path),
 
   
 

@@ -415,6 +415,27 @@
     return true;
   });
 
+
+  /************************* */
+ 
+
+  ipcMain.on('openTerminal', (event, path) => {
+    console.log("M 17")
+    if (!validateSender(event.senderFrame)) return null;
+    try {
+      var cp = require('child_process');
+      cp.spawn('cmd', ['/C', 'start cmd.exe']);
+      //cp.spawn('cd', ['"C:/Users/sundr/Documents/My Docs"']);
+    } catch (error) {
+      console.log("ERROR:")
+      console.log(error.toString())
+      return false;
+    }
+    return true;
+  });
+
+
+
   function validateSender (frame) {
     //console.log((new URL(frame.url)).host)
     // Value the host of the URL using an actual URL parser and an allowlist
