@@ -1,4 +1,4 @@
-  import {app, BrowserWindow, ipcMain, session, protocol, net} from 'electron';
+  import {app, BrowserWindow, ipcMain, session, protocol, net, shell} from 'electron';
   import {join} from 'path';
 
   import {readFileSync, mkdir, rmdirSync, writeFile, existsSync, rmSync, readdirSync, lstatSync, unlinkSync, copyFile, constants, copyFileSync} from 'fs';
@@ -424,8 +424,7 @@
     if (!validateSender(event.senderFrame)) return null;
     try {
       var cp = require('child_process');
-      cp.spawn('cmd', ['/C', 'start cmd.exe']);
-      //cp.spawn('cd', ['"C:/Users/sundr/Documents/My Docs"']);
+      cp.spawn('cmd', ['/C', 'start cmd', `"/K cd ${path}"`]);
     } catch (error) {
       console.log("ERROR:")
       console.log(error.toString())
@@ -433,6 +432,22 @@
     }
     return true;
   });
+
+    /*************************  MUST BE TO A FILE >>> */
+ 
+    ipcMain.on('openFileExplorer', (event, path) => {
+      console.log("M 18")
+      if (!validateSender(event.senderFrame)) return null;
+      try {
+
+        shell.showItemInFolder(path);
+      } catch (error) {
+        console.log("ERROR:")
+        console.log(error.toString())
+        return false;
+      }
+      return true;
+    });
 
 
 

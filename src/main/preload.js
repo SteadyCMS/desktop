@@ -53,9 +53,9 @@
     return data;
   },
   openTerminal: (path) => ipcRenderer.send('openTerminal', path),
-
+  openFileExplorer: (path) => ipcRenderer.send('openFileExplorer', path),
   
-
+  
 
 
   });
