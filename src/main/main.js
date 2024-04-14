@@ -439,8 +439,7 @@
       console.log("M 18")
       if (!validateSender(event.senderFrame)) return null;
       try {
-
-        shell.showItemInFolder(path);
+        shell.showItemInFolder(path.replace(/\//g, "\\"));
       } catch (error) {
         console.log("ERROR:")
         console.log(error.toString())
