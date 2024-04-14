@@ -416,9 +416,10 @@
   });
 
 
-  /************************* */
- 
-
+  /**
+   * Open terminal at a given directory
+   * @param {string} path - Full path to be opened in terminal
+  */ 
   ipcMain.on('openTerminal', (event, path) => {
     console.log("M 17")
     if (!validateSender(event.senderFrame)) return null;
@@ -433,8 +434,10 @@
     return true;
   });
 
-    /*************************  MUST BE TO A FILE >>> */
- 
+  /**
+   * Open File Explorer at a given path
+   * @param {string} path - Full path to be opened in File Explorer Note: MUST be to a file not just a directory (i.e "path/path/file.txt", NOT "path/path/")
+  */ 
     ipcMain.on('openFileExplorer', (event, path) => {
       console.log("M 18")
       if (!validateSender(event.senderFrame)) return null;
