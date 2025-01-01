@@ -1,12 +1,13 @@
   import {app, BrowserWindow, ipcMain, session, protocol, net, shell} from 'electron';
   import {join} from 'path';
 
-  import {readFileSync, mkdir, rmdirSync, writeFile, existsSync, rmSync, readdirSync, lstatSync, unlinkSync, copyFile, constants, copyFileSync} from 'fs';
+  import {createReadStream, readFileSync, mkdir, rmdirSync, writeFile, existsSync, rmSync, readdirSync, lstatSync, unlinkSync, copyFile, constants, copyFileSync} from 'fs';
   import {execFile} from 'child_process';
   import {download} from "electron-dl";
   import decompress from "decompress";
 
-
+  const SftpClient = require('ssh2-sftp-client');
+  
   function createWindow () {
     const mainWindow = new BrowserWindow({
       width: 1000,
@@ -83,6 +84,112 @@
 // API 
 
   /** 
+   * @param {String} localFilePath - The full path to the file to be uploaded
+     * @param {Object} ServerConfig - Server info (i.e  
+     * const ServerConfig = { host: '_', username: "_", password: "_", port: _ || 22 };)
+   */ 
+  ipcMain.handle('uploadFile',  async (event, localFilePath, ServerConfig) => {
+    console.log("M 19")
+    if (!validateSender(event.senderFrame)) return null;
+
+      const client = new SftpClient();
+      // Where to put the file on the server
+      // TODO: Right now it's only for hugo
+      // NOTE: File paths on server must be with "/" NOT "\" or it won't work (that's what the .replaceAll("\\","/") is for )
+      const breakType = localFilePath.includes("\\") ? "\\" : "/";
+      const remote = '/website/'.concat(localFilePath.split(breakType + "public" + breakType)[1].replaceAll("\\","/")); 
+
+      let data = createReadStream(localFilePath);
+      client.connect(ServerConfig)
+        .then(() => {
+          return client.put(data, remote);
+        })
+        .then(() => {
+          return client.end();
+        })
+        .catch(err => {
+          console.error(err.message);
+        });
+        return true;
+  });
+
+    /**  
+     * @param {String} serverPath - Path to directory on server
+     * @param {Object} ServerConfig - Server info (i.e  
+     * const ServerConfig = { host: '_', username: "_", password: "_", port: _ || 22 };)
+     */ 
+    ipcMain.handle('deleteServerDir',  async (event, serverPath, ServerConfig) => {
+      console.log("M 21")
+      if (!validateSender(event.senderFrame)) return null;
+
+        const client = new SftpClient();
+        const dst = '/website/';
+        try {
+          client.connect(ServerConfig)
+          .then(() => {
+            return client.rmdir(serverPath, true);
+          })
+          .then(() => {
+            return client.end();
+          })
+          .catch(err => {
+            console.error(err.message);
+          });
+        } catch (err) {
+          console.error(err);
+        } finally {
+          client.end();
+        }
+  });
+
+
+  /** 
+   * @param {String} path - The Path to the directory you want to walk for files
+   * @param {Boolean} includeDir - Optional parameter to include directories in retured array. Defult is False.
+   * @returns {Array} An Array of all files (and directories if includeDir is true) found with full file paths 
+   */ 
+  ipcMain.handle('walkDir',  async (event, dirPath, includeDir) => {
+    console.log("M 20")
+    if (!validateSender(event.senderFrame)) return null;
+
+    includeDir = includeDir || false;
+    let dirArray = [dirPath];
+    let filesArray = []
+
+    function readAllFiles(dir) {
+      const files = readdirSync(dir, { withFileTypes: true });
+      for (const file of files) {
+        if (file.isDirectory()) {
+          dirArray.push(join(dir, file.name));
+        } else {
+          //console.log(dir)
+         // console.log(file.name)
+          filesArray.push(join(dir, file.name));
+        }
+      }
+    }
+
+    let i = 0;
+    do {
+      readAllFiles(dirArray[i]);
+      //console.log("Working In:" + dirArray[i]);
+      //console.log(i < dirArray.length)
+      i++;
+    } while (i < dirArray.length);
+
+
+    if (includeDir) {
+      // Dir and files
+      return filesArray.concat(dirArray);
+    }else{
+      // Only files
+      return filesArray;
+    }
+    
+  });
+
+
+  /** 
    * Reads the full contents of a file 
    * @param {String} path - The full path to the file
    * @returns {String} The full contents of file
@@ -94,7 +201,7 @@
     return data.toString();
   });
 
-   /** 
+   /**  
    * Reads the full contents of a file in the app directory
    * @param {String} path - The path to the file in the app directory
    * @returns {String} The full contents of the file
@@ -408,7 +515,7 @@
     try {
       copyFileSync(source, destination, constants.COPYFILE_EXCL); 
     } catch (error) {
-      console.log("ERROR:")
+      console.log("ERROR (copyFile):")
       console.log(error.toString())
       return false;
     }
