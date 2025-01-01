@@ -88,7 +88,7 @@
      * @param {Object} ServerConfig - Server info (i.e  
      * const ServerConfig = { host: '_', username: "_", password: "_", port: _ || 22 };)
    */ 
-  ipcMain.handle('uploadFile',  async (event, localFilePath, ServerConfig) => {
+  ipcMain.handle('uploadFileToServer',  async (event, localFilePath, ServerConfig) => {
     console.log("M 19")
     if (!validateSender(event.senderFrame)) return null;
 

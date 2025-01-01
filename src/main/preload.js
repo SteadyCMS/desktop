@@ -13,8 +13,8 @@
     const data = await ipcRenderer.invoke('readFromFile', path);
     return data;
   },
-  uploadFile: async (localFilePath, ServerConfig) =>  {
-    const data = await ipcRenderer.invoke('uploadFile', localFilePath, ServerConfig);
+  uploadFileToServer: async (localFilePath, ServerConfig) =>  {
+    const data = await ipcRenderer.invoke('uploadFileToServer', localFilePath, ServerConfig);
     return data;
   },
   deleteServerDir: async (serverPath, ServerConfig) =>  {
