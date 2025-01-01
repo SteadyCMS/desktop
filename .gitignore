@@ -16,4 +16,5 @@ src/renderer/*.js
 src/renderer/*.json
 src/renderer/README.md
 src/renderer/LICENSE
+src/renderer/.gitignore
 dist
