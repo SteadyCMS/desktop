@@ -18,21 +18,21 @@ cd src/renderer
 ```
 
 ```bash
-git clone https://github.com/SteadyCMS/SteadyCMS.git
+git clone https://github.com/SteadyCMS/SteadyCMS.git .
 ```
 
 ```bash
 cd ../..
 ```
 
-#### Rebuilding tailwindcss
+#### Rebuilding the CSS
 
 ```bash
 cd src/renderer
 ```
 
 ```bash
-npx tailwindcss -i ./assets/source.css -o ./assets/main.css --watch
+npx run cssdev
 ```
 
 ### Start developing
