@@ -18,21 +18,21 @@ cd src/renderer
 ```
 
 ```bash
-git clone https://github.com/SteadyCMS/SteadyCMS.git
+git clone https://github.com/SteadyCMS/SteadyCMS.git .
 ```
 
 ```bash
 cd ../..
 ```
 
-#### Rebuilding tailwindcss
+#### Rebuilding the CSS
 
 ```bash
 cd src/renderer
 ```
 
 ```bash
-npx tailwindcss -i ./assets/source.css -o ./assets/main.css --watch
+npx run cssdev
 ```
 
 ### Start developing
@@ -69,4 +69,4 @@ Optional configuration options can be found in the [Electron Builder CLI docs](h
 
 ## License
 
-Copyright 2023 SteadyCMS authors. GPL-3.0 license, see [LICENSE](/LICENSE) for details.
+Copyright 2023-2025, the SteadyCMS team. Licensed under the GPL-3.0 license. See [LICENSE](/LICENSE) for details.
