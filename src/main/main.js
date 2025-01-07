@@ -278,7 +278,7 @@
    * @param {Array} commands - The command to be executed (Each word of the command must be broken up into the array)
    * @example Example of an array to create an new website in Hugo
    * ['new', 'site', FILE-PATH]
-   * @example Example of an array to start a hugo sever to perview a website
+   * @example Example of an array to start a hugo sever to preview a website
    * ['server', '--source', PATH-TO-WEBSITE, '-b', 'http://localhost/', '--port', THE-PORT-NUMBER]
    * @example Example of an array to build a hugo website
    * ['--source', pathToWebsite]
