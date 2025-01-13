@@ -5,6 +5,7 @@
   import {execFile} from 'child_process';
   import {download} from "electron-dl";
   import decompress from "decompress";
+  import path from 'path'
 
   const SftpClient = require('ssh2-sftp-client');
   
@@ -34,15 +35,16 @@
     }
 
     mainWindow.on('close', (e) => { // On close save the website settings to file
-      mainWindow.webContents.executeJavaScript('localStorage.setItem("SteadyCMSInitialized", "false"); localStorage.getItem("currentSiteSettings");', true).then(result => {
+      mainWindow.webContents.executeJavaScript('localStorage.setItem("SteadyCMSInitialized", "false"); localStorage.getItem("websiteData");', true).then(result => {
          console.log(">>>>>>>>>");
-         console.log(result);
-        const currentWebsite = JSON.parse(result).path.site;
-        mkdir(app.getPath('documents') + "/SteadyCMS/" + currentWebsite, { recursive: true }, (err) => {
+         //console.log(result);
+        const currentWebsite = JSON.parse(result).path;
+        console.log(JSON.parse(result))
+        mkdir(currentWebsite, { recursive: true }, (err) => {
           if (err){
             throw err;
           } else {
-            writeFile(app.getPath('documents') + "/SteadyCMS/" + currentWebsite + "/site.settings.json", result, (err) => {
+            writeFile(currentWebsite + "/site.settings.json", result, (err) => {
                 if (err) throw err;
               }); 
           }
