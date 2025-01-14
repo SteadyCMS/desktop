@@ -4,6 +4,7 @@
     static appPath = "";
     static path = "";
     static contentPath = "";
+    static fullContentPath = "";
     static mediaPath = "";
     static favicon = "";
     static logo = "";
@@ -23,7 +24,9 @@
         Website.name = data.name;
         Website.folder = data.folder;
         Website.appPath = data.appPath;
+        Website.path = data.path;
         Website.contentPath = data.contentPath;
+        Website.fullContentPath = data.fullContentPath;
         Website.mediaPath = data.mediaPath;
         Website.favicon = data.favicon;
         Website.logo = data.logo;
@@ -43,6 +46,7 @@
           "appPath": Website.appPath,
           "path": Website.path,
           "contentPath": Website.contentPath, 
+          "fullContentPath": Website.fullContentPath,
           "mediaPath": Website.mediaPath,
           "favicon": Website.favicon,
           "logo": Website.logo,
@@ -61,7 +65,9 @@
       Website.name = data.name;
       Website.folder = data.folder;
       Website.appPath = data.appPath;
+      Website.path = data.path;
       Website.contentPath = data.contentPath;
+      Website.fullContentPath = data.fullContentPath;
       Website.mediaPath = data.mediaPath;
       Website.favicon = data.favicon;
       Website.logo = data.logo;
@@ -75,21 +81,13 @@
     }
 
 
+
+
+
+
+    
+
   }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

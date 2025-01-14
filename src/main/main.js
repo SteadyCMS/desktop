@@ -94,6 +94,8 @@
     console.log("M 19")
     if (!validateSender(event.senderFrame)) return null;
 
+    let uploadError = "No Errors";
+    let success = false;
       const client = new SftpClient();
       // Where to put the file on the server
       // TODO: Right now it's only for hugo
@@ -102,17 +104,20 @@
       const remote = '/website/'.concat(localFilePath.split(breakType + "public" + breakType)[1].replaceAll("\\","/")); 
 
       let data = createReadStream(localFilePath);
-      client.connect(ServerConfig)
+      await client.connect(ServerConfig)
         .then(() => {
           return client.put(data, remote);
         })
         .then(() => {
+          success = true;
           return client.end();
         })
         .catch(err => {
           console.error(err.message);
+          uploadError = err.message;
+          success = false;
         });
-        return true;
+        return {successful: success, error: uploadError };
   });
 
     /**  
