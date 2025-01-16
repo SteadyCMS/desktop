@@ -132,9 +132,9 @@
         const client = new SftpClient();
         const dst = '/website/';
         try {
-          client.connect(ServerConfig)
+         await client.connect(ServerConfig) 
           .then(() => {
-            return client.rmdir(serverPath, true);
+            return client.rmdir(dst, true);
           })
           .then(() => {
             return client.end();

@@ -1,4 +1,5 @@
  export default class Website {
+    // Saved
     static name = "";
     static folder = "";
     static appPath = "";
@@ -15,6 +16,9 @@
     static serverPort = "";
     static developmentMode = "";
     static images = [];
+
+    // Not saved
+    static isRedirect = false;
 
     constructor() {
     }
