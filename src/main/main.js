@@ -36,15 +36,20 @@
 
     mainWindow.on('close', (e) => { // On close save the website settings to file
       mainWindow.webContents.executeJavaScript('localStorage.setItem("SteadyCMSInitialized", "false"); localStorage.getItem("websiteData");', true).then(result => {
-         console.log(">>>>>>>>>");
-         //console.log(result);
-        const currentWebsite = JSON.parse(result).path;
-        console.log(JSON.parse(result))
+      console.log(">>>>>>>>>");
+      let website = JSON.parse(result);
+      const currentWebsite = website.path;
+      // Clear server password if they don't want it saved
+      if (website.saveServerPassword == false) {
+        website.serverPassword = "";
+       }
+     
+      console.log(website)
         mkdir(currentWebsite, { recursive: true }, (err) => {
           if (err){
             throw err;
           } else {
-            writeFile(currentWebsite + "/site.settings.json", result, (err) => {
+            writeFile(currentWebsite + "/site.settings.json", JSON.stringify(website), (err) => {
                 if (err) throw err;
               }); 
           }
