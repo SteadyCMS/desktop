@@ -95,7 +95,7 @@
      * @param {Object} ServerConfig - Server info (i.e  
      * const ServerConfig = { host: '_', username: "_", password: "_", port: _ || 22 };)
    */ 
-  ipcMain.handle('uploadFileToServer',  async (event, localFilePath, ServerConfig) => {
+  ipcMain.handle('uploadFileToServer',  async (event, localFilePath, ServerConfig, serverFilePath) => {
     console.log("M 19")
     if (!validateSender(event.senderFrame)) return null;
 
@@ -106,7 +106,7 @@
       // TODO: Right now it's only for hugo
       // NOTE: File paths on server must be with "/" NOT "\" or it won't work (that's what the .replaceAll("\\","/") is for )
       const breakType = localFilePath.includes("\\") ? "\\" : "/";
-      const remote = '/website/'.concat(localFilePath.split(breakType + "public" + breakType)[1].replaceAll("\\","/")); 
+      const remote = breakType + serverFilePath.concat(localFilePath.split(breakType + "public" + breakType)[1].replaceAll("\\","/")); 
 
       let data = createReadStream(localFilePath);
       await client.connect(ServerConfig)

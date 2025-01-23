@@ -14,6 +14,7 @@
     static saveServerPassword = "";
     static serverUsername = "";
     static serverPort = "";
+    static serverFilePath = "";
     static developmentMode = "";
     static images = [];
 
@@ -39,6 +40,7 @@
         Website.saveServerPassword = data.saveServerPassword;
         Website.serverUsername = data.serverUsername;
         Website.serverPort = data.serverPort;
+        Website.serverFilePath = data.serverFilePath;
         Website.developmentMode = data.developmentMode;
         Website.images = data.images;
     }
@@ -59,6 +61,7 @@
           "serverPassword": Website.serverPassword,
           "saveServerPassword": Website.saveServerPassword,
           "serverPort": Website.serverPort,
+          "serverFilePath": Website.serverFilePath,
           "developmentMode": Website.developmentMode,
           "images": Website.images
         };
@@ -80,6 +83,7 @@
       Website.serverUsername = data.serverUsername;
       Website.saveServerPassword = data.saveServerPassword;
       Website.serverPort = data.serverPort;
+      Website.serverFilePath = data.serverFilePath;
       Website.developmentMode = data.developmentMode;
       Website.images = data.images;
     }
